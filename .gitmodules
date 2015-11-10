@@ -1,0 +1,6 @@
+[submodule "submodules/greg"]
+	path = submodules/greg
+	url = https://github.com/nddrylliog/greg.git
+[submodule "submodules/MarkdownTest"]
+	path = submodules/MarkdownTest
+	url = https://github.com/fletcher/MMD-Test-Suite.git

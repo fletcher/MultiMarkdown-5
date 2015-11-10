@@ -2,12 +2,12 @@ BUILD_DIR = build
 
 $(BUILD_DIR_):
 	-mkdir $(BUILD_DIR_) 2>/dev/null
-	-cd $(BUILD_DIR); rm -rf *
+	-cd $(BUILD_DIR); rm -rf *; touch README.html
 
 # The release target will perform additional optimization
 .PHONY : release
 release: $(BUILD_DIR)
-	cd $(BUILD_DIR); \
+	cd $(BUILD_DIR); touch README.html; \
 	cmake -DCMAKE_BUILD_TYPE=Release ..
 
 # Build zip file package
@@ -19,13 +19,13 @@ zip: $(BUILD_DIR)
 # debug target enables CuTest unit testing
 .PHONY : debug
 debug: $(BUILD_DIR)
-	cd $(BUILD_DIR); \
+	cd $(BUILD_DIR); touch README.html; \
 	cmake -DTEST=1 ..
 
 # Create xcode project
 .PHONY : xcode
 xcode: $(BUILD_DIR)
-	cd $(BUILD_DIR); \
+	cd $(BUILD_DIR); touch README.html; \
 	cmake -G Xcode ..
 
 # Cross-compile for Windows using MinGW on *nix
@@ -55,7 +55,7 @@ windows-zip-32: $(BUILD_DIR)
 # Build the documentation using doxygen
 .PHONY : documentation
 documentation: $(BUILD_DIR)
-	cd $(BUILD_DIR); \
+	cd $(BUILD_DIR); touch README.html; \
 	cmake -DDOCUMENTATION=1 ..; cd ..; \
 	doxygen build/doxygen.conf
 

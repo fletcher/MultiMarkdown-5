@@ -7,6 +7,7 @@
 | Date:      | @My_Project_Revised_Date@ |
 | Copyright: | @My_Project_Copyright@    |
 | Version:   | @My_Project_Version@      |
+| Build:     | @CMAKE_SYSTEM_NAME@       |
 
 
 ## Introduction ##
