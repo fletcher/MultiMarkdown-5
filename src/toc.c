@@ -18,7 +18,7 @@
 #include "toc.h"
 
 
-/* print_toc_node_tree -- convert node tree to LaTeX */
+/* print_toc_node_tree -- convert node tree to MultiMarkdown */
 void print_toc_node_tree(GString *out, node *list, scratch_pad *scratch) {
 #ifdef DEBUG_ON
 	fprintf(stderr, "print_toc_node_tree\n");
@@ -64,7 +64,7 @@ void print_toc_section_and_children(GString *out, node *list, scratch_pad *scrat
 	scratch->toc_level --;
 }
 
-/* print_toc_node -- convert given node to OPML and append */
+/* print_toc_node -- convert given node to MultiMarkdown and append */
 void print_toc_node(GString *out, node *n, scratch_pad *scratch) {
 	char *temp;
 	int i;
@@ -103,20 +103,35 @@ void print_toc_node(GString *out, node *n, scratch_pad *scratch) {
 		case STR:
 			print_toc_string(out, n->str);
 			break;
+		case EMPH:
+			g_string_append_printf(out, "*");
+			print_toc_node_tree(out, n->children, scratch);
+			g_string_append_printf(out, "*");
+			break;
+		case STRONG:
+			g_string_append_printf(out, "**");
+			print_toc_node_tree(out, n->children, scratch);
+			g_string_append_printf(out, "**");
+			break;
 		case SPACE:
 			g_string_append_printf(out, "%s", n->str);
 			break;
 		case LINK:
 			print_toc_node_tree(out, n->children, scratch);
 			break;
+		case HTML:
+			break;
 		case LINKREFERENCE:
 			break;
 		case AUTOLABEL:
 			break;
+		case VARIABLE:
+			g_string_append_printf(out, "[%%%s]",n->str);
+			break;
 		case LIST:
 			print_toc_node_tree(out, n->children, scratch);
 			break;
-		default: fprintf(stderr, "print_html_node encountered unknown node key = %d\n",n->key);
+		default: fprintf(stderr, "print_toc_node encountered unknown node key = %d\n",n->key);
 			break;
 	}
 #ifdef DEBUG_ON
@@ -124,7 +139,7 @@ void print_toc_node(GString *out, node *n, scratch_pad *scratch) {
 #endif
 }
 
-/* print_toc_string - print string, escaping for OPML */
+/* print_toc_string - print string, escaping for MultiMarkdown */
 void print_toc_string(GString *out, char *str) {
 	while (*str != '\0') {
 		switch (*str) {

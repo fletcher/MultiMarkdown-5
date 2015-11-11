@@ -261,6 +261,8 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(n->str, "xhtmlheader") == 0) {
 			} else if (strcmp(n->str, "htmlheader") == 0) {
 			} else if (strcmp(n->str, "mmdfooter") == 0) {
+			} else if (strcmp(n->str, "mmdheader") == 0) {
+			} else if (strcmp(n->str, "lang") == 0) {
 			} else if (strcmp(n->str, "latexinput") == 0) {
 				trim_trailing_whitespace(n->children->str);
 				g_string_append_printf(out, "\\input{%s}\n", n->children->str);
@@ -661,7 +663,9 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 				g_string_append_printf(out, "}}\\glsadd{%s}",temp_node->children->children->str);
 			} else {
 				g_string_append_printf(out, "\\footnote{");
+				scratch->inside_footnote = true;
 				print_latex_node_tree(out, temp_node->children, scratch);
+				scratch->inside_footnote = false;
 				g_string_append_printf(out, "}");
 			}
 			scratch->padded = 0;
@@ -752,7 +756,7 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 			if (temp == NULL) {
 				g_string_append_printf(out, "[%%%s]",n->str);
 			} else {
-				g_string_append_printf(out, temp);
+				print_latex_string(out, temp, scratch);
 				free(temp);
 			}
 			break;
@@ -824,9 +828,18 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 			break;
 		case TABLE:
 			pad(out, 2, scratch);
-			g_string_append_printf(out, "\\begin{table}[htbp]\n\\begin{minipage}{\\linewidth}\n\\setlength{\\tymax}{0.5\\linewidth}\n\\centering\n\\small\n");
+			
+			if (!scratch->inside_footnote)
+				g_string_append_printf(out, "\\begin{table}[htbp]\n");
+
+			g_string_append_printf(out,"\\begin{minipage}{\\linewidth}\n\\setlength{\\tymax}{0.5\\linewidth}\n\\centering\n\\small\n");
 			print_latex_node_tree(out, n->children, scratch);
-			g_string_append_printf(out, "\n\\end{tabulary}\n\\end{minipage}\n\\end{table}");
+
+			g_string_append_printf(out, "\n\\end{tabulary}\n\\end{minipage}");
+
+			if (!scratch->inside_footnote)
+				g_string_append_printf(out, "\n\\end{table}");
+
 			scratch->padded = 0;
 			break;
 		case TABLESEPARATOR:

@@ -51,6 +51,7 @@ typedef struct {
 	int   language;              /* For smart quotes */
 	char *table_alignment;       /* Hold the alignment string while parsing table */
 	int   table_column;          /* Track the current column number */
+	bool  inside_footnote;       /* Are we inside a footnote? */
 	char  cell_type;             /* What sort of cell type are we in? */
 	bool  printing_notes;        /* Are we printing notes/glossary/etc.? */
 	node *notes;                 /* Store reference notes */
@@ -157,6 +158,7 @@ void   trim_trailing_whitespace(char *str);
 void   trim_trailing_newlines(char *str);
 
 /* other utilities */
+char * lower_string(char *str);
 char * label_from_string(char *str);
 char * ascii_label_from_string(char *str);
 char * clean_string(char *str);
@@ -175,6 +177,8 @@ char * metavalue_for_key(char *key, node *list);
 
 bool tree_contains_key(node *list, int key);
 int tree_contains_key_count(node *list, int key);
+
+node * markdown_chunk_to_node(const char * source, unsigned long extensions);
 
 bool check_timeout();
 

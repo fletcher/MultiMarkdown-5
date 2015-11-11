@@ -23,6 +23,10 @@ void begin_odf_output(GString *out, node* list, scratch_pad *scratch) {
 	fprintf(stderr, "begin_odf_output\n");
 #endif	
 	print_odf_header(out);
+
+	if (list == NULL) {
+		g_string_append_printf(out, "<office:body>\n<office:text>\n");
+	}
 }
 
 /* end_odf_output -- close the document */
@@ -195,6 +199,16 @@ void print_odf_node(GString *out, node *n, scratch_pad *scratch) {
 						break;
 				}
 				scratch->odf_list_needs_end_p = true;
+			} else if ((n->children != NULL) && (n->children->key == LIST) && (n->children->children == NULL)) {
+				/* This is an empty list item.  ODF apparently requires something for the empty item to appear */
+				switch (scratch->odf_para_type) {
+					case BULLETLIST:
+						g_string_append_printf(out, "<text:p text:style-name=\"P1\"/>");
+						break;
+					case ORDEREDLIST:
+						g_string_append_printf(out, "<text:p text:style-name=\"P2\"/>");
+						break;
+				}
 			}
 			scratch->padded = 2;
 			print_odf_node_tree(out, n->children, scratch);
@@ -234,6 +248,7 @@ void print_odf_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(temp, "xhtmlheader") == 0) {
 			} else if (strcmp(temp, "htmlheader") == 0) {
 			} else if (strcmp(n->str, "mmdfooter") == 0) {
+			} else if (strcmp(n->str, "mmdheader") == 0) {
 			} else if (strcmp(temp, "baseheaderlevel") == 0) {
 				scratch->baseheaderlevel = atoi(n->children->str);
 			} else if (strcmp(temp, "odfheaderlevel") == 0) {
@@ -254,6 +269,7 @@ void print_odf_node(GString *out, node *n, scratch_pad *scratch) {
 				if (strcmp(temp, "germanguillemets") == 0) { scratch->language = GERMANGUILL; } else 
 				if ((strcmp(temp, "fr") == 0) || (strcmp(temp, "french") == 0)) { scratch->language = FRENCH; } else 
 				if ((strcmp(temp, "sv") == 0) || (strcmp(temp, "swedish") == 0)) { scratch->language = SWEDISH; }
+			} else if (strcmp(temp, "lang") == 0) {
 			} else {
 				g_string_append_printf(out,"<meta:user-defined meta:name=\"");
 				print_odf_string(out, n->str);
@@ -654,7 +670,7 @@ void print_odf_node(GString *out, node *n, scratch_pad *scratch) {
 			if (temp == NULL) {
 				g_string_append_printf(out, "[%%%s]",n->str);
 			} else {
-				g_string_append_printf(out, temp);
+				print_odf_string(out, temp);
 				free(temp);
 			}
 			break;

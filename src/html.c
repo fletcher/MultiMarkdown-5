@@ -21,6 +21,8 @@
 
 #include "html.h"
 
+/* #define DEBUG_ON */
+
 bool is_html_complete_doc(node *meta);
 void print_col_group(GString *out,scratch_pad *scratch);
 
@@ -187,8 +189,15 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			
 			if (!(scratch->extensions & EXT_COMPLETE) && (is_html_complete_doc(n))) {
 				/* We have metadata to include, and didn't already force complete */
-				g_string_append_printf(out,
-				"<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\"/>\n");
+				temp = metavalue_for_key("lang", scratch->result_tree);
+				if (temp != NULL) {
+				    g_string_append_printf(out,
+					"<!DOCTYPE html>\n<html lang=\"%s\">\n<head>\n\t<meta charset=\"utf-8\"/>\n",temp);
+					free(temp);
+				} else {
+				    g_string_append_printf(out,
+					"<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\"/>\n");
+				}
 				/* either way, now we need to be a complete doc */
 				scratch->extensions = scratch->extensions | EXT_COMPLETE;
 			} else {
@@ -245,6 +254,8 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 				print_raw_node(out, n->children);
 				g_string_append_printf(out, "\n");
 			} else if (strcmp(n->str, "mmdfooter") == 0) {
+			} else if (strcmp(n->str, "mmdheader") == 0) {
+			} else if (strcmp(n->str, "lang") == 0) {
 			} else {
 				g_string_append_printf(out,"\t<meta name=\"%s\" content=\"",n->str);
 				print_html_node(out,n->children,scratch);
@@ -367,6 +378,10 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			if (n->link_data->label != NULL) {
 				temp = strdup(n->link_data->label);
 
+#ifdef DEBUG_ON
+	fprintf(stderr, "print html link: '%s'\n",n->link_data->title);				
+	fprintf(stderr, "print html link: '%s'\n",temp);
+#endif
 				n->link_data->attr = NULL;
 				free_link_data(n->link_data);
 
@@ -450,8 +465,6 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			if (n->link_data != NULL)
 				temp_link_data = mk_link_data(n->link_data->label, n->link_data->source, n->link_data->title, n->link_data->attr);
 
-			if (n->key == IMAGEBLOCK)
-				g_string_append_printf(out, "<figure>\n");
 			/* Do we have proper info? */
 			if ((n->link_data->label == NULL) &&
 			(n->link_data->source == NULL)) {
@@ -485,8 +498,14 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 					free(temp);
 
 					break;
+				} else {
+					if (n->key == IMAGEBLOCK)
+						g_string_append_printf(out, "<figure>\n");
 				}
 				free(temp);
+			} else {
+				if (n->key == IMAGEBLOCK)
+						g_string_append_printf(out, "<figure>\n");
 			}
 #ifdef DEBUG_ON
 	fprintf(stderr, "create img\n");
@@ -685,7 +704,7 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			if (temp == NULL) {
 				g_string_append_printf(out, "[%%%s]",n->str);
 			} else {
-				g_string_append_printf(out, temp);
+				print_html_string(out, temp, scratch);
 				free(temp);
 			}
 			break;

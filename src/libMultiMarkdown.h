@@ -46,20 +46,22 @@ enum parser_extensions {
 	EXT_RANDOM_FOOT         = 1 << 15,   /* Use random numbers for footnote links */
 	EXT_HEADINGSECTION      = 1 << 16,   /* Group blocks under parent heading */
 	EXT_ESCAPED_LINE_BREAKS = 1 << 17,   /* Escaped line break */
+	EXT_NO_STRONG           = 1 << 18,   /* Don't allow nested <strong>'s */
+	EXT_NO_EMPH             = 1 << 19,   /* Don't allow nested <emph>'s */
 	EXT_FAKE                = 1 << 31,   /* 31 is highest number allowed */
 };
 
 /* Define output formats we support -- first in list is default */
 enum export_formats {
+	ORIGINAL_FORMAT,                /* Transclusion happens, but no parsing */
 	HTML_FORMAT,
-	TEXT_FORMAT,
+	TEXT_FORMAT,                    /* Not currently used */
 	LATEX_FORMAT,
 	MEMOIR_FORMAT,
 	BEAMER_FORMAT,
 	OPML_FORMAT,
 	ODF_FORMAT,
 	RTF_FORMAT,
-	ORIGINAL_FORMAT,                 /* Not currently used */
 	CRITIC_ACCEPT_FORMAT,
 	CRITIC_REJECT_FORMAT,
 	CRITIC_HTML_HIGHLIGHT_FORMAT,
