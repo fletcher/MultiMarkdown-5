@@ -18,6 +18,7 @@ zip: $(BUILD_DIR) $(GREG)
 .PHONY : debug
 debug: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
+	../tools/enumsToPerl.pl ../src/libMultiMarkdown.h enumMap.txt; \
 	cmake -DTEST=1 ..
 
 # analyze target enables use of clang's scan-build (if installed)
