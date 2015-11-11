@@ -2,10 +2,6 @@ BUILD_DIR = build
 
 GREG = submodules/greg/greg
 
-$(BUILD_DIR_):
-	-mkdir $(BUILD_DIR_) 2>/dev/null
-	-cd $(BUILD_DIR); rm -rf *; touch README.html
-
 # The release target will perform additional optimization
 .PHONY : release
 release: $(BUILD_DIR) $(GREG)
@@ -23,6 +19,13 @@ zip: $(BUILD_DIR) $(GREG)
 debug: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
 	cmake -DTEST=1 ..
+
+# analyze target enables use of clang's scan-build (if installed)
+# will then need to run 'scan-build make' to compile and analyze
+.PHONY : analyze
+analyze: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	scan-build cmake -DTEST=1 ..
 
 # Create xcode project
 .PHONY : xcode
@@ -69,3 +72,8 @@ clean:
 # Ensure greg is compiled
 $(GREG):
 	$(MAKE) -C submodules/greg
+
+# Create build directory if it doesn't exist
+$(BUILD_DIR):
+	-mkdir $(BUILD_DIR) 2>/dev/null
+	-cd $(BUILD_DIR); rm -rf *
