@@ -373,41 +373,42 @@ include (CPack)
 
 enable_testing()
 
-function(ADD_MY_TEST NAME FORMAT FOLDER EXTENSION)
+function(ADD_MMD_TEST NAME FLAGS FOLDER EXTENSION)
 	add_test ( ${NAME}
 		${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl
 		--Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown
 		--testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/${FOLDER}
-		"--Flags=-t ${FORMAT}"
+		"--Flags=${FLAGS}"
 		--ext=${EXTENSION}
 	)
 
-endfunction(ADD_MY_TEST)
+endfunction(ADD_MMD_TEST)
 
 
 # Original Markdown tests
 
 add_test( markdown-should-fail ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Test)
+
 add_test( markdown ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests)
 
 
 # Basic MultiMarkdown integration testing
 
-ADD_MY_TEST(mmd html MultiMarkdownTests html)
-ADD_MY_TEST(latex latex MultiMarkdownTests tex)
-ADD_MY_TEST(beamer beamer BeamerTests tex)
-ADD_MY_TEST(memoir memoir MemoirTests tex)
-ADD_MY_TEST(lyx lyx MultiMarkdownTests lyx)
-ADD_MY_TEST(lyx-beamer lyx BeamerTests lyx)
-ADD_MY_TEST(opml opml MultiMarkdownTests opml)
-ADD_MY_TEST(odf odf MultiMarkdownTests fodt)
+ADD_MMD_TEST(mmd "-t html" MultiMarkdownTests html)
+ADD_MMD_TEST(latex "-t latex" MultiMarkdownTests tex)
+ADD_MMD_TEST(beamer "-t beamer" BeamerTests tex)
+ADD_MMD_TEST(memoir "-t memoir" MemoirTests tex)
+ADD_MMD_TEST(lyx "-t lyx" MultiMarkdownTests lyx)
+ADD_MMD_TEST(lyx-beamer "-t lyx" BeamerTests lyx)
+ADD_MMD_TEST(opml "-t opml" MultiMarkdownTests opml)
+ADD_MMD_TEST(odf "-t odf" MultiMarkdownTests fodt)
 
 
 # CriticMarkup tests
 
-add_test ( critic-accept  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/CriticMarkup --Flags=-a --ext=htmla)
-add_test ( critic-reject  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/CriticMarkup --Flags=-r --ext=htmlr)
-add_test ( critic-highlight  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/CriticMarkup --Flags=-r\ -a --ext=htmlh)
+ADD_MMD_TEST(critic-accept "-a" CriticMarkup htmla)
+ADD_MMD_TEST(critic-reject "-r" CriticMarkup htmlr)
+ADD_MMD_TEST(critic-highlight "-r -a" CriticMarkup htmlh)
 
 
 # XSLT tests -- obsolete - they won't pass
