@@ -24,7 +24,7 @@ debug: $(BUILD_DIR) $(GREG)
 # will then need to run 'scan-build make' to compile and analyze
 .PHONY : analyze
 analyze: $(BUILD_DIR)
-	cd $(BUILD_DIR); \
+	cd $(BUILD_DIR); touch README.html; \
 	scan-build cmake -DTEST=1 ..
 
 # Create xcode project
