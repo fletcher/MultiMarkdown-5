@@ -373,27 +373,53 @@ include (CPack)
 
 enable_testing()
 
+function(ADD_MY_TEST NAME FORMAT FOLDER EXTENSION)
+	add_test ( ${NAME}
+		${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl
+		--Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown
+		--testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/${FOLDER}
+		"--Flags=-t ${FORMAT}"
+		--ext=${EXTENSION}
+	)
+
+endfunction(ADD_MY_TEST)
+
+
+# Original Markdown tests
 add_test( markdown-should-fail ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Test)
 add_test( markdown ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests)
 
-add_test ( mmd  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests)
+# Basic MultiMarkdown integration testing
 
-add_test ( latex  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --Flags=-t\ latex --ext=tex)
-add_test ( beamer  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/BeamerTests --Flags=-t\ beamer --ext=tex)
-add_test ( memoir  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MemoirTests --Flags=-t\ memoir --ext=tex)
+ADD_MY_TEST(mmd html MultiMarkdownTests html)
+ADD_MY_TEST(latex latex MultiMarkdownTests tex)
+ADD_MY_TEST(beamer beamer BeamerTests tex)
+ADD_MY_TEST(memoir memoir MemoirTests tex)
+ADD_MY_TEST(lyx lyx MultiMarkdownTests lyx)
+ADD_MY_TEST(lyx-beamer lyx BeamerTests lyx)
+ADD_MY_TEST(opml opml MultiMarkdownTests opml)
+ADD_MY_TEST(odf odf MultiMarkdownTests fodt)
 
-add_test ( lyx  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --Flags=-t\ lyx --ext=lyx)
-add_test ( lyx-beamer  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/BeamerTests --Flags=-t\ lyx --ext=lyx)
 
-add_test ( opml  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --Flags=-t\ opml --ext=opml)
-
-add_test ( odf  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --Flags=-t\ odf --ext=fodt)
-
+# CriticMarkup tests
 add_test ( critic-accept  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/CriticMarkup --Flags=-a --ext=htmla)
 add_test ( critic-reject  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/CriticMarkup --Flags=-r --ext=htmlr)
 add_test ( critic-highlight  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/CriticMarkup --Flags=-r\ -a --ext=htmlh)
 
-add_test ( xslt-1  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
-add_test ( xslt-2  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/BeamerTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
-add_test ( xslt-3  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MemoirTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+# XSLT tests -- out of date
+# add_test ( xslt-1  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+# add_test ( xslt-2  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/BeamerTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+# add_test ( xslt-3  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MemoirTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+
+
+# valgrind memory testing
+
+find_program ( MEMORYCHECK_COMMAND valgrind)
+set ( MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
+
+file (GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests/*.text ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests/*.text)
+
+foreach (FORMAT html latex odf beamer memoir opml lyx) 
+	add_test (NAME valgrind-${FORMAT} COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/multimarkdown -t ${FORMAT} ${TEST_FILES} > /dev/null)
+endforeach()
 
