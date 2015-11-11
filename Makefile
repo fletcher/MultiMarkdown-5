@@ -23,7 +23,7 @@ debug: $(BUILD_DIR) $(GREG)
 # analyze target enables use of clang's scan-build (if installed)
 # will then need to run 'scan-build make' to compile and analyze
 .PHONY : analyze
-analyze: $(BUILD_DIR)
+analyze: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
 	scan-build cmake -DTEST=1 ..
 
