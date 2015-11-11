@@ -387,6 +387,9 @@ endfunction(ADD_MMD_TEST)
 
 # Original Markdown tests
 
+# This first test will fail with a single error on Lists, the same as peg-markdown
+# https://github.com/jgm/peg-markdown
+
 add_test( markdown-should-fail ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Test)
 
 add_test( markdown ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests)
