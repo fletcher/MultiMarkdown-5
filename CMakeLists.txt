@@ -15,7 +15,7 @@ set (My_Project_Version_Patch 0)
 
 set (My_Project_Version "${My_Project_Version_Major}.${My_Project_Version_Minor}.${My_Project_Version_Patch}")
 
-set (My_Project_Copyright_Date "2015")
+set (My_Project_Copyright_Date "2013-2015")
 set (My_Project_Copyright "Copyright © ${My_Project_Copyright_Date} ${My_Project_Author}.")
 
 project (${My_Project_Title})
@@ -72,11 +72,11 @@ add_custom_command (
 
 # src_files are the primary files, and will be included in doxygen documentation
 set(src_files
-#	src/foo.c
 )
 
 # primary header files
 set(header_files
+	src/libMultiMarkdown.h
 )
 
 # Utility source files will not be included in doxygen
@@ -98,7 +98,7 @@ set(src_utility_files
 	src/toc.c
 	src/transclude.c
 	src/writer.c
-	
+
 	${CMAKE_CURRENT_BINARY_DIR}/parser.c
 )
 
@@ -110,7 +110,6 @@ set(header_utility_files
 	src/glib.h
 	src/html.h
 	src/latex.h
-	src/libMultiMarkdown.h
 	src/lyx.h
 	src/lyxbeamer.h
 	src/memoir.h
@@ -136,7 +135,7 @@ set(scripts
 )
 
 # Generate doxygen configuration file
-string(REPLACE ";" " " doxygen_src_files "${src_files}" )
+string(REPLACE ";" " " doxygen_src_files "${src_files} src/multimarkdown.c" )
 string(REPLACE ";" " " doxygen_header_files "${header_files}" )
 
 configure_file (

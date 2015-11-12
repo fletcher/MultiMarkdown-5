@@ -1,23 +1,62 @@
+/**
+
+	MultiMarkdown
+
+	@file multimarkdown.c
+
+	@brief MultiMarkdown - lightweight markup processor
+
+	This file provides the command line executable wrapper for the 
+	libMultiMarkdown library.  It handles parsing arguments to determine
+	which options and formats are needed, as well as providing file
+	locations to support file transclusion.
+
+	@author	Fletcher T. Penney
+	@bug	No known bugs
+
+**/
+
 /*
 
-	parser.leg -> parser.c -- Parse (Multi)Markdown plain text for
-		conversion into other formats
-	
-	(c) 2013-2015 Fletcher T. Penney (http://fletcherpenney.net/).
+	Copyright © 2013-2015 Fletcher T. Penney.
 
-	Derived from peg-multimarkdown, which was forked from peg-markdown,
-	which is (c) 2008 John MacFarlane (jgm at berkeley dot edu), and 
-	licensed under GNU GPL or MIT.
+	MultiMarkdown 4 and 5 are derived from peg-multimarkdown, which was
+	forked from peg-markdown, which is (c) 2008 John MacFarlane
+	(jgm at berkeley dot edu), and licensed under GNU GPL or MIT.
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License or the MIT
-	license.  See LICENSE for details.
+
+	The `c-template` project is released under the MIT License.
 	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+	
+	MMD 5 is released under the MIT License.
+	
+	
+	CuTest is released under the zlib/libpng license. See CuTest.c for the text
+	of the license.
+	
+	
+	## The MIT License ##
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+
 */
+
 
 #include <getopt.h>
 #include <libgen.h>
@@ -25,6 +64,7 @@
 #include "transclude.h"
 #include "version.h"
 
+/// main()
 int main(int argc, char **argv)
 {
 	int numargs;

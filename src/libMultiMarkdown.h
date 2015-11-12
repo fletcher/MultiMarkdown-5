@@ -1,28 +1,84 @@
+/**
+
+	MultiMarkdown - lightweight markup processor
+
+	@file libMultiMarkdown.h
+
+	@brief MultiMarkdown library header
+
+	libMultiMarkdown.h provides the key commands to convert raw MultiMarkdown
+	text into a desired export format.
+
+	For most simple uses, the main API commands provided here are sufficient.
+	For more complex scenarios, however, you may need to handle file
+	transclusion which requires knowledge about the location of the source
+	file in order to appropriately handle relative links.  In this case, you
+	may benefit from examining multimarkdown.c.
+
+	@author	Fletcher T. Penney
+	@bug	No known bugs
+
+**/
+
 /*
 
-	libMultiMarkdown.h -- MultiMarkdown library header
+	Copyright © 2013-2015 Fletcher T. Penney.
 
-	(c) 2013-2015 Fletcher T. Penney (http://fletcherpenney.net/).
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License or the MIT
-	license.  See LICENSE for details.
+	The `c-template` project is released under the MIT License.
 	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+	
+	MMD 5 is released under the MIT License.
+	
+	
+	CuTest is released under the zlib/libpng license. See CuTest.c for the text
+	of the license.
+	
+	
+	## The MIT License ##
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
 
 */
 
-//#include "parser.h"
 
 /* Main API commands */
 
+/// Convert source string to output string, based on provided `parser_extensions`
+/// and requested `export_format`.
+/// The returned `char *` will need to be freed after it is no longer needed.
 char * markdown_to_string(const char * source, unsigned long extensions, int format);
+
+/// Does the source string have metadata, using provided `parser_extensions`?
+///
 bool   has_metadata(const char *source, unsigned long extensions);
+
+/// List all metadata keys, using provided `parser_extensions`.
+/// The returned `char *` will need to be freed after it is no longer needed.
 char * extract_metadata_keys(const char *source, unsigned long extensions);
+
+/// Extract the value for the specified metadata key, using provided `parser_extensions`.
+/// The returned `char *` will need to be freed after it is no longer needed.
 char * extract_metadata_value(const char *source, unsigned long extensions, char *key);
+
+/// Return the version string for this build of libMultiMarkdown
+/// The returned `char *` will need to be freed after it is no longer needed.
 char * mmd_version(void);
 
 

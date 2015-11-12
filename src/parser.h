@@ -17,7 +17,7 @@
 #define MMD_COPYRIGHT \
 	"Copyright (c) 2013-2015 Fletcher T. Penney.\n\n" \
 	"LyX export code (c) 2013-2014 Charles R. Cowan,\n" \
-	"licensed under both GPL and MIT licenses.\n\n" \
+	"licensed under the MIT licenses.\n\n" \
 	"portions based on peg-markdown - Copyright (c) 2008-2009 John MacFarlane.\n" \
 	"peg-markdown is Licensed under either the GPLv2+ or MIT.\n" \
 	"portions Copyright (c) 2011 Daniel Jalkut, MIT licensed.\n\n" \
