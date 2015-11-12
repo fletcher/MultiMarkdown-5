@@ -4,3 +4,6 @@
 [submodule "submodules/MarkdownTest"]
 	path = submodules/MarkdownTest
 	url = https://github.com/fletcher/MMD-Test-Suite.git
+[submodule "submodules/cheat-sheet"]
+	path = submodules/cheat-sheet
+	url = https://github.com/fletcher/human-markdown-reference.git
