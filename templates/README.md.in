@@ -1,17 +1,15 @@
 ## About ##
 
-|            |                           |
-| ---------- | ------------------------- |
-| Title:     | @My_Project_Title@        |
-| Author:    | @My_Project_Author@       |
-| Date:      | @My_Project_Revised_Date@ |
-| Copyright: | @My_Project_Copyright@    |
-| Version:   | @My_Project_Version@      |
-| Build:     | @CMAKE_SYSTEM_NAME@       |
+|            |                           |  
+| ---------- | ------------------------- |  
+| Title:     | @My_Project_Title@        |  
+| Author:    | @My_Project_Author@       |  
+| Date:      | @My_Project_Revised_Date@ |  
+| Copyright: | @My_Project_Copyright@    |  
+| Version:   | @My_Project_Version@      |  
 
 
 ## Introduction ##
-
 
 
 ## License ##
