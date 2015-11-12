@@ -59,6 +59,10 @@ configure_file (
 	"${PROJECT_BINARY_DIR}/version.h"
 )
 
+if (DEFINED VERSION_ONLY)
+	return ()
+endif ()
+
 
 # ============
 # Source Files
@@ -292,7 +296,7 @@ target_link_libraries(multimarkdown libMultiMarkdown)
 add_custom_command(
 	TARGET multimarkdown
 	POST_BUILD
-    COMMAND $<TARGET_FILE:multimarkdown> -f -b ${PROJECT_BINARY_DIR}/README.md
+    COMMAND $<TARGET_FILE:multimarkdown> -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
 )
 
 install (TARGETS multimarkdown
