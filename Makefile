@@ -31,6 +31,9 @@ analyze: $(BUILD_DIR) $(GREG)
 	scan-build cmake -DTEST=1 ..
 
 # Create xcode project
+# You can then build within XCode, or using the commands:
+#	xcodebuild -configuration Debug
+#	xcodebuild -configuration Release
 .PHONY : xcode
 xcode: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
