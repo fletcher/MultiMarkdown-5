@@ -233,3 +233,5 @@ struct link_data {
 };
 
 typedef struct link_data link_data;
+
+#endif
