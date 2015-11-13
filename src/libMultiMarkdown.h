@@ -58,6 +58,10 @@
 */
 
 
+#ifndef LIB_MULTIMARKDOWN_H
+#define LIB_MULTIMARKDOWN_H
+
+
 /* Main API commands */
 
 /// Convert source string to output string, based on provided `parser_extensions`
