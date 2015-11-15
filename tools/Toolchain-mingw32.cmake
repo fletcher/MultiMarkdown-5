@@ -1,4 +1,4 @@
-# Settings for compiling under MinGW32
+# Settings for compiling for Windows 32-bit machines
 
 set (CMAKE_SYSTEM_NAME Windows)
 

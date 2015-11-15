@@ -1,86 +1,151 @@
-Title:	Some Project  
-Author:	Fletcher T. Penney  
-Date:	2015-06-05  
-Copyright:	Copyright © 2015 Fletcher T. Penney.  
-Version:	1.0.0  
+## About ##
 
-# Introduction #
-
-This template was created out of a desire to simplify some of the setup and
-configuration that I was doing over and over each time I started a new project.
-Additionally, I wanted to try to start encouraging some "better practices"
-(though not necessarily "best practices"):
-
-1. [Test-driven development][tdd] -- My development of MultiMarkdown
-	focused on integration testing, but really had no unit testing to
-	speak of.  Some newer projects I began working on were a bit math-
-	heavy, and ensuring that each piece works properly became even more
-	important.  It was also nice to be able to actually develop code that
-	could do *something* (via the test suite), even though the project as
-	a whole was nowhere near complete.)  To accomplish this, I include the
-	[CuTest] project to support writing tests for your code.
-
-2.  Use of the [cmake] build system.  `cmake` is not perfect by any
-	means, but it does offer some very useful features and a means for
-	better integrating the compilation and packaging/installation aspects
-	of development.  Rather than reinventing the wheel each time, this
-	setup incorporates basic `cmake` functionality to make it easy to 
-	control how your project is compiled, and includes automated generation
-	of the test command.
-
-3.	Templates -- `cmake` has a reasonable templating system, so that you
-	can define basic variables (e.g. author, project name, etc.) and allow
-	`cmake` to combine those elements to ensure consistency across source
-	code and README files.
+|            |                           |  
+| ---------- | ------------------------- |  
+| Title:     | MultiMarkdown        |  
+| Author:    | Fletcher T. Penney       |  
+| Date:      | 2015-11-12 |  
+| Copyright: | Copyright © 2013-2015 Fletcher T. Penney.    |  
+| Version:   | 5.0.0      |  
 
 
+## Introduction ##
 
-[tdd]:	https://en.wikipedia.org/wiki/Test-driven_development
-[cmake]:	http://www.cmake.org/
-[CuTest]:	http://cutest.sourceforge.net
+[Markdown] is a simple markup language used to convert plain text into HTML. 
 
-
-# How do I use it? #
-
-You can download the source from [github] and get to work. The file "IMPORTANT"
-contains instructions on the various build commands you can use.
+[MultiMarkdown] is a derivative of Markdown that adds new syntax features, such as footnotes, tables, and metadata. Additionally, it offers mechanisms to convert plain text into LaTeX in addition to HTML. 
 
 
-I recommend using the following script to automatically create a new git repo,
-pull in the default project template, and configure git-flow.  You simply have
-to rename your project from `new-project` to whatever you desire:
+## Background ##
+
+MultiMarkdown started as a Perl script, which was modified from the original Markdown.pl.
+
+MultiMarkdown v3 (aka 'peg-multimarkdown') was based on John MacFarlane's [peg-markdown].  It used a parsing expression grammar (PEG), and was written in C in order to compile on almost any operating system.  Thanks to work by Daniel Jalkut, MMD v3 was built so that it didn't have any external library requirements.
+
+MultiMarkdown v4 was basically a complete rewrite of v3.  It used the same basic PEG for parsing (Multi)Markdown text, but otherwise was almost completely rebuilt.
+
+MultiMarkdown v5 is basically the same code as v4, but the project has been restructured:
+
+*	It is designed with the CMake build system, rather than just
+	a Makefile
 
 
-	#!/bin/sh
+## Why switch to CMake? ##
 
-	git init new-project
+In early 2014, a user of MMD introduced me to the [CMake] build system. I 
+looked at it briefly, but didn't do anything with it.  Later on, I looked
+at it more in depth and created a parallel branch after 4.6.  This would allow
+me to experiment with CMake without breaking anything else in the `master`
+branch.
 
-	cd new-project
+CMake isn't perfect by any means, but it does allow for some interesting
+things:
 
-	git remote add "template" https://github.com/fletcher/c-template.git
-
-	git pull template master
-
-	git flow init -d
-
-	git checkout develop
-
-
-Using this approach, you can define your own "origin" remote if you like, but
-the "template" remote can be used to update the core project files should any
-improvements come about:
-
-	git checkout develop
-	git merge template master
-
-**NOTE**: `cmake` is a complex suite of utilities, and if you have trouble you
-will need to get support elsewhere.  If you find errors in this template, by
-all means I want to hear about them and fix them, but this is just a basic 
-framework to get you started.  In all likelihood, all but the most basic
-projects will need some customization.
+*	Automatically generate GUI installers for OS X and Windows, as well as zip
+	files for *nix.  I have not looked into using CMake to build `.deb`
+	packages, but that might be possible as well.  My old system could generate
+	GUI installers for Windows and OS X, but it was a complex process that
+	required a lot of manual processing.  This is much more amenable to
+	automation.
+*	An improved organization structure for various tests, including [Valgrind]
+	testing.  The old system was getting rather messy.
+*	A templating system that better allows me to synchronize version, and
+	other, information in code, documentation, and READMEs
+*	Automatic generation of project files for Xcode, Visual Studio, and
+	alternative build systems beyond `make`
+*	An opportunity to reorganize my code directory hierarchy
+*	The option to start adding unit test code to the source.  This probably
+	won't happen, as it would be too much work.  But it is possible.
 
 
-# License #
+The biggest *problem* is that this means that anyone wishing to compile the
+source will need to install CMake.  This isn't hard, but it is an extra step.
+
+As a temporary measure, you can use the `make deprecated` command to use a 
+simplified `make` recipe to compile a binary of MultiMarkdown for the current
+machine.  I don't recommend this approach, but it should work in a pinch until
+you can upgrade your machine to support cmake.
+
+I welcome feedback on this decision, but please note -- "I don't like it" or
+"bring back the old way" comments will be ignored.  Please send meaningful
+criticism or suggestions.
+
+Perhaps an approach if others want to contribute will be to do the reverse of
+what I did before -- create a `make` branch that includes a modified Makefile
+designed to be used without CMake?
+
+Additionally, the old Makefile had grown over time to include some tricks that
+users of various systems required.  I have tested the CMake system on OS X,
+Ubuntu and Debian Linux, and MinGW on Ubuntu.  I welcome suggestions for
+improvements to the CMake configuration.
+
+
+## Download Binary ##
+
+
+## Compile from Source ##
+
+To compile MultiMarkdown, you will need to have [CMake] installed on your machine.
+
+To download the source:
+
+*	Obtain the source from the github page:
+
+		git clone https://github.com/fletcher/MultiMarkdown-5.git
+
+*	Configure the submodules with two helper scripts (This can be done manually on Windows systems by looking at the source):
+
+		./link_git_modules
+		./update_git_modules
+
+*	Compile, and (optionally) test:
+
+		make
+		cd build
+		make
+		make test
+
+Like all versions of MultiMarkdown since v3, there is one test that will fail (now helpfully called `markdown-should-fail`).  The other tests should pass.  The valgrind tests will not work on OS X, but should pass if valgrind is installed and used on Linux machines.
+
+If you want to make an installer, after the above, use the `cpack` command inside the build directory.
+
+For more information, checkout the `IMPORTANT` file.
+
+
+## Usage ##
+
+The [MultiMarkdown User's Guide] has complete instructions on how to use MultiMarkdown.
+
+
+## Developer's Notes ##
+
+The documentation, created by doxygen, has information for developers:
+
+	make documentation
+
+You can then view `build/documentation/html/index.html` for some developer's notes.  There's not a lot there yet.  There is also a LaTeX version created if you want a PDF.  Just use latexmk in the latex directory.
+
+
+# LyX Support #
+
+Charles R. Cowan (<https://github.com/crcowan>) added support for conversion to [LyX](http://www.lyx.org/).  Support for this should be considered to be in alpha/beta, and is not guaranteed.  Issues related to LyX can be added to the MultiMarkdown [issues] page on github, but will need to be answered by Charles.  I am happy to include this code in the main MMD repo, but since I don't use LyX I can't support it myself.  If this arrangement becomes a problem, then LyX support can be removed and it can be kept as a separate fork.
+
+
+# More Information #
+
+To get more information about MultiMarkdown, check out the [website][MultiMarkdown] or [MultiMarkdown User's Guide].
+
+## License ##
+
+The `c-template` project is released under the MIT License.
+
+
+MMD 5 is released under the MIT License.
+
+
+CuTest is released under the zlib/libpng license. See CuTest.c for the text
+of the license.
+
 
 ## The MIT License ##
 
@@ -101,4 +166,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+
+
+[Markdown]:	http://daringfireball.net/projects/markdown/
+[MultiMarkdown]:	http://fletcherpenney.net/multimarkdown/
+[MultiMarkdown User's Guide]:	http://fletcher.github.io/MultiMarkdown-5/
+[c-template]: https://github.com/fletcher/c-template
+[CMake]: https://cmake.org/
+[Doxygen]: http://www.doxygen.org/
+[Valgrind]: http://valgrind.org/
+[peg-markdown]:	https://github.com/jgm/peg-markdown
+[issues]:	https://github.com/fletcher/MultiMarkdown-5/issues
+
 

@@ -1,10 +1,7 @@
-The `new-project` project is released under the MIT License.
+The `c-template` project is released under the MIT License.
 
-GLibFacade.c and GLibFacade.h are from the MultiMarkdown v4 project:
 
-	https://github.com/fletcher/MultiMarkdown-4/
-
-MMD 4 is released under both the MIT License and GPL.
+MMD 5 is released under the MIT License.
 
 
 CuTest is released under the zlib/libpng license. See CuTest.c for the text

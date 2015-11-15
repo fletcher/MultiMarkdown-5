@@ -5,14 +5,17 @@ cmake_minimum_required (VERSION 2.6)
 # Define Our Project
 # ==================
 
-set (My_Project_Title "Some Project")
-set (My_Project_Author "Somebody")
-set (My_Project_Revised_Date "2015-06-05")
-set (My_Project_Version_Major 1)
+set (My_Project_Title "MultiMarkdown")
+set (My_Project_Description "MultiMarkdown - lightweight markup processor")
+set (My_Project_Author "Fletcher T. Penney")
+set (My_Project_Revised_Date "2015-11-12")
+set (My_Project_Version_Major 5)
 set (My_Project_Version_Minor 0)
 set (My_Project_Version_Patch 0)
 
-set (My_Project_Copyright_Date "2015")
+set (My_Project_Version "${My_Project_Version_Major}.${My_Project_Version_Minor}.${My_Project_Version_Patch}")
+
+set (My_Project_Copyright_Date "2013-2015")
 set (My_Project_Copyright "Copyright © ${My_Project_Copyright_Date} ${My_Project_Author}.")
 
 project (${My_Project_Title})
@@ -21,7 +24,7 @@ project (${My_Project_Title})
 # Search for included files here
 include_directories( ${PROJECT_SOURCE_DIR}/src )
 include_directories( ${PROJECT_SOURCE_DIR}/test )
-
+include_directories(${PROJECT_BINARY_DIR})
 
 string(TOUPPER ${My_Project_Title} My_Project_Title_Caps  )
 string(REGEX REPLACE " " "_" My_Project_Title_Caps ${My_Project_Title_Caps} )
@@ -45,45 +48,104 @@ configure_file (
 	"${PROJECT_BINARY_DIR}/template.h"
 )
 
+# Update the project README, to pull in new version #, etc.
 configure_file (
 	"${PROJECT_SOURCE_DIR}/templates/README.md.in"
-	"${PROJECT_BINARY_DIR}/README.md"
+	"${CMAKE_CURRENT_LIST_DIR}/README.md"
 )
 
+configure_file (
+	"${PROJECT_SOURCE_DIR}/templates/version.h.in"
+	"${PROJECT_BINARY_DIR}/version.h"
+)
 
-# =============
-# Build Targets
-# =============
+if (DEFINED VERSION_ONLY)
+	return ()
+endif ()
 
+
+# ============
+# Source Files
+# ============
+
+# Need to build parser.c via greg
+add_custom_command (
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.c
+	COMMAND ${PROJECT_SOURCE_DIR}/submodules/greg/greg -o ${CMAKE_CURRENT_BINARY_DIR}/parser.c ${PROJECT_SOURCE_DIR}/src/parser.leg
+)
+
+# src_files are the primary files, and will be included in doxygen documentation
 set(src_files
-#	src/file.c
 )
 
+# primary header files
 set(header_files
-#	src/file.h
+	src/libMultiMarkdown.h
 )
 
-# Create a library?
-# add_library(libFOO STATIC
-#	${src_files}
-#	${header_files}
-# )
+# Utility source files will not be included in doxygen
+set(src_utility_files
+	src/GLibFacade.c
+	src/beamer.c
+	src/critic.c
+	src/html.c
+	src/latex.c
+	src/lyx.c
+	src/lyxbeamer.c
+	src/memoir.c
+	src/odf.c
+	src/opml.c
+	src/parse_utilities.c
+	src/rng.c
+	src/rtf.c
+	src/text.c
+	src/toc.c
+	src/transclude.c
+	src/writer.c
 
-# remove the extra "lib" from "liblibFOO"
-# SET_TARGET_PROPERTIES(libFOO PROPERTIES PREFIX "")
+	${CMAKE_CURRENT_BINARY_DIR}/parser.c
+)
 
-# Create a command-line app?
-# if (NOT DEFINED TEST)
-# 	add_executable(main
-# 		src/main.c
-# 		src/GLibFacade.c
-# 		src/GLibFacade.h
-# 		${header_files}
-# 	)
-# 
-#	Link the library to the app?
-#	target_link_libraries(main libFOO)
-# endif()
+set(header_utility_files
+	src/GLibFacade.h
+	${PROJECT_BINARY_DIR}/version.h
+	src/beamer.h
+	src/critic.h
+	src/glib.h
+	src/html.h
+	src/latex.h
+	src/lyx.h
+	src/lyxbeamer.h
+	src/memoir.h
+	src/odf.h
+	src/opml.h
+	src/parser.h
+	src/rtf.h
+	src/text.h
+	src/toc.h
+	src/transclude.h
+	src/writer.h
+)
+
+set(scripts
+	scripts/mmd
+	scripts/mmd2all
+	scripts/mmd2opml
+	scripts/mmd2rtf
+	scripts/mmd2odf
+	scripts/mmd2pdf
+	scripts/mmd2tex
+	scripts/markdown
+)
+
+# Generate doxygen configuration file
+string(REPLACE ";" " " doxygen_src_files "${src_files} src/multimarkdown.c" )
+string(REPLACE ";" " " doxygen_header_files "${header_files}" )
+
+configure_file (
+	"${PROJECT_SOURCE_DIR}/templates/doxygen.conf.in"
+	"${PROJECT_BINARY_DIR}/doxygen.conf"
+)
 
 
 # ===========================================
@@ -103,6 +165,8 @@ if (DEFINED TEST)
 		${test_files}
 		${src_files}
 		${header_files}
+		${src_utility_files}
+		${header_utility_files}
 	)
 
 	# Process source files to look for tests to run
@@ -115,11 +179,269 @@ if (DEFINED TEST)
 
 	add_test( test ${PROJECT_BINARY_DIR}/run_tests)
 
+	# valgrind memory testing
+	find_program (MEMORYCHECK_COMMAND valgrind)
+	SET (MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
+
+	add_test( memory_test ${MEMORYCHECK_COMMAND} ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/run_tests)
+
 endif()
+
+
+# =======================
+# Configure for Target OS
+# =======================
+
+# OS X Builds
+if (APPLE)
+
+	# Configure backwards-compatible support (if your project allows it)
+	SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.4" CACHE STRING "Deployment target for OSX" FORCE)
+
+	# Compile for x86_64 and i386.  ppc no longer supported
+	if(CMAKE_BUILD_TYPE MATCHES "Release")
+		SET (CMAKE_OSX_ARCHITECTURES x86_64;i386)
+		# set( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_64_BIT)")
+	endif(CMAKE_BUILD_TYPE MATCHES "Release")
+
+	# Use PackageMaker for installers?
+	if (DEFINED ZIP)
+		set (CPACK_GENERATOR ZIP)
+	else (DEFINED ZIP)
+		set (CPACK_GENERATOR PackageMaker)
+	endif (DEFINED ZIP)
+
+	# Xcode settings
+	set (XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+endif (APPLE)
+
+# Windows Builds
+if (WIN32)
+
+	# We need strtok on Windows
+	list (APPEND src_files src/strtok.c)
+	list (APPEND header_files src/strtok.h)
+
+	# Use bat files instead of shell scripts
+	set(scripts
+		scripts/mmd.bat
+		scripts/mmd2odf.bat
+		scripts/mmd2opml.bat
+		scripts/mmd2rtf.bat
+		scripts/mmd2tex.bat
+		scripts/markdown.bat
+	)
+
+	# Use NSIS to generate installers?
+	if (DEFINED ZIP)
+		set (CPACK_GENERATOR ZIP)
+	else (DEFINED ZIP)
+		set (CPACK_GENERATOR NSIS)
+	endif (DEFINED ZIP)
+
+# Linux Builds (not cross-compiling for Windows)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+	# Create zip archive
+	set (CPACK_GENERATOR ZIP)
+
+	# Statically link libraries -- might make the binary slightly more
+	# compatible across Linux distributions, for example
+	#
+	# You may wish to disable this.
+	#
+	
+	set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+	set (BUILD_SHARED_LIBRARIES OFF)
+	set (CMAKE_EXE_LINKER_FLAGS "-static")
+
+	# Some libraries need to be linked on some Linux builds
+	if (DEFINED TEST)
+		# target_link_libraries(run_tests m)
+	endif (DEFINED TEST)
+
+endif (WIN32)
+
+
+# ==============
+# Define targets
+# ==============
+
+# Create a library?
+add_library(libMultiMarkdown STATIC
+	${src_files}
+	${src_utility_files}
+	${header_files}
+	${header_utility_files}
+)
+
+# remove the extra "lib" from "liblibFOO"
+SET_TARGET_PROPERTIES(libMultiMarkdown PROPERTIES PREFIX "")
+
+# Create command-line app
+add_executable(multimarkdown
+	src/multimarkdown.c
+	src/GLibFacade.c
+	src/GLibFacade.h
+	${header_files}
+)
+
+# Xcode settings for fat binaries
+set_target_properties(libMultiMarkdown PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+set_target_properties(multimarkdown PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+
+# Link the library to the app
+target_link_libraries(multimarkdown libMultiMarkdown)
+
+# Xcode settings for fat binaries
+# set_target_properties(libFOO PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+# set_target_properties(main PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
 
 
 # ==========================
 # Build Installer with CPack
 # ==========================
 
-# You're on your own here
+# Create HTML version of README (using mmd binary we just built)
+add_custom_command(
+	TARGET multimarkdown
+	POST_BUILD
+    COMMAND $<TARGET_FILE:multimarkdown> -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
+)
+
+install (TARGETS multimarkdown
+	DESTINATION bin
+	COMPONENT application
+)
+
+set (CPACK_COMPONENT_APPLICATION_DISPLAY_NAME "MultiMarkdown")
+set (CPACK_COMPONENT_APPLICATION_DESCRIPTION 
+   "Install the actual `multimarkdown` program.")
+
+
+install (FILES ${scripts}
+	DESTINATION bin
+	COMPONENT scripts
+	PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
+
+install (FILES ${PROJECT_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_BINARY_DIR}/README.html
+	DESTINATION notes
+)
+
+set (CPACK_COMPONENT_SCRIPTS_DISPLAY_NAME "Convenience scripts")
+set (CPACK_COMPONENT_SCRIPTS_DESCRIPTION 
+   "Install convenience scripts for common MultiMarkdown shortcuts, e.g. `mmd`, `mmd2tex`, etc.")
+
+include (InstallRequiredSystemLibraries)
+
+set (CPACK_COMPONENTS_ALL application scripts)
+
+
+set (CPACK_COMPONENT_APPLICATION_GROUP "MultiMarkdown")
+set (CPACK_COMPONENT_SCRIPTS_GROUP "MultiMarkdown")
+
+set (CPACK_COMPONENT_GROUP_MULTIMARKDOWN_DESCRIPTION
+   "The basic MultiMarkdown utility and convenience scripts.")
+
+set (CPACK_SET_DESTDIR true)
+
+set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "${My_Project_Description}")
+set (CPACK_PACKAGE_VENDOR "${My_Project_Author}")
+set (CPACK_PACKAGE_VERSION "${My_Project_Version_Major}.${My_Project_Version_Minor}.${My_Project_Version_Patch}")
+set (CPACK_PACKAGE_VERSION_MAJOR "${My_Project_Version_Major}")
+set (CPACK_PACKAGE_VERSION_MINOR "${My_Project_Version_Minor}")
+set (CPACK_PACKAGE_VERSION_PATCH "My_Project_Version_Patch")
+
+set (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_BINARY_DIR}/README.html")
+set (CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.html")
+set (CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.txt")
+	
+if (APPLE)
+	set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-Mac-${CPACK_PACKAGE_VERSION}")
+else (APPLE)
+	set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CPACK_PACKAGE_VERSION}")
+endif (APPLE)
+
+install (TARGETS multimarkdown
+	DESTINATION bin
+	COMPONENT application
+)
+
+# Use some default install locations (if appropriate)
+if (WIN32)
+	set (CPACK_INSTALL_PREFIX "")
+	set (CPACK_NSIS_MODIFY_PATH ON)
+else (WIN32)
+	set (CPACK_INSTALL_PREFIX /usr/local)
+endif (WIN32)
+
+set (CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT})
+
+include (CPack)
+
+
+# ======================
+# Integration Test Suite
+# ======================
+
+enable_testing()
+
+function(ADD_MMD_TEST NAME FLAGS FOLDER EXTENSION)
+	add_test ( ${NAME}
+		${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl
+		--Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown
+		--testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/${FOLDER}
+		"--Flags=${FLAGS}"
+		--ext=${EXTENSION}
+	)
+
+endfunction(ADD_MMD_TEST)
+
+
+# Original Markdown tests
+
+# This first test will fail with a single error on Lists, the same as peg-markdown
+# https://github.com/jgm/peg-markdown
+
+add_test( markdown-should-fail ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Test)
+
+add_test( markdown ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=${CMAKE_CURRENT_BINARY_DIR}/multimarkdown --Tidy --Flags="--compatibility" --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests)
+
+
+# Basic MultiMarkdown integration testing
+
+ADD_MMD_TEST(mmd "-t html" MultiMarkdownTests html)
+ADD_MMD_TEST(latex "-t latex" MultiMarkdownTests tex)
+ADD_MMD_TEST(beamer "-t beamer" BeamerTests tex)
+ADD_MMD_TEST(memoir "-t memoir" MemoirTests tex)
+ADD_MMD_TEST(lyx "-t lyx" MultiMarkdownTests lyx)
+ADD_MMD_TEST(lyx-beamer "-t lyx" BeamerTests lyx)
+ADD_MMD_TEST(opml "-t opml" MultiMarkdownTests opml)
+ADD_MMD_TEST(odf "-t odf" MultiMarkdownTests fodt)
+
+
+# CriticMarkup tests
+
+ADD_MMD_TEST(critic-accept "-a" CriticMarkup htmla)
+ADD_MMD_TEST(critic-reject "-r" CriticMarkup htmlr)
+ADD_MMD_TEST(critic-highlight "-r -a" CriticMarkup htmlh)
+
+
+# XSLT tests -- obsolete - they won't pass
+
+# add_test ( xslt-1  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+# add_test ( xslt-2  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/BeamerTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+# add_test ( xslt-3  ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MarkdownTest.pl --Script=/bin/cat --testdir=${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MemoirTests --TrailFlags=|\ ${PROJECT_SOURCE_DIR}/Support/bin/mmd2tex-xslt --ext=tex)
+
+
+# valgrind memory testing
+
+find_program ( MEMORYCHECK_COMMAND valgrind)
+set ( MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
+
+file (GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests/*.text ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests/*.text)
+
+foreach (FORMAT html latex odf beamer memoir opml lyx) 
+	add_test ( NAME valgrind-${FORMAT} COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/multimarkdown -t ${FORMAT} ${TEST_FILES} )
+endforeach()

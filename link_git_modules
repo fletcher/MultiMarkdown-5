@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# This command sets up any git submodules in the project.
+# Generally, this only needs to be run once on a freshly cloned
+# project, but won't harm anything if run later, provided
+# you modify it to accomodate any submodules that should *NOT*
+# be on the `master` branch.
+
+git submodule init
+
+git submodule update
+
+git submodule foreach git branch --set-upstream master origin/master
+
+git submodule foreach git checkout master
+
+# If one module needs to follow a different branch:
+# cd some_module
+# git branch --set-upstream our-branch origin/some-branch
+# git checkout our-branch
+# cd ..

@@ -1,6 +1,18 @@
-/*
+/**
 
-	file.h -- @My_Project_Title@
+	@My_Project_Title@ -- @My_Project_Description@
+
+	@file file.h
+
+	@brief 
+
+
+	@author	@My_Project_Author@
+	@bug	
+
+**/
+
+/*
 
 	@My_Project_Copyright@
 
@@ -9,6 +21,7 @@
 
 */
 
+
 #ifndef FILE_@My_Project_Title_Caps@_H
 #define FILE_@My_Project_Title_Caps@_H
 
@@ -16,5 +29,8 @@
 #include "CuTest.h"
 #endif
 
+
+/// This is a sample function with a doxygen description.
+// void void_f(void);
 
 #endif
