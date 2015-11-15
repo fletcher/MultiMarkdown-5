@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="latexinput" content="mmd-tufte-handout-header"/>
+	<title>Installation</title>
+	<meta name="author" content="Fletcher T. Penney"/>
+	<meta name="version" content="5.0.0"/>
+	<meta name="revised" content="2015-03-10"/>
+	<link type="text/css" rel="stylesheet" href="http://fletcher.github.io/MultiMarkdown-4/css/document.css"/>
+	<meta name="latexmode" content="memoir"/>
+	<meta name="latexinput" content="mmd-tufte-handout-begin-doc"/>
+	<meta name="latexfooter" content="mmd-tufte-footer"/>
+</head>
+<body>
+
+<h3 id="installation">Installation</h3>
+
+<p>You have several options for obtaining and installing MultiMarkdown:</p>
+
+<ul>
+<li>Binary installer &#8211; available for:
+
+<ul>
+<li>Mac OS</li>
+<li>Windows</li>
+</ul></li>
+<li>Use a third party package installer:
+
+<ul>
+<li><code>homebrew</code> for Mac OS</li>
+</ul></li>
+<li>Compile from source &#8211; useful if you want to modify MMD&#8217;s behavior, or if there isn&#8217;t an available binary download for your operating system</li>
+</ul>
+
+<h4 id="macos">Mac OS</h4>
+
+<h5 id="installer">Installer</h5>
+
+<p>You can download the installers from the MMD website <a href="http://fletcherpenney.net/multimarkdown/download/">download</a> page. You need the <code>Mac Installer</code>. Download it. Run it. Done.</p>
+
+<p>If you use older tools that were designed for MultiMarkdown version 3, you may need to use the <code>Mac Support Installer</code>. This is also useful if you need the older XSLT based parsing tools.</p>
+
+<p>If you plan on creating LaTeX documents, you should also download the <a href="https://github.com/fletcher/peg-multimarkdown-latex-support">LaTeX Support Files</a> and install them into the appropriate location for your system and LaTeX software.</p>
+
+<h5 id="homebrew">Homebrew</h5>
+
+<p>You can use <a href="https://github.com/Homebrew/homebrew">homebrew</a> to install:</p>
+
+<pre><code>brew install multimarkdown
+</code></pre>
+
+<p>Or, if you want the latest updates between releases:</p>
+
+<pre><code>brew install --HEAD multimarkdown
+</code></pre>
+
+<p>(<strong>Note:</strong> I use the <code>--HEAD</code> version on my own machine.)</p>
+
+<h5 id="macports">MacPorts</h5>
+
+<p><a href="https://www.macports.org/">MacPorts</a> has a package for MultiMarkdown:</p>
+
+<pre><code>sudo port install multimarkdown
+</code></pre>
+
+<p>I don&#8217;t maintain this package, and it will likely not point to the latest version. I don&#8217;t recommend it.</p>
+
+<h4 id="nix">*nix</h4>
+
+<p>Unix/Linux users should use the instructions for compiling from source below.</p>
+
+<h4 id="windows">Windows</h4>
+
+<p>The easiest way to install MMD on Windows is the <code>MultiMarkdown-Windows</code>
+installer from the <a href="http://fletcherpenney.net/multimarkdown/download/">download</a> page and run it. The installer is built using
+the <code>NSIS</code> package maker software via the <code>cmake</code> and <code>cpack</code> tools.</p>
+
+<p>Just as with the Mac OS X version, the installer includes the <code>multimarkdown</code>
+binary, as well as several convenience scripts.</p>
+
+<p>You can use Windows Explorer to create shortcuts to the <code>multimarkdown</code>
+binary, and adjust the properties to allow you to create &#8220;drag and drop&#8221;
+versions of MMD as well.</p>
+
+<p>You can also download a &#8220;Portable&#8221; version that can be run off USB thumb drives, for example. It is also available on the <a href="http://fletcherpenney.net/multimarkdown/download/">download</a> page.</p>
+
+<h4 id="freebsd">Free BSD</h4>
+
+<p>If you want to compile manually, you should be able to follow the directions for Linux below. However, apparently MultiMarkdown has been put in the ports tree, so you can also use:</p>
+
+<pre><code>cd /usr/ports/textproc/multimarkdown
+make install
+</code></pre>
+
+<p>(I have not tested this myself, and cannot guarantee that it works properly.)</p>
+
+<h4 id="compilefromsource">Compile From Source</h4>
+
+<h5 id="macandnixmachines">Mac and *Nix Machines</h5>
+
+<ul>
+<li><p>Download the source from the <a href="https://github.com/fletcher/MultiMarkdown-4">github</a> web site:</p>
+
+<pre><code>git https://github.com/fletcher/MultiMarkdown-4.git
+</code></pre></li>
+<li><p>Update the submodules, including <code>greg</code></p>
+
+<pre><code>git submodule init
+git submodule update
+</code></pre></li>
+<li><p>Compile:</p>
+
+<pre><code>make
+</code></pre></li>
+<li><p>Run <code>make test-all | less</code> (or <code>make test-all | grep failed</code> for a more concise version) to verify that the build is correct. One of the tests is expected to fail (&#8220;Ordered and unordered lists&#8221;); the rest should pass on all systems. </p></li>
+<li><p><code>make install</code> (as root) will install the software</p></li>
+<li><p><code>make install-scripts</code> will install the helper scripts for you (e.g.<code>mmd</code>, <code>mmd2tex</code>, etc.)</p></li>
+<li><p>If you plan on creating LaTeX documents, you should also download the <a href="https://github.com/fletcher/peg-multimarkdown-latex-support">LaTeX Support Files</a> and install them into the appropriate location for your system and LaTeX software.</p></li>
+</ul>
+
+<p>MultiMarkdown includes a few other projects as submodules, but the only one you need to actually compile the code is the <code>greg</code> software. Once compiled, MultiMarkdown has no external dependencies &#8211; the binary is self-contained. Therefore, it should basically compile and run anywhere. </p>
+
+<h5 id="windows">Windows</h5>
+
+<p>Windows users can obtain the code in the same way, but will need to use their own compiler. The way I compile for Windows is actually to use the <code>make windows</code> command running on a *nix system with MinGW installed.</p>
+
+<p>The instructions for <a href="https://github.com/jgm/peg-markdown">peg-markdown</a> demonstrate how to compile a package for Windows.</p>
+
+<p>Otherwise, you&#8217;re on your own here.</p>
+
+</body>
+</html>

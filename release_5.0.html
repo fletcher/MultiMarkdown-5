@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="latexinput" content="mmd-tufte-handout-header"/>
+	<title>Version 4.7 Release Notes</title>
+	<meta name="author" content="Fletcher T. Penney"/>
+	<meta name="version" content="5.0.0"/>
+	<meta name="revised" content="2015-11-12"/>
+	<link type="text/css" rel="stylesheet" href="http://fletcher.github.io/MultiMarkdown-4/css/document.css"/>
+	<meta name="latexmode" content="memoir"/>
+	<meta name="latexinput" content="mmd-tufte-handout-begin-doc"/>
+	<meta name="latexfooter" content="mmd-tufte-footer"/>
+</head>
+<body>
+
+<h3 id="5.0">5.0</h3>
+
+<ul>
+<li>The source repository for MultiMarkdown has been completely rebuit:
+
+<ul>
+<li>Use my <a href="https://github.com/fletcher/c-template">c-template</a> to provide the basic structure</li>
+<li>Requires the <a href="https://cmake.org/">CMake</a> build system</li>
+<li>Has the beginnings of documentation within the code to support
+<a href="http://www.doxygen.org/">Doxygen</a>-generated developer documentation</li>
+</ul></li>
+<li>Other changes since 4.7.1:
+
+<ul>
+<li>Improvements from Matthias Lohr for the shell scripts</li>
+<li>Additional documentation in code</li>
+<li>Fix issue with whitespace after footnotes in ODF export</li>
+<li>Improve accuracy of recognizing single line code blocks</li>
+<li>Fix memory leaks</li>
+<li>Fix <code>mmd2pdf</code> for certain installs of TeX on El Capitan</li>
+<li>Improve POSIX compliance on shell scripts</li>
+<li>Improve accuracy of strong/emph matching</li>
+<li>Make reference label matching case insensitive</li>
+<li>Fix error if no caption was included on table</li>
+<li>Fix edge case slowdown when lots of HTML included</li>
+<li>Fix error when quotes included in explicit link</li>
+<li>Allow tables inside LaTeX footnotes</li>
+<li>Improved window path separator support</li>
+<li>And other improvements/fixes</li>
+</ul></li>
+</ul>
+
+<h4 id="whyswitchtocmake">Why switch to CMake?</h4>
+
+<p>In early 2014, a user of MMD introduced me to the <a href="https://cmake.org/">CMake</a> build system. I
+looked at it briefly, but didn&#8217;t do anything with it. Later on, I looked
+at it more in depth and created a parallel branch after 4.6. This would allow
+me to experiment with CMake without breaking anything else in the <code>master</code>
+branch.</p>
+
+<p>CMake isn&#8217;t perfect by any means, but it does allow for some interesting
+things:</p>
+
+<ul>
+<li>Automatically generate GUI installers for OS X and Windows, as well as zip
+files for *nix. I have not looked into using CMake to build <code>.deb</code>
+packages, but that might be possible as well. My old system could generate
+GUI installers for Windows and OS X, but it was a complex process that
+required a lot of manual processing. This is much more amenable to
+automation.</li>
+<li>An improved organization structure for various tests, including <a href="http://valgrind.org/">Valgrind</a>
+testing. The old system was getting rather messy.</li>
+<li>A templating system that better allows me to synchronize version, and
+other, information in code, documentation, and READMEs</li>
+<li>Automatic generation of project files for Xcode, Visual Studio, and
+alternative build systems beyond <code>make</code></li>
+<li>An opportunity to reorganize my code directory hierarchy</li>
+<li>The option to start adding unit test code to the source. This probably
+won&#8217;t happen, as it would be too much work. But it is possible.</li>
+</ul>
+
+<p>The biggest <em>problem</em> is that this means that anyone wishing to compile the
+source will need to install CMake. This isn&#8217;t hard, but it is an extra step.</p>
+
+<p>As a temporary measure, you can use the <code>make deprecated</code> command to use a
+simplified <code>make</code> recipe to compile a binary of MultiMarkdown for the current
+machine. I don&#8217;t recommend this approach, but it should work in a pinch until
+you can upgrade your machine to support cmake.</p>
+
+<p>I welcome feedback on this decision, but please note &#8211; &#8220;I don&#8217;t like it&#8221; or
+&#8220;bring back the old way&#8221; comments will be ignored. Please send meaningful
+criticism or suggestions.</p>
+
+<p>Perhaps an approach if others want to contribute will be to do the reverse of
+what I did before &#8211; create a <code>make</code> branch that includes a modified Makefile
+designed to be used without CMake?</p>
+
+<p>Additionally, the old Makefile had grown over time to include some tricks that
+users of various systems required. I have tested the CMake system on OS X,
+Ubuntu and Debian Linux, and MinGW on Ubuntu. I welcome suggestions for
+improvements to the CMake configuration.</p>
+
+</body>
+</html>

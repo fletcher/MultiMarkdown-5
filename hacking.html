@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="latexinput" content="mmd-tufte-handout-header"/>
+	<title>Hacking MultiMarkdown</title>
+	<meta name="author" content="Fletcher T. Penney"/>
+	<meta name="version" content="5.0.0"/>
+	<meta name="revised" content="2014-10-01"/>
+	<link type="text/css" rel="stylesheet" href="http://fletcher.github.io/MultiMarkdown-4/css/document.css"/>
+	<meta name="latexmode" content="memoir"/>
+	<meta name="latexinput" content="mmd-tufte-handout-begin-doc"/>
+	<meta name="latexfooter" content="mmd-tufte-footer"/>
+</head>
+<body>
+
+<h3 id="hackingmultimarkdown">&#8220;Hacking&#8221; MultiMarkdown</h3>
+
+<h4 id="multipleformats">Multiple Formats</h4>
+
+<p>On some occasions, the same MultiMarkdown syntax is not ideal for different output formats. For example, a link may need to be slightly different for the HTML version than for the LaTeX version (since LaTeX offers the <code>\autoref()</code> feature).</p>
+
+<p>You have a few options for crafting MultiMarkdown that will be handled differently for HTML than for another format.</p>
+
+<ol>
+<li><p>You can use HTML comments to include text that is ignored in HTML documents, but is passed through verbatim to other formats. See the section on [Raw Source][rawhtml] for more information. This only works with one format besides HTML.</p></li>
+<li><p>You can use file transclusion with [Wildcard Extensions] to embed a different string of text for each output format. This requires a bit more organization, but allows you to do just about anything you like.</p></li>
+</ol>
+
+<h4 id="scrivenertricks">Scrivener Tricks</h4>
+
+<p><a href="http://www.literatureandlatte.com/">Scrivener</a> is a full-featured tool for writers that includes some support for MultiMarkdown when exporting to other formats.</p>
+
+<h5 id="multiplecitations">Multiple Citations</h5>
+
+<p>When using Scrivener to publish to LaTeX, you may want to include multiple sources within a single citation. Mike Thicke suggests this approach:</p>
+
+<pre><code>In the Compile | Replacements dialog I have:
+
+][],[# --&gt; ,
+],[][# --&gt; ,
+
+So for citations like this:
+
+[][#Tversky:1974wi],[][#Kahneman:1979wl],[][#Tversky:1981vc]
+
+I get this:
+
+[][#Tversky:1974wi,Kahneman:1979wl,Tversky:1981vc]
+
+When complied to Latex it becomes:
+
+ ~\citep{Tversky:1974wi,Kahneman:1979wl,Tversky:1981vc} 
+And finally:
+
+(Tversky and Kahneman 1974; Kahneman and Tversky 1979; Tversky and Kahneman 1981)
+
+If you want page numbers you might have to do raw latex or use RegEx replacements.
+</code></pre>
+
+<p>You could always doing something similar with a script to find/replace the same syntax in tools other than Scrivener.</p>
+
+</body>
+</html>
