@@ -96,7 +96,7 @@ To compile MultiMarkdown, you will need to have [CMake] installed on your machin
 
 To download the source:
 
-*	Obtain the source from the github page:
+*	Obtain the source from the github repository (Download a zipfile of the source won't allow you to configure the submodules -- it's much better to use git):
 
 		git clone https://github.com/fletcher/MultiMarkdown-5.git
 
