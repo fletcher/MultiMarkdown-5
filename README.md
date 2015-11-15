@@ -3,7 +3,7 @@ Author:	Fletcher T. Penney
 
 These files are used to generate the MultiMarkdown User's Guide.  The document is, of course, written using MultiMarkdown.  It is also a *relatively* complex document, making use of several tricks with file transclusion among other things.  The idea is to repeat oneself as little as possible, and make it easier to keep all the formats and files in sync automatically.
 
-Compiled versions of these documents can be found on the github site -- <http://fletcher.github.io/MultiMarkdown-4/>.
+Compiled versions of these documents can be found on the github site -- <http://fletcher.github.io/MultiMarkdown-5/>.
 
 There are several commands you can use to compile the documentation:
 

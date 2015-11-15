@@ -158,5 +158,5 @@ MultiMarkdown 3 (aka `peg-multimarkdown`) was built using John MacFarlane's [peg
 This guide has been rewritten with the following changes:
 
 * The source is now in the `gh_pages` branch of the [MultiMarkdown project][github].  You can submit changes as a pull request, or by writing me.
-* You can access this information on the web at <http://fletcher.github.io/MultiMarkdown-4>
+* You can access this information on the web at <http://fletcher.github.io/MultiMarkdown-5>
 * The source itself is a collection of MultiMarkdown text documents that use the transclusion features to create a master document from the individual source files.  These documents can be viewed in the browser as HTML, or downloaded as PDF or OpenDocument files.

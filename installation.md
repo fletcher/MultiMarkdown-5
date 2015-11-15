@@ -91,7 +91,7 @@ If you want to compile manually, you should be able to follow the directions for
 
 *	Download the source from the [github] web site:
 
-		git https://github.com/fletcher/MultiMarkdown-4.git
+		git https://github.com/fletcher/MultiMarkdown-5.git
 
 *	Update the submodules, including `greg`
 

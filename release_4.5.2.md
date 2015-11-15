@@ -12,7 +12,7 @@ latex footer: mmd-tufte-footer
 
 ## 4.5.2 ##
 
-* escaped newlines (from njmsdk)--- <http://fletcher.github.io/MultiMarkdown-4/escaped-newlines>
+* escaped newlines (from njmsdk)--- <http://fletcher.github.io/MultiMarkdown-5/escaped-newlines>
 * updated test suite
 * fix bug in CriticMarkup parsing
 * fix bug when processing multiple files in batch mode with latexmode metadata set

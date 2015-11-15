@@ -436,7 +436,7 @@ If you have a more complex document, I encourage you to use the OpenDocument exp
 
 [LyX] is is a document processor that seems to be a sort of hybrid between a markup language processor and a word processor.  I'll be honest -- I don't quite get it, and I don't use it.
 
-That said, Charles Cowan has contributed code to the MultiMarkdown project that enables exporting of LyX documents directly.  If you have any trouble getting this to work, please use the MultiMarkdown [issues page](https://github.com/fletcher/MultiMarkdown-4/issues) to get help.
+That said, Charles Cowan has contributed code to the MultiMarkdown project that enables exporting of LyX documents directly.  If you have any trouble getting this to work, please use the MultiMarkdown [issues page](https://github.com/fletcher/MultiMarkdown-5/issues) to get help.
 
 See [his page](http://crcowan.github.io/MultiMarkdown-4-LyX-Maintenance/) for more information.
 
