@@ -2,7 +2,7 @@ latex input:	mmd-tufte-handout-header
 Title:	Release Notes
 Author:	Fletcher T. Penney
 Version:	{{version.txt}}
-Revised:	2015-03-04  
+Revised:	2015-11-15  
 Base Header Level:	2
 CSS:	{{css.txt}}
 HTML header:	<script type="text/javascript"
