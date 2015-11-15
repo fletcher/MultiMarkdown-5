@@ -12,7 +12,7 @@ latex footer: mmd-tufte-footer
 
 ## 5.0 ##
 
-* The source repository for MultiMarkdown has been completely rebuit:
+* The source repository for MultiMarkdown has been completely rebuilt:
 	* Use my [c-template] to provide the basic structure
 	* Requires the [CMake] build system
 	* Has the beginnings of documentation within the code to support
