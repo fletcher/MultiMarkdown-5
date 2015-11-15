@@ -1,5 +1,7 @@
 # Settings for compiling for Windows 32-bit machines
 
+set (IS_CROSSCOMPILING "YES")
+
 set (CMAKE_SYSTEM_NAME Windows)
 
 set (CMAKE_C_COMPILER i586-mingw32msvc-gcc)

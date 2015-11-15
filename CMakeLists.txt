@@ -302,12 +302,24 @@ target_link_libraries(multimarkdown libMultiMarkdown)
 # Build Installer with CPack
 # ==========================
 
-# Create HTML version of README (using mmd binary we just built)
-add_custom_command(
-	TARGET multimarkdown
-	POST_BUILD
-    COMMAND $<TARGET_FILE:multimarkdown> -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
-)
+# Create HTML version of README
+
+if (DEFINED IS_CROSSCOMPILING)
+	# Need to use installed MMD when cross compiling
+	add_custom_command(
+		TARGET multimarkdown
+		POST_BUILD
+		COMMAND multimarkdown -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
+	)
+else ()
+	# Use mmd binary we just built
+	add_custom_command(
+		TARGET multimarkdown
+		POST_BUILD
+		COMMAND $<TARGET_FILE:multimarkdown> -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
+	)
+endif()
+
 
 install (TARGETS multimarkdown
 	DESTINATION bin
@@ -343,8 +355,6 @@ set (CPACK_COMPONENT_SCRIPTS_GROUP "MultiMarkdown")
 
 set (CPACK_COMPONENT_GROUP_MULTIMARKDOWN_DESCRIPTION
    "The basic MultiMarkdown utility and convenience scripts.")
-
-set (CPACK_SET_DESTDIR true)
 
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "${My_Project_Description}")
 set (CPACK_PACKAGE_VENDOR "${My_Project_Author}")
