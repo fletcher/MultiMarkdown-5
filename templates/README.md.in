@@ -13,18 +13,28 @@
 
 [Markdown] is a simple markup language used to convert plain text into HTML. 
 
-[MultiMarkdown] is a derivative of Markdown that adds new syntax features, such as footnotes, tables, and metadata. Additionally, it offers mechanisms to convert plain text into LaTeX in addition to HTML. 
+[MultiMarkdown] is a derivative of Markdown that adds new syntax features,
+such as footnotes, tables, and metadata. Additionally, it offers mechanisms to
+convert plain text into LaTeX in addition to HTML. 
 
 
 ## Background ##
 
-MultiMarkdown started as a Perl script, which was modified from the original Markdown.pl.
+MultiMarkdown started as a Perl script, which was modified from the original
+Markdown.pl.
 
-MultiMarkdown v3 (aka 'peg-multimarkdown') was based on John MacFarlane's [peg-markdown].  It used a parsing expression grammar (PEG), and was written in C in order to compile on almost any operating system.  Thanks to work by Daniel Jalkut, MMD v3 was built so that it didn't have any external library requirements.
+MultiMarkdown v3 (aka 'peg-multimarkdown') was based on John MacFarlane's
+[peg-markdown].  It used a parsing expression grammar (PEG), and was written
+in C in order to compile on almost any operating system.  Thanks to work by
+Daniel Jalkut, MMD v3 was built so that it didn't have any external library
+requirements.
 
-MultiMarkdown v4 was basically a complete rewrite of v3.  It used the same basic PEG for parsing (Multi)Markdown text, but otherwise was almost completely rebuilt.
+MultiMarkdown v4 was basically a complete rewrite of v3.  It used the same
+basic PEG for parsing (Multi)Markdown text, but otherwise was almost
+completely rebuilt.
 
-MultiMarkdown v5 is basically the same code as v4, but the project has been restructured:
+MultiMarkdown v5 is basically the same code as v4, but the project has been
+restructured:
 
 *	It is built using my [c-template] project boilerplate -- I welcome
 	suggestions and ideas for improvement about this.
@@ -92,15 +102,19 @@ Binaries for OS X and Windows are available on the github site:
 
 ## Compile from Source ##
 
-To compile MultiMarkdown, you will need to have [CMake] installed on your machine.
+To compile MultiMarkdown, you will need to have [CMake] installed on your
+machine.
 
 To download the source:
 
-*	Obtain the source from the github repository (Download a zipfile of the source won't allow you to configure the submodules -- it's much better to use git):
+*	Obtain the source from the github repository (Download a zipfile of the
+	source won't allow you to configure the submodules -- it's much better to
+	use git):
 
 		git clone https://github.com/fletcher/MultiMarkdown-5.git
 
-*	Configure the submodules with two helper scripts (This can be done manually on Windows systems by looking at the source):
+*	Configure the submodules with two helper scripts (This can be done
+	manually on Windows systems by looking at the source):
 
 		./link_git_modules
 		./update_git_modules
@@ -112,16 +126,21 @@ To download the source:
 		make
 		make test
 
-Like all versions of MultiMarkdown since v3, there is one test that will fail (now helpfully called `markdown-should-fail`).  The other tests should pass.  The valgrind tests will not work on OS X, but should pass if valgrind is installed and used on Linux machines.
+Like all versions of MultiMarkdown since v3, there is one test that will fail
+(now helpfully called `markdown-should-fail`).  The other tests should pass.
+The valgrind tests will not work on OS X, but should pass if valgrind is
+installed and used on Linux machines.
 
-If you want to make an installer, after the above, use the `cpack` command inside the build directory.
+If you want to make an installer, after the above, use the `cpack` command
+inside the build directory.
 
 For more information, checkout the `IMPORTANT` file.
 
 
 ## Usage ##
 
-The [MultiMarkdown User's Guide] has complete instructions on how to use MultiMarkdown.
+The [MultiMarkdown User's Guide] has complete instructions on how to use
+MultiMarkdown.
 
 
 ## Developer's Notes ##
@@ -130,17 +149,27 @@ The documentation, created by doxygen, has information for developers:
 
 	make documentation
 
-You can then view `build/documentation/html/index.html` for some developer's notes.  There's not a lot there yet.  There is also a LaTeX version created if you want a PDF.  Just use latexmk in the latex directory.
+You can then view `build/documentation/html/index.html` for some developer's
+notes.  There's not a lot there yet.  There is also a LaTeX version created
+if you want a PDF.  Just use latexmk in the latex directory.
 
 
 # LyX Support #
 
-Charles R. Cowan (<https://github.com/crcowan>) added support for conversion to [LyX](http://www.lyx.org/).  Support for this should be considered to be in alpha/beta, and is not guaranteed.  Issues related to LyX can be added to the MultiMarkdown [issues] page on github, but will need to be answered by Charles.  I am happy to include this code in the main MMD repo, but since I don't use LyX I can't support it myself.  If this arrangement becomes a problem, then LyX support can be removed and it can be kept as a separate fork.
+Charles R. Cowan (<https://github.com/crcowan>) added support for conversion
+to [LyX](http://www.lyx.org/).  Support for this should be considered to be in
+alpha/beta, and is not guaranteed.  Issues related to LyX can be added to the
+MultiMarkdown [issues] page on github, but will need to be answered by
+Charles.  I am happy to include this code in the main MMD repo, but since I
+don't use LyX I can't support it myself.  If this arrangement becomes a
+problem, then LyX support can be removed and it can be kept as a separate
+fork.
 
 
 # More Information #
 
-To get more information about MultiMarkdown, check out the [website][MultiMarkdown] or [MultiMarkdown User's Guide].
+To get more information about MultiMarkdown, check out the
+[website][MultiMarkdown] or [MultiMarkdown User's Guide].
 
 ## License ##
 
