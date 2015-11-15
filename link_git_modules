@@ -14,6 +14,8 @@ git submodule foreach git branch --set-upstream master origin/master
 
 git submodule foreach git checkout master
 
+cd submodules/documentation; git branch --set-upstream gh-pages origin/gh-pages;git checkout gh-pages
+
 # If one module needs to follow a different branch:
 # cd some_module
 # git branch --set-upstream our-branch origin/some-branch
