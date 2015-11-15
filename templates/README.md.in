@@ -85,6 +85,10 @@ improvements to the CMake configuration.
 
 ## Download Binary ##
 
+Binaries for OS X and Windows are available on the github site:
+
+<https://github.com/fletcher/MultiMarkdown-5/releases>
+
 
 ## Compile from Source ##
 
