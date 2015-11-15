@@ -30,8 +30,57 @@ MultiMarkdown v5 is basically the same code as v4, but the project has been rest
 	a Makefile
 
 
-## Download Binary ##
+## Why switch to CMake? ##
 
+In early 2014, a user of MMD introduced me to the [CMake] build system. I 
+looked at it briefly, but didn't do anything with it.  Later on, I looked
+at it more in depth and created a parallel branch after 4.6.  This would allow
+me to experiment with CMake without breaking anything else in the `master`
+branch.
+
+CMake isn't perfect by any means, but it does allow for some interesting
+things:
+
+*	Automatically generate GUI installers for OS X and Windows, as well as zip
+	files for *nix.  I have not looked into using CMake to build `.deb`
+	packages, but that might be possible as well.  My old system could generate
+	GUI installers for Windows and OS X, but it was a complex process that
+	required a lot of manual processing.  This is much more amenable to
+	automation.
+*	An improved organization structure for various tests, including [Valgrind]
+	testing.  The old system was getting rather messy.
+*	A templating system that better allows me to synchronize version, and
+	other, information in code, documentation, and READMEs
+*	Automatic generation of project files for Xcode, Visual Studio, and
+	alternative build systems beyond `make`
+*	An opportunity to reorganize my code directory hierarchy
+*	The option to start adding unit test code to the source.  This probably
+	won't happen, as it would be too much work.  But it is possible.
+
+
+The biggest *problem* is that this means that anyone wishing to compile the
+source will need to install CMake.  This isn't hard, but it is an extra step.
+
+As a temporary measure, you can use the `make deprecated` command to use a 
+simplified `make` recipe to compile a binary of MultiMarkdown for the current
+machine.  I don't recommend this approach, but it should work in a pinch until
+you can upgrade your machine to support cmake.
+
+I welcome feedback on this decision, but please note -- "I don't like it" or
+"bring back the old way" comments will be ignored.  Please send meaningful
+criticism or suggestions.
+
+Perhaps an approach if others want to contribute will be to do the reverse of
+what I did before -- create a `make` branch that includes a modified Makefile
+designed to be used without CMake?
+
+Additionally, the old Makefile had grown over time to include some tricks that
+users of various systems required.  I have tested the CMake system on OS X,
+Ubuntu and Debian Linux, and MinGW on Ubuntu.  I welcome suggestions for
+improvements to the CMake configuration.
+
+
+## Download Binary ##
 
 
 ## Compile from Source ##
@@ -65,12 +114,12 @@ For more information, checkout the `IMPORTANT` file.
 
 ## Usage ##
 
-The [MultiMarkdown Composer User's Guide] has complete instructions on how to use MultiMarkdown.
+The [MultiMarkdown User's Guide] has complete instructions on how to use MultiMarkdown.
 
 
 ## Developer's Notes ##
 
-The [Documentation], created by doxygen, has information for developers:
+The documentation, created by doxygen, has information for developers:
 
 	make documentation
 
@@ -84,7 +133,7 @@ Charles R. Cowan (<https://github.com/crcowan>) added support for conversion to 
 
 # More Information #
 
-To get more information about MultiMarkdown, check out the [website][MultiMarkdown] or [User's Guide].
+To get more information about MultiMarkdown, check out the [website][MultiMarkdown] or [MultiMarkdown User's Guide].
 
 ## License ##
 
@@ -95,4 +144,11 @@ To get more information about MultiMarkdown, check out the [website][MultiMarkdo
 [Markdown]:	http://daringfireball.net/projects/markdown/
 [MultiMarkdown]:	http://fletcherpenney.net/multimarkdown/
 [MultiMarkdown User's Guide]:	http://fletcher.github.io/MultiMarkdown-5/
+[c-template]: https://github.com/fletcher/c-template
+[CMake]: https://cmake.org/
+[Doxygen]: http://www.doxygen.org/
+[Valgrind]: http://valgrind.org/
+[peg-markdown]:	https://github.com/jgm/peg-markdown
+[issues]:	https://github.com/fletcher/MultiMarkdown-5/issues
+
 
