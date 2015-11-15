@@ -26,8 +26,11 @@ MultiMarkdown v4 was basically a complete rewrite of v3.  It used the same basic
 
 MultiMarkdown v5 is basically the same code as v4, but the project has been restructured:
 
+*	It is built using my [c-template] project boilerplate -- I welcome
+	suggestions and ideas for improvement about this.
 *	It is designed with the CMake build system, rather than just
 	a Makefile
+
 
 
 ## Why switch to CMake? ##
