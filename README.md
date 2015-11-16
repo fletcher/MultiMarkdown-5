@@ -107,7 +107,7 @@ machine.
 
 To download the source:
 
-*	Obtain the source from the github repository (Download a zipfile of the
+*	Obtain the source from the github repository (Downloading a zipfile of the
 	source won't allow you to configure the submodules -- it's much better to
 	use git):
 
