@@ -118,9 +118,6 @@ node * mk_node(int key);
 node * mk_str(char *string);
 node * mk_list(int key, node *list);
 node * mk_link(node *text, char *label, char *source, char *title, node *attr);
-node * mk_pos_node(int key, char *string, unsigned int start, unsigned int stop);
-node * mk_pos_str(char *string, unsigned int start, unsigned int stop);
-node * mk_pos_list(int key, node *list, unsigned int start, unsigned int stop);
 
 void   free_node(node *n);
 void   free_node_tree(node * n);
