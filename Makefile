@@ -1,4 +1,4 @@
-CHANGELOG-UNRELEASEDBUILD_DIR = build
+BUILD_DIR = build
 
 GREG = submodules/greg/greg
 
