@@ -67,69 +67,83 @@
 /// Convert source string to output string, based on provided `parser_extensions`
 /// and requested `export_format`.
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * markdown_to_string(const char * source, unsigned long extensions, int format);
+char * markdown_to_string(
+	const char * source,			//!< Pointer to c-string of the source text
+	unsigned long extensions,       //!< Bit field of parser_extensions
+	int format                      //!< Specify export_format to be used
+);
 
 /// Does the source string have metadata, using provided `parser_extensions`?
 ///
-bool   has_metadata(const char *source, unsigned long extensions);
+bool   has_metadata(
+	const char *source,             //!< Pointer to c-string of the source text
+	unsigned long extensions 		//!< Bit field of parser_extensions
+);
 
 /// List all metadata keys, using provided `parser_extensions`.
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * extract_metadata_keys(const char *source, unsigned long extensions);
+char * extract_metadata_keys(
+	const char *source,             //!< Pointer to c-string of the source text
+	unsigned long extensions        //!< Bit field of parser_extensions
+);
 
 /// Extract the value for the specified metadata key, using provided `parser_extensions`.
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * extract_metadata_value(const char *source, unsigned long extensions, char *key);
+char * extract_metadata_value(
+	const char *source,             //!< Pointer to c-string of the source text
+	unsigned long extensions, 		//!< Bit field of parser_extensions
+	char *key                       //!< C-string of the key we need to find
+);
 
 /// Return the version string for this build of libMultiMarkdown
 /// The returned `char *` will need to be freed after it is no longer needed.
 char * mmd_version(void);
 
 
-/* These are the basic extensions */
+/// These are the basic extensions that enable or disable MultiMarkdown features
 enum parser_extensions {
-	EXT_COMPATIBILITY       = 1 << 0,    /* Markdown compatibility mode */
-	EXT_COMPLETE            = 1 << 1,    /* Create complete document */
-	EXT_SNIPPET             = 1 << 2,    /* Create snippet only */
-	EXT_HEAD_CLOSED         = 1 << 3,    /* for use by parser */
-	EXT_SMART               = 1 << 4,    /* Enable Smart quotes */
-	EXT_NOTES               = 1 << 5,    /* Enable Footnotes */
-	EXT_NO_LABELS           = 1 << 6,    /* Don't add anchors to headers, etc. */
-	EXT_FILTER_STYLES       = 1 << 7,    /* Filter out style blocks */
-	EXT_FILTER_HTML         = 1 << 8,    /* Filter out raw HTML */
-	EXT_PROCESS_HTML        = 1 << 9,    /* Process Markdown inside HTML */
-	EXT_NO_METADATA         = 1 << 10,   /* Don't parse Metadata */
-	EXT_OBFUSCATE           = 1 << 11,   /* Mask email addresses */
-	EXT_CRITIC              = 1 << 12,   /* Critic Markup Support */
-	EXT_CRITIC_ACCEPT       = 1 << 13,   /* Accept all proposed changes */
-	EXT_CRITIC_REJECT       = 1 << 14,   /* Reject all proposed changes */
-	EXT_RANDOM_FOOT         = 1 << 15,   /* Use random numbers for footnote links */
-	EXT_HEADINGSECTION      = 1 << 16,   /* Group blocks under parent heading */
-	EXT_ESCAPED_LINE_BREAKS = 1 << 17,   /* Escaped line break */
-	EXT_NO_STRONG           = 1 << 18,   /* Don't allow nested <strong>'s */
-	EXT_NO_EMPH             = 1 << 19,   /* Don't allow nested <emph>'s */
-	EXT_FAKE                = 1 << 31,   /* 31 is highest number allowed */
+	EXT_COMPATIBILITY       = 1 << 0,    //!< Markdown compatibility mode
+	EXT_COMPLETE            = 1 << 1,    //!< Create complete document
+	EXT_SNIPPET             = 1 << 2,    //!< Create snippet only
+	EXT_HEAD_CLOSED         = 1 << 3,    //!< for use by parser
+	EXT_SMART               = 1 << 4,    //!< Enable Smart quotes
+	EXT_NOTES               = 1 << 5,    //!< Enable Footnotes
+	EXT_NO_LABELS           = 1 << 6,    //!< Don't add anchors to headers, etc.
+	EXT_FILTER_STYLES       = 1 << 7,    //!< Filter out style blocks
+	EXT_FILTER_HTML         = 1 << 8,    //!< Filter out raw HTML
+	EXT_PROCESS_HTML        = 1 << 9,    //!< Process Markdown inside HTML
+	EXT_NO_METADATA         = 1 << 10,   //!< Don't parse Metadata
+	EXT_OBFUSCATE           = 1 << 11,   //!< Mask email addresses
+	EXT_CRITIC              = 1 << 12,   //!< Critic Markup Support
+	EXT_CRITIC_ACCEPT       = 1 << 13,   //!< Accept all proposed changes
+	EXT_CRITIC_REJECT       = 1 << 14,   //!< Reject all proposed changes
+	EXT_RANDOM_FOOT         = 1 << 15,   //!< Use random numbers for footnote links
+	EXT_HEADINGSECTION      = 1 << 16,   //!< Group blocks under parent heading
+	EXT_ESCAPED_LINE_BREAKS = 1 << 17,   //!< Escaped line break
+	EXT_NO_STRONG           = 1 << 18,   //!< Don't allow nested \<strong\>'s
+	EXT_NO_EMPH             = 1 << 19,   //!< Don't allow nested \<emph\>'s
+	EXT_FAKE                = 1 << 31,   //!< 31 is highest number allowed
 };
 
-/* Define output formats we support -- first in list is default */
+/// Define the output formats we support -- not all of these should be used
 enum export_formats {
-	ORIGINAL_FORMAT,                /* Transclusion happens, but no parsing */
-	HTML_FORMAT,                    /* Well supported */
-	TEXT_FORMAT,                    /* Not currently used, may exit host process */
+	ORIGINAL_FORMAT,                //!< Transclusion happens, but no parsing
+	HTML_FORMAT,                    //!< Well supported
+	TEXT_FORMAT,                    //!< Not currently used, may exit host process
 	LATEX_FORMAT,
 	MEMOIR_FORMAT,
 	BEAMER_FORMAT,
 	OPML_FORMAT,
 	ODF_FORMAT,
-	RTF_FORMAT,                     /* Not recommended for production code, may crash */
+	RTF_FORMAT,                     //!< Not recommended for production code, may crash
 	CRITIC_ACCEPT_FORMAT,
 	CRITIC_REJECT_FORMAT,
 	CRITIC_HTML_HIGHLIGHT_FORMAT,
-	LYX_FORMAT,                     /* Not actively developed */
+	LYX_FORMAT,                     //!< Not actively developed
 	TOC_FORMAT,
 };
 
-/* These are the identifiers for node types */
+/// These are the identifiers for node types
 enum keys {
 	NO_TYPE,
 	LIST,
@@ -141,7 +155,7 @@ enum keys {
 	LINEBREAK,
 	SPACE,
 	HEADINGSECTION,
-	H1, H2, H3, H4, H5, H6, H7,	/* Keep these in order */
+	H1, H2, H3, H4, H5, H6, H7,	//!< Keep H1 through H7 in order
 	METADATA,
 	METAKEY,
 	METAVALUE,
@@ -212,30 +226,32 @@ enum keys {
 	ABBRSTART,
 	ABBRSTOP,
 	TOC,
-	KEY_COUNTER                      /* This *MUST* be the last item in the list */
+	KEY_COUNTER                      //!< This *MUST* be the last item in the list
 };
 
 
-/* This is the element used in the resulting parse tree */
+/// This is the element used in the resulting parse tree
 struct node {
-	short             key;           /* what type of element are we? */
-	char              *str;          /* relevant string from source for element */
-	struct link_data  *link_data;    /* store link info when relevant */
-	struct node       *children;     /* child elements */
-	struct node       *next;         /* next element */
+	short             key;           //!< What type of element is this?
+	char              *str;          //!< Relevant string from source for this element 
+	struct link_data  *link_data;    //!< Store link info when relevant to this node
+	struct node       *children;     //!< Pointer to child elements
+	struct node       *next;         //!< Pointer to next element
 };
 
+/// This is the element used in the resulting parse tree
 typedef struct node node;
 
 
-/* Define a structure to simplify handling of links */
+/// Structure to simplify handling of links
 struct link_data {
-	char *label;                /* if this is a reference link */
-	char *source;               /* source URL     */
-	char *title;                /* title string   */
-	node *attr;                 /* attribute tree */
+	char *label;                //!< Text of the label, if this is a reference link
+	char *source;               //!< Source URL string
+	char *title;                //!< Title string
+	node *attr;                 //!< Pointer to tree of attributes, if any
 };
 
+/// Structure to simplify handling of links
 typedef struct link_data link_data;
 
 #endif
