@@ -130,17 +130,17 @@ enum export_formats {
 	ORIGINAL_FORMAT,                //!< Transclusion happens, but no parsing
 	HTML_FORMAT,                    //!< Well supported
 	TEXT_FORMAT,                    //!< Not currently used, may exit host process
-	LATEX_FORMAT,
-	MEMOIR_FORMAT,
-	BEAMER_FORMAT,
-	OPML_FORMAT,
-	ODF_FORMAT,
+	LATEX_FORMAT,                   //!< Well supported
+	MEMOIR_FORMAT,                  //!< Well supported
+	BEAMER_FORMAT,                  //!< Well supported
+	OPML_FORMAT,                    //!< Well supported
+	ODF_FORMAT,                     //!< Well supported
 	RTF_FORMAT,                     //!< Not recommended for production code, may crash
-	CRITIC_ACCEPT_FORMAT,
-	CRITIC_REJECT_FORMAT,
-	CRITIC_HTML_HIGHLIGHT_FORMAT,
-	LYX_FORMAT,                     //!< Not actively developed
-	TOC_FORMAT,
+	CRITIC_ACCEPT_FORMAT,           //!< Used as a pre-processing step
+	CRITIC_REJECT_FORMAT,           //!< Used as a pre-processing step
+	CRITIC_HTML_HIGHLIGHT_FORMAT,   //!< Used as a pre-processing step
+	LYX_FORMAT,                     //!< Developed and maintained by Charles R. Cowan
+	TOC_FORMAT,                     //!< Used as a pre-processing step
 };
 
 /// These are the identifiers for node types
@@ -155,7 +155,7 @@ enum keys {
 	LINEBREAK,
 	SPACE,
 	HEADINGSECTION,
-	H1, H2, H3, H4, H5, H6, H7,	//!< Keep H1 through H7 in order
+	H1, H2, H3, H4, H5, H6, H7,	    //!< Keep H1 through H7 in order
 	METADATA,
 	METAKEY,
 	METAVALUE,
@@ -226,17 +226,17 @@ enum keys {
 	ABBRSTART,
 	ABBRSTOP,
 	TOC,
-	KEY_COUNTER                      //!< This *MUST* be the last item in the list
+	KEY_COUNTER                     //!< This *MUST* be the last item in the list
 };
 
 
 /// This is the element used in the resulting parse tree
 struct node {
-	short             key;           //!< What type of element is this?
-	char              *str;          //!< Relevant string from source for this element 
-	struct link_data  *link_data;    //!< Store link info when relevant to this node
-	struct node       *children;     //!< Pointer to child elements
-	struct node       *next;         //!< Pointer to next element
+	short             key;          //!< What type of element is this?
+	char              *str;         //!< Relevant string from source for this element 
+	struct link_data  *link_data;   //!< Store link info when relevant to this node
+	struct node       *children;    //!< Pointer to child elements
+	struct node       *next;        //!< Pointer to next element
 };
 
 /// This is the element used in the resulting parse tree
@@ -245,10 +245,10 @@ typedef struct node node;
 
 /// Structure to simplify handling of links
 struct link_data {
-	char *label;                //!< Text of the label, if this is a reference link
-	char *source;               //!< Source URL string
-	char *title;                //!< Title string
-	node *attr;                 //!< Pointer to tree of attributes, if any
+	char *label;                    //!< Text of the label, if this is a reference link
+	char *source;                   //!< Source URL string
+	char *title;                    //!< Title string
+	node *attr;                     //!< Pointer to tree of attributes, if any
 };
 
 /// Structure to simplify handling of links
