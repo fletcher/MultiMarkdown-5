@@ -87,7 +87,7 @@ $(BUILD_DIR): CHANGELOG
 # Generate a list of changes since last commit to 'master' branch
 .PHONY : CHANGELOG
 CHANGELOG:
-	git log master..develop --format="*    %s" | sort | uniq > CHANGELOG-UNRELEASED
+	git log master..develop --format="*	%s" | sort | uniq > CHANGELOG-UNRELEASED
 
 
 # ===============
