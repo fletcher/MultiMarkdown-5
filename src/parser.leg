@@ -159,8 +159,8 @@ HeadingSectionBlock = BlankLine* !Heading
 
 TOC = "{{TOC}}" Sp Newline
 	{
-		$$ = mk_node(TOC);
-		$$->children = mk_node(RAW);
+		$$ = node(TOC);
+		$$->children = node(RAW);
 		$$->children->str = markdown_to_string(((parser_data *)G->data)->original, 0, TOC_FORMAT);
 	}
 
@@ -219,7 +219,7 @@ BlockQuote = a:BlockQuoteRaw
 BlockQuoteRaw =  a:StartList x:StartList
 		(( NonindentSpace b:BlockQuoteMarker Line { a = cons($$, a); x = cons(b, x); } )
 		( !(NonindentSpace '>') !BlankLine Line { a = cons($$, a); } )*
-		( BlankLine { a = cons(mk_str("\n"), a); } )*
+		( BlankLine { a = cons(str("\n"), a); } )*
 		)+
 		{
 			$$ = x;
@@ -657,7 +657,7 @@ AttrKey = < AlphanumericAscii+ >
 	{
 		char *lab;
 		lab = label_from_string(yytext);
-		$$ = mk_str(lab);
+		$$ = str(lab);
 		$$->key = ATTRKEY;
 		free(lab);
 	}
@@ -788,15 +788,15 @@ Glossary =  &{ ext(EXT_NOTES) }
 
 GlossaryTerm =  < (!Newline !'(' .)+ >
 	{ 
-		$$ = mk_list(LIST, NULL);
+		$$ = list(LIST, NULL);
 		$$->str = 0;
-		$$->children = mk_str(yytext);
+		$$->children = str(yytext);
 		$$->key = GLOSSARYTERM;
 	}
 
 GlossarySortKey = '(' < (!')' !Newline .)* > ')'
 	{
-		$$ = mk_str(yytext);
+		$$ = str(yytext);
 		$$->key = GLOSSARYSORTKEY;
 	}
 
@@ -857,7 +857,7 @@ SingleQuoted = SingleQuoteStart
 		( !SingleQuoteEnd b:Inline { a = cons(b, a); } )*
 		SingleQuoteEnd
 		{
-			$$ = mk_list(SINGLEQUOTED, a);
+			$$ = list(SINGLEQUOTED, a);
 		}
 
 DoubleQuoteStart = '"'
@@ -868,7 +868,7 @@ DoubleQuoted =  DoubleQuoteStart
 		a:StartList
 		( !DoubleQuoteEnd !BackTickEnd !BackTickStart b:Inline { a = cons(b, a); } )*
 		DoubleQuoteEnd
-		{ $$ = mk_list(DOUBLEQUOTED, a); }
+		{ $$ = list(DOUBLEQUOTED, a); }
 
 BackTickStart = '``'
 
@@ -879,13 +879,13 @@ BackTickQuoted =  BackTickStart
 		( !DoubleQuoteEnd !BackTickEnd b:Inline { a = cons(b, a); } )*
 		BackTickEnd
 		{
-			$$ = mk_list(DOUBLEQUOTED, a);
+			$$ = list(DOUBLEQUOTED, a);
 		}
 
 NonblankIndentedLine = !BlankLine IndentedLine
 
 VerbatimChunk = a:StartList
-		( BlankLine { a = cons(mk_str("\n"), a); } )*
+		( BlankLine { a = cons(str("\n"), a); } )*
 		( NonblankIndentedLine { a = cons($$, a); } )+
 		{
 			$$ = mk_str_from_list(a, false);
@@ -905,7 +905,7 @@ HorizontalRule = NonindentSpace
 		| '_' Sp '_' Sp '_' (Sp '_')*)
 		Sp Newline BlankLine*
 		{
-			$$ = mk_node(HRULE);
+			$$ = node(HRULE);
 		}
 
 DefinitionList =  a:StartList &(TermLine+ Newline? NonindentSpace ':')
@@ -915,7 +915,7 @@ DefinitionList =  a:StartList &(TermLine+ Newline? NonindentSpace ':')
 			BlankLine*
 		)+
 		{
-			$$ = mk_list(LIST, a);
+			$$ = list(LIST, a);
 			$$->key = DEFLIST;
 		}
 
@@ -924,16 +924,16 @@ TermLine = !':' !BlankLine (!Newline .)* Newline
 Term =  a:StartList !BlankLine !':'
 	(!Newline !Endline Inline {a = cons($$, a);} )+ Sp Newline
 	{
-		$$ = mk_list(TERM,a);
+		$$ = list(TERM,a);
 	}
 
 Definition = (a:StartList b:StartList
-		(BlankLine { b = cons(mk_str("\n"),b); } )?
-		( NonindentSpace ':' Sp RawLine { a = cons(mk_str(yytext), a);}) 
-		( !':' !BlankLine RawLine { a = cons(mk_str(yytext), a);})*
-		( BlankLine {a = cons(mk_str("\n"),a);}
+		(BlankLine { b = cons(str("\n"),b); } )?
+		( NonindentSpace ':' Sp RawLine { a = cons(str(yytext), a);}) 
+		( !':' !BlankLine RawLine { a = cons(str(yytext), a);})*
+		( BlankLine {a = cons(str("\n"),a);}
 			(IndentedLine { a = cons($$,a);})+ 
-			{ a = cons(mk_str("\n"),a);}
+			{ a = cons(str("\n"),a);}
 		)*  )
 		{
 			if (b != NULL) { a = cons(b,a);}
@@ -998,7 +998,7 @@ ListItemTight = ( Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoS
 
 EmptyList = BlankLine
 		{
-			$$ = mk_str("");
+			$$ = str("");
 		}
 
 ListBlock = a:StartList
@@ -1288,7 +1288,7 @@ HtmlBlock = !MarkdownHtmlTagOpen < ( HtmlBlockInTags | HtmlComment | HtmlBlockSe
 		BlankLine+
 		{
 			if (ext(EXT_FILTER_HTML)) {
-				$$ = mk_list(LIST, NULL);
+				$$ = list(LIST, NULL);
 			} else {
 				$$ = str(yytext);
 				if ( ext(EXT_PROCESS_HTML)) $$->key = RAW;
@@ -1303,15 +1303,15 @@ MarkdownHtmlBlock = &MarkdownHtmlTagOpen < ( HtmlBlockInTags | HtmlComment | Htm
 MarkdownHtmlAttribute = ("markdown" | "MARKDOWN")
 		Spnl '=' Spnl ('"' Spnl)? "1" (Spnl '"')? Spnl
 
-MarkdownHtmlTagOpen = a:StartList '<' {a = cons(mk_str("<"),a);}
-		Spnl <HtmlBlockType> {a = cons(mk_str(yytext),a);} &Spacechar Spnl
+MarkdownHtmlTagOpen = a:StartList '<' {a = cons(str("<"),a);}
+		Spnl <HtmlBlockType> {a = cons(str(yytext),a);} &Spacechar Spnl
 		(!MarkdownHtmlAttribute
-			<HtmlAttribute> {a = cons(mk_str(" "),a);
-				a = cons(mk_str(yytext),a);})*
+			<HtmlAttribute> {a = cons(str(" "),a);
+				a = cons(str(yytext),a);})*
 			MarkdownHtmlAttribute
-			(<HtmlAttribute> {a = cons(mk_str(" "),a);
-				a = cons(mk_str(yytext),a);})*
-			'>' { a = cons(mk_str(">"),a);}
+			(<HtmlAttribute> {a = cons(str(" "),a);
+				a = cons(str(yytext),a);})*
+			'>' { a = cons(str(">"),a);}
 			{
 				$$ = mk_str_from_list(a,false);
 				$$->key = HTML;
@@ -1334,9 +1334,9 @@ StyleBlock  = < InStyleTags >
 		BlankLine*
 		{
 			if (ext(EXT_FILTER_STYLES)) {
-				$$ = mk_list(LIST, NULL);
+				$$ = list(LIST, NULL);
 			} else {
-				$$ = mk_str(yytext);
+				$$ = str(yytext);
 				$$->key = HTMLBLOCK;
 			}
 		}
@@ -1412,22 +1412,22 @@ AlignmentCell = Sp (!CellDivider ( LeftAlignWrap | CenterAlignWrap | RightAlignW
 		Sp ( CellDivider )?
 
 LeftAlignWrap = ':'? ('-'+ | '='+) '+' &(!'-' !'=' !':')
-		{ $$ = mk_str("L");}
+		{ $$ = str("L");}
 
 LeftAlign = ':'? ('-'+ | '='+) &(!'-' !':')
-		{ $$ = mk_str("l");}
+		{ $$ = str("l");}
 
 CenterAlignWrap = ':' ('-'+ | '='+)? '+' ':' &(!'-' !'=' !':')
-		{ $$ = mk_str("C");}
+		{ $$ = str("C");}
 
 CenterAlign = ':' ('-'+ | '='+)? ':' &(!'-' !'=' !':')
-		{ $$ = mk_str("c");}
+		{ $$ = str("c");}
 
 RightAlignWrap = ('-'+ | '='+) ':' '+' &(!'-' !'=' !':')
-		{ $$ = mk_str("R");}
+		{ $$ = str("R");}
 
 RightAlign = ('-'+ | '='+)':' &(!'-' !'=' !':')
-		{ $$ = mk_str("r");}
+		{ $$ = str("r");}
 
 CellDivider = '|'
 
@@ -1489,7 +1489,7 @@ OPMLBlock = BlankLine* ( OPMLHeadingSection | OPMLPlain )
 
 OPMLHeadingSection = a:StartList OPMLHeading { a = cons($$, a); }
 		(OPMLSectionBlock {a = cons($$, a); })*
-		{ $$ = mk_list(HEADINGSECTION, a);}
+		{ $$ = list(HEADINGSECTION, a);}
 
 OPMLHeading = OPMLAtxHeading | OPMLSetextHeading
 
@@ -1513,7 +1513,7 @@ OPMLSetextHeading2 = < (!'\r' !'\n' .)* > Newline SetextBottom2
 OPMLSectionBlock = BlankLine* !OPMLHeading OPMLPlain
 
 OPMLPlain = a:StartList (!BlankLine !Heading Line { a = cons($$,a); })+
-		{ $$ = mk_list(PLAIN, a); }
+		{ $$ = list(PLAIN, a); }
 
 DocForTOC = BOM? a: StartList
 		(&( (YAMLStart)? MetaDataKey Sp ':' Sp (!Newline)) z:MetaData { free_node_tree(z); } )?
@@ -1525,7 +1525,7 @@ TOCBlock = BlankLine* TOCHeadingSection
 
 TOCHeadingSection = a:StartList Heading { a = cons($$, a); }
 	(TOCSectionBlock )*
-	{ $$ = mk_list(HEADINGSECTION, a); }
+	{ $$ = list(HEADINGSECTION, a); }
 
 TOCSectionBlock = BlankLine* !Heading TOCPlain
 
