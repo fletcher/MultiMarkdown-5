@@ -201,7 +201,7 @@ void print_odf_node(GString *out, node *n, scratch_pad *scratch) {
 				scratch->odf_list_needs_end_p = true;
 			} else if ((n->children != NULL) && 
 				(((n->children->key == LIST) && (n->children->children == NULL)) || 
-					((n->children->key == STR) && (n->children->str == NULL)))) {
+					((n->children->key == STR) && (strlen(n->children->str) == 0)))) {
 				/* This is an empty list item.  ODF apparently requires something for the empty item to appear */
 				switch (scratch->odf_para_type) {
 					case BULLETLIST:
