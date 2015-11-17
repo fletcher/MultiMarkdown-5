@@ -136,13 +136,15 @@ void transclude_source(GString *source, char *basedir, char *stack, int output_f
 	/* Look for override folder inside document */
 	if (has_metadata(source->str, 0x000000)) {
 		char *meta = extract_metadata_value(source->str, 0x000000, "transcludebase");
-		if (meta != NULL)
+		if (meta != NULL) {
+			free(path);
 			path = path_from_dir_base(base, meta);
+			free(meta);
+		}
 	}
 
 	if (path == NULL) {
 		/* We have nowhere to look, so nothing to do */
-		free(path);
 		free(base);
 		return;
 	}
