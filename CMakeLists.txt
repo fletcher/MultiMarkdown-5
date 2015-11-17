@@ -455,12 +455,15 @@ ADD_MMD_TEST(critic-highlight "-r -a" CriticMarkup htmlh)
 
 
 # valgrind memory testing
+# Only in 'make debug' mode
 
-find_program ( MEMORYCHECK_COMMAND valgrind)
-set ( MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
+if (DEFINED TEST)
+	find_program ( MEMORYCHECK_COMMAND valgrind)
+	set ( MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
 
-file (GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests/*.text ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests/*.text)
+	file (GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests/*.text ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests/*.text)
 
-foreach (FORMAT html latex odf beamer memoir opml lyx) 
-	add_test ( NAME valgrind-${FORMAT} COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/multimarkdown -t ${FORMAT} ${TEST_FILES} )
-endforeach()
+	foreach (FORMAT html latex odf beamer memoir opml lyx) 
+		add_test ( NAME valgrind-${FORMAT} COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/multimarkdown -t ${FORMAT} ${TEST_FILES} )
+	endforeach()
+endif (DEFINED TEST)
