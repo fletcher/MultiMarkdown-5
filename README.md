@@ -143,17 +143,6 @@ The [MultiMarkdown User's Guide] has complete instructions on how to use
 MultiMarkdown.
 
 
-## Developer's Notes ##
-
-The documentation, created by doxygen, has information for developers:
-
-	make documentation
-
-You can then view `build/documentation/html/index.html` for some developer's
-notes.  There's not a lot there yet.  There is also a LaTeX version created
-if you want a PDF.  Just use latexmk in the latex directory.
-
-
 # LyX Support #
 
 Charles R. Cowan (<https://github.com/crcowan>) added support for conversion
