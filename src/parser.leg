@@ -1645,6 +1645,7 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 	return n;
 }
 
+
 node * markdown_chunk_to_node(const char * source, unsigned long extensions) {
 	/* 
 		Designed for parsing 'chunks' of markdown from inside a specific range,
@@ -1674,8 +1675,8 @@ node * markdown_chunk_to_node(const char * source, unsigned long extensions) {
 	return result;
 }
 
-char * markdown_to_string(const char * source, unsigned long extensions, int format) {
-	char *out;
+
+node * parse_markdown(const char * source, unsigned long extensions, int format) {
 	char *formatted;
 	char *critic_resolved;
 	char *target_meta_key = FALSE;
@@ -1731,14 +1732,18 @@ char * markdown_to_string(const char * source, unsigned long extensions, int for
 	}
 
 	if (((parser_data *)g.data)->parse_aborted) {
+		/*
+			2015-11-28 - I don't believe this error had occurred in years.  More recently,
+			however, the check_timeout() function has been disabled. - FTP
+		*/
+
 		/* clean up */
 		free_parser_data((parser_data *)g.data);
 		yydeinit(&g);
 		
 		free(formatted);
 		
-		out = strdup("MultiMarkdown was unable to parse this file.");
-		return out;
+		return NULL;
 	}
 
 	refined = process_raw_blocks(((parser_data *)g.data)->result, extensions);    /* iteratively parse RAW bits */
@@ -1752,16 +1757,35 @@ char * markdown_to_string(const char * source, unsigned long extensions, int for
 //		fprintf(stderr, "No autolabels\n");
 	}
 	
-	/* Show what we got */
-	out = export_node_tree(refined, format, extensions);
-	
 	/* clean up */
-	free_parser_data((parser_data *)g.data);
+	free_parser_data_preserving_result((parser_data *)g.data);
 	yydeinit(&g);
 	
 	free(formatted);
-	return out;
+
+	return refined;
 }
+
+
+char * markdown_to_string(const char * source, unsigned long extensions, int format) { 
+	char * output;
+	node * parse_tree;
+
+	/* Parse source (Multi)Markdown text */
+	parse_tree = parse_markdown(source, extensions, format);
+
+	if (parse_tree == NULL) {
+		output = strdup("");
+		return output;
+	}
+
+	/* Convert to desired output format */
+	output = export_node_tree(parse_tree, format, extensions);
+
+	free_node_tree(parse_tree);
+	return output;
+}
+
 
 /* has_metadata -- determine whether metadata exists or not */
 bool has_metadata(const char *source, unsigned long extensions) {
@@ -1789,6 +1813,7 @@ bool has_metadata(const char *source, unsigned long extensions) {
 	return answer;
 }
 
+
 /* extract_metadata_keys -- return list of metadata keys as "\n" separated list */
 char * extract_metadata_keys(const char *source, unsigned long extensions) {
 	char *out;
@@ -1814,6 +1839,7 @@ char * extract_metadata_keys(const char *source, unsigned long extensions) {
 	free(formatted);
 	return out;
 }
+
 
 /* extract_metadata_value -- find the value and return it */
 char * extract_metadata_value(const char *source, unsigned long extensions, char *key) {
@@ -1841,4 +1867,3 @@ char * extract_metadata_value(const char *source, unsigned long extensions, char
 	free(formatted);
 	return out;
 }
-

@@ -217,6 +217,15 @@ parser_data * mk_parser_data(const char *charbuf, unsigned long extensions) {
 	return result;
 }
 
+void free_parser_data_preserving_result(parser_data *data) {
+	free_node_tree(data->autolabels);
+/* don't do this - it's owned by someone else -- free(data->original); */
+	data->original = NULL;
+	data->charbuf = NULL;
+	
+	free(data);
+}
+
 void free_parser_data(parser_data *data) {
 	free_node_tree(data->result);
 	free_node_tree(data->autolabels);
