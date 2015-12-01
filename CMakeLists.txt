@@ -323,6 +323,8 @@ else ()
 	)
 endif()
 
+set(CPACK_SET_DESTDIR true)
+set(CPACK_INSTALL_PREFIX /usr/local)
 
 install (TARGETS multimarkdown
 	DESTINATION bin
