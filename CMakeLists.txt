@@ -8,10 +8,10 @@ cmake_minimum_required (VERSION 2.6)
 set (My_Project_Title "MultiMarkdown")
 set (My_Project_Description "MultiMarkdown - lightweight markup processor")
 set (My_Project_Author "Fletcher T. Penney")
-set (My_Project_Revised_Date "2015-11-12")
+set (My_Project_Revised_Date "2015-12-01")
 set (My_Project_Version_Major 5)
 set (My_Project_Version_Minor 0)
-set (My_Project_Version_Patch 0)
+set (My_Project_Version_Patch 1)
 
 set (My_Project_Version "${My_Project_Version_Major}.${My_Project_Version_Minor}.${My_Project_Version_Patch}")
 
@@ -245,19 +245,22 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Create zip archive
 	set (CPACK_GENERATOR ZIP)
 
-	# Statically link libraries -- might make the binary slightly more
-	# compatible across Linux distributions, for example
-	#
-	# You may wish to disable this.
-	#
-	
-	set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-	set (BUILD_SHARED_LIBRARIES OFF)
-	set (CMAKE_EXE_LINKER_FLAGS "-static")
-
 	# Some libraries need to be linked on some Linux builds
 	if (DEFINED TEST)
 		# target_link_libraries(run_tests m)
+	else (DEFINE TEST)
+		# Statically link libraries -- might make the binary slightly more
+		# compatible across Linux distributions, for example
+		#
+		# It will likely cause large numbers of errors on valgrind, 
+		# so use "make debug" for valgrind testing
+		#
+		# You may wish to disable this.
+		#
+		
+		set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+		set (BUILD_SHARED_LIBRARIES OFF)
+		set (CMAKE_EXE_LINKER_FLAGS "-static")
 	endif (DEFINED TEST)
 
 endif (WIN32)
@@ -374,9 +377,9 @@ if (DEFINED ZIP)
 endif (DEFINED ZIP)
 
 if (APPLE)
-	set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-Mac-${ZIP_NAME}${CPACK_PACKAGE_VERSION}")
+	set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-Mac-${IS_32_BIT}${ZIP_NAME}${CPACK_PACKAGE_VERSION}")
 else (APPLE)
-	set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${ZIP_NAME}${CPACK_PACKAGE_VERSION}")
+	set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${IS_32_BIT}${ZIP_NAME}${CPACK_PACKAGE_VERSION}")
 endif (APPLE)
 
 install (TARGETS multimarkdown
@@ -452,12 +455,15 @@ ADD_MMD_TEST(critic-highlight "-r -a" CriticMarkup htmlh)
 
 
 # valgrind memory testing
+# Only in 'make debug' mode
 
-find_program ( MEMORYCHECK_COMMAND valgrind)
-set ( MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
+if (DEFINED TEST)
+	find_program ( MEMORYCHECK_COMMAND valgrind)
+	set ( MEMORYCHECK_COMMAND_OPTIONS --leak-check=full --error-exitcode=1)
 
-file (GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests/*.text ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests/*.text)
+	file (GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/Tests/*.text ${PROJECT_SOURCE_DIR}/submodules/MarkdownTest/MultiMarkdownTests/*.text)
 
-foreach (FORMAT html latex odf beamer memoir opml lyx) 
-	add_test ( NAME valgrind-${FORMAT} COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/multimarkdown -t ${FORMAT} ${TEST_FILES} )
-endforeach()
+	foreach (FORMAT html latex odf beamer memoir opml lyx) 
+		add_test ( NAME valgrind-${FORMAT} COMMAND "${MEMORYCHECK_COMMAND}" ${MEMORYCHECK_COMMAND_OPTIONS} ${PROJECT_BINARY_DIR}/multimarkdown -t ${FORMAT} ${TEST_FILES} )
+	endforeach()
+endif (DEFINED TEST)

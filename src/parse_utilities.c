@@ -103,29 +103,6 @@ node * mk_list(int key, node *list) {
 	result->children = reverse_list(list);
 	return result;
 }
-	
-/* Create a new node with position information */
-node * mk_pos_node(int key, char *string, unsigned int start, unsigned int stop) {
-	node *result = mk_node(key);
-	if (string != NULL)
-		result->str = strdup(string);
-	
-	return result;
-}
-
-/* Create a new string node with position information */
-node * mk_pos_str(char *string, unsigned int start, unsigned int stop) {
-	node *result = mk_str(string);
-	
-	return result;
-}
-
-/* Create a new list node with position information */
-node * mk_pos_list(int key, node *list, unsigned int start, unsigned int stop) {
-	node *result = mk_list(key, list);
-	
-	return result;
-}
 
 /* free just the current node and children*/
 void free_node(node *n) {
@@ -238,6 +215,15 @@ parser_data * mk_parser_data(const char *charbuf, unsigned long extensions) {
 	result->stop_time = start + 3 * CLOCKS_PER_SEC;	/* 3 second timeout */
 	
 	return result;
+}
+
+void free_parser_data_preserving_result(parser_data *data) {
+	free_node_tree(data->autolabels);
+/* don't do this - it's owned by someone else -- free(data->original); */
+	data->original = NULL;
+	data->charbuf = NULL;
+	
+	free(data);
 }
 
 void free_parser_data(parser_data *data) {

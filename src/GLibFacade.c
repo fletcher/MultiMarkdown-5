@@ -76,7 +76,7 @@ int asprintf( char **sptr, char *fmt, ... )
 #define kStringBufferStartingSize 1024
 #define kStringBufferGrowthMultiplier 2
 
-GString* g_string_new(char *startingString)
+GString* g_string_new(const char *startingString)
 {
 	GString* newString = malloc(sizeof(GString));
 

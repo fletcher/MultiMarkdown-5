@@ -61,7 +61,7 @@ windows-32: $(BUILD_DIR) $(GREG)
 .PHONY : windows-zip-32
 windows-zip-32: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
-	cmake -DCMAKE_TOOLCHAIN_FILE=../tools/Toolchain-mingw32.cmake -DCMAKE_BUILD_TYPE=Release -DZIP=1 ..
+	cmake -DCMAKE_TOOLCHAIN_FILE=../tools/Toolchain-MinGW-w64-32bit.cmake -DCMAKE_BUILD_TYPE=Release -DZIP=1 ..
 
 # Build the documentation using doxygen
 .PHONY : documentation
@@ -80,10 +80,14 @@ $(GREG):
 	$(MAKE) -C submodules/greg
 
 # Create build directory if it doesn't exist
-$(BUILD_DIR):
+$(BUILD_DIR): CHANGELOG
 	-mkdir $(BUILD_DIR) 2>/dev/null
 	-cd $(BUILD_DIR); rm -rf *
 
+# Generate a list of changes since last commit to 'master' branch
+.PHONY : CHANGELOG
+CHANGELOG:
+	git log master..develop --format="*	%s" | sort | uniq > CHANGELOG-UNRELEASED
 
 
 # ===============

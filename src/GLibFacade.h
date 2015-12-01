@@ -69,7 +69,7 @@ typedef struct
 	unsigned long currentStringLength;
 } GString;
 
-GString* g_string_new(char *startingString);
+GString* g_string_new(const char *startingString);
 char* g_string_free(GString* ripString, bool freeCharacterData);
 
 void g_string_append_c(GString* baseString, char appendedCharacter);

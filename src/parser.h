@@ -118,9 +118,6 @@ node * mk_node(int key);
 node * mk_str(char *string);
 node * mk_list(int key, node *list);
 node * mk_link(node *text, char *label, char *source, char *title, node *attr);
-node * mk_pos_node(int key, char *string, unsigned int start, unsigned int stop);
-node * mk_pos_str(char *string, unsigned int start, unsigned int stop);
-node * mk_pos_list(int key, node *list, unsigned int start, unsigned int stop);
 
 void   free_node(node *n);
 void   free_node_tree(node * n);
@@ -137,6 +134,7 @@ GString * concat_string_list(node *list);
 
 parser_data * mk_parser_data(const char *charbuf, unsigned long extensions);
 void   free_parser_data(parser_data *data);
+void free_parser_data_preserving_result(parser_data *data);
 
 char * preformat_text(const char *text);
 

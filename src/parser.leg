@@ -25,9 +25,9 @@
 
 
 /* Define shortcuts to adding nodes, etc. */
-#define node(x)       mk_pos_node(x, NULL, thunk->begin, thunk->end)
-#define str(x)        mk_pos_str(x, thunk->begin, thunk->end)
-#define list(x,y)     mk_pos_list(x, y, thunk->begin, thunk->end)
+#define node(x)       mk_node(x)
+#define str(x)        mk_str(x)
+#define list(x,y)     mk_list(x, y)
 
 #define ext(x)        extension(x,((parser_data *)G->data)->extensions)
 
@@ -66,7 +66,9 @@ MetaData = a:StartList
 		)
 		(MetaDataKeyValue { a = cons($$, a); })+
 		(YAMLStop)?)
-		{ $$ = list(METADATA, a); }
+		{
+			$$ = list(METADATA, a);
+		}
 
 MetaDataKeyValue = a:MetaDataKey Sp ':' Sp b:MetaDataValue
 	{
@@ -157,25 +159,36 @@ HeadingSectionBlock = BlankLine* !Heading
 
 TOC = "{{TOC}}" Sp Newline
 	{
-		$$ = mk_node(TOC);
-		$$->children = mk_node(RAW);
+		$$ = node(TOC);
+		$$->children = node(RAW);
 		$$->children->str = markdown_to_string(((parser_data *)G->data)->original, 0, TOC_FORMAT);
 	}
 
 Heading = SetextHeading | AtxHeading
 
-HeadingSection = a:StartList Heading { a = cons($$, a); }
+HeadingSection = a:StartList Heading {
+		a = cons($$, a);
+	}
 	(HeadingSectionBlock {a = cons($$, a); })*
-	{ $$ = list(HEADINGSECTION, a); }
+	{
+		$$ = list(HEADINGSECTION, a);
+	}
 
 AtxInline = !Newline !( &{ !ext(EXT_COMPATIBILITY) } Sp AutoLabel Sp '#'* Sp Newline) !(Sp '#'* Sp Newline) Inline
 
 AtxStart =  NonindentSpace < ( "######" | "#####" | "####" | "###" | "##" | "#" ) >
 		{ $$ = node(H1 + ((int)strlen(yytext) - 1)); }
 
-AtxHeading = s:AtxStart Sp a:StartList ( AtxInline { a = cons($$, a); } )+ ( Sp b:AutoLabel { append_list(b,a);})? (Sp '#'* Sp)? Sp < Newline >
-# <newline> ensures that we count characters all the way to the end
-		{ $$ = list(s->key,a); free(s); }
+AtxHeading = s:AtxStart Sp a:StartList
+	( AtxInline { a = cons($$, a); } )+
+	( Sp b:AutoLabel { append_list(b,a);})?
+	(Sp '#'* Sp)?
+	Sp < Newline >
+	# <newline> ensures that we count characters all the way to the end
+		{
+			$$ = list(s->key,a);
+			free(s);
+		}
 
 SetextHeading = NonindentSpace (SetextHeading1 | SetextHeading2)
 
@@ -185,20 +198,28 @@ SetextBottom2 = NonindentSpace '-'+ Sp Newline
 
 SetextHeading1 =  &(RawLine SetextBottom1)
 		a:StartList ( !Endline !( &{ !ext(EXT_COMPATIBILITY) } Sp AutoLabel ) Inline { a = cons($$, a); } )+ ( Sp b:AutoLabel { append_list(b,a);} Sp )? Sp Newline
-		<SetextBottom1> { $$ = list(H1, a); }
+		<SetextBottom1>
+		{
+			$$ = list(H1, a);
+		}
 
 SetextHeading2 =  &(RawLine SetextBottom2)
 		a:StartList ( !Endline !( &{ !ext(EXT_COMPATIBILITY) } Sp AutoLabel ) Inline { a = cons($$, a); } )+ ( Sp b:AutoLabel { append_list(b,a)} Sp )? Sp Newline
-		<SetextBottom2> { $$ = list(H2, a); }
+		<SetextBottom2>
+		{
+			$$ = list(H2, a);
+		}
 
 
 BlockQuote = a:BlockQuoteRaw
-	{ $$ = list(BLOCKQUOTE,a); }
+	{
+		$$ = list(BLOCKQUOTE,a);
+	}
 
 BlockQuoteRaw =  a:StartList x:StartList
 		(( NonindentSpace b:BlockQuoteMarker Line { a = cons($$, a); x = cons(b, x); } )
 		( !(NonindentSpace '>') !BlankLine Line { a = cons($$, a); } )*
-		( BlankLine { a = cons(mk_str("\n"), a); } )*
+		( BlankLine { a = cons(str("\n"), a); } )*
 		)+
 		{
 			$$ = x;
@@ -274,14 +295,22 @@ Entity = ( HexEntity | DecEntity | CharEntity )
 		{ $$ = str(yytext); $$->key = HTML; }
 
 Para =	NonindentSpace a:Inlines BlankLine+
-		{ $$ = a; $$->key = PARA; }
+		{
+			$$ = a;
+			$$->key = PARA;
+		}
 
 Plain =	a:Inlines
-		{ $$ = a; $$->key = PLAIN; }
+		{
+			$$ = a;
+			$$->key = PLAIN;
+		}
 
 Inlines =	a:StartList ( !Endline Inline { a = cons($$, a); }
 			| c:Endline &Inline { a = cons(c, a); } )+ voidEndline?
-		{ $$ = list(LIST, a); }
+		{
+			$$ = list(LIST, a);
+		}
 
 Inline = #&{ check_timeout((parser_data *)G->data) }
 # TODO: the check_timeout function still slows us down -- do we still need it??
@@ -333,7 +362,10 @@ InlineNoEmph = #&{ check_timeout((parser_data *)G->data) }
 
 
 Space = Spacechar+
-	{ $$ = str(" "); $$->key = SPACE; }
+	{
+		$$ = str(" ");
+		$$->key = SPACE;
+	}
 
 Endline =   LineBreak | TerminalEndline | NormalEndline
 
@@ -348,7 +380,10 @@ TerminalEndline = Sp Newline Eof
 		{ $$ = NULL; }
 
 LineBreak = ("  " | &{ !ext(EXT_COMPATIBILITY) && ext(EXT_ESCAPED_LINE_BREAKS) } Sp "\\") a:NormalEndline
-		{ $$ = a; $$->key = LINEBREAK; }
+		{
+			$$ = a;
+			$$->key = LINEBREAK;
+		}
 
 voidEndline = (("  " | &{ !ext(EXT_COMPATIBILITY) && ext(EXT_ESCAPED_LINE_BREAKS) } Sp "\\") voidNormalEndline) | (Sp Newline Eof) | voidNormalEndline
 
@@ -358,7 +393,13 @@ voidNormalEndline = Sp Newline !BlankLine !'>' !AtxStart
 Str = 	a:StartList < NormalChar+ > { a = cons(str(yytext), a); }
 		( &{ !ext(EXT_COMPATIBILITY) }  StrChunk { a = cons($$, a); } )*
 		( &{ !ext(EXT_COMPATIBILITY) } ( Superscript | Subscript) {a = cons($$, a); } )*
-		{ if (a->next == NULL) { $$ = a; } else { $$ = list(LIST, a); } }
+		{
+			if (a->next == NULL) {
+				$$ = a;
+			} else {
+				$$ = list(LIST, a);
+			}
+		}
 
 StrChunk = < (NormalChar | '_'+ !Punctuation &Alphanumeric)+ > { $$ = str(yytext); } |
 	AposChunk
@@ -378,13 +419,13 @@ StartList = &.
 MathSpan = '\\' < (
 	('\\[' (!'\\\\]' .)* '\\\\]') |
 	('\\(' (!'\\\\)' .)* '\\\\)') ) >
-{
-	/* Basically, these delimiters indicate math in LaTeX syntax, and the
-	   delimiters are compatible with MathJax and LaTeX
-	   ASCIIMathML is *not* supported */
-	$$ = str(yytext);
-	$$->key = MATHSPAN;
-}
+		{
+			/* Basically, these delimiters indicate math in LaTeX syntax, and the
+			   delimiters are compatible with MathJax and LaTeX
+			   ASCIIMathML is *not* supported */
+			$$ = str(yytext);
+			$$->key = MATHSPAN;
+		}
 
 SingleDollarMathStart = '$' !(Spacechar | Newline | '$' )
 
@@ -420,8 +461,9 @@ Emph = < EmphMatch >
 		*/
 
 		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
-		if ($$ != NULL)
+		if ($$ != NULL) {
 			$$->key = EMPH;
+		}
 	}
 
 
@@ -447,8 +489,9 @@ Strong = < StrongMatch >
 			*/
 
 			$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions );
-			if ($$ != NULL)
+			if ($$ != NULL) {
 				$$->key = STRONG;
+			}
 		}
 
 StrongMatch = &{ !ext(EXT_NO_STRONG) } (StrongStar | StrongUl)
@@ -531,7 +574,9 @@ CitationReferenceSingle =  < (( "[]" Spnl b:RawCitationReference )
 	}
 
 RawCitationReference = "[#" < ( !Newline !']' . )+ > ']'
-		{ $$ = str(yytext); }
+		{
+			$$ = str(yytext);
+		}
 
 Variable = "[%" < (!Newline !']' .)+ > ']'
 	{
@@ -612,7 +657,7 @@ AttrKey = < AlphanumericAscii+ >
 	{
 		char *lab;
 		lab = label_from_string(yytext);
-		$$ = mk_str(lab);
+		$$ = str(lab);
 		$$->key = ATTRKEY;
 		free(lab);
 	}
@@ -662,17 +707,24 @@ Abbreviation = '*' l:Label Sp ':' Sp RawLine
 	}
 
 ImageBlock = Image Sp Newline BlankLine+
-	{ if ($$->key == IMAGE) $$->key = IMAGEBLOCK; }
+	{
+		if ($$->key == IMAGE)
+			$$->key = IMAGEBLOCK;
+	}
 
 Image = '!' ( !AutoLink Link )
-		{ $$->key = IMAGE; }
+		{
+			$$->key = IMAGE;
+		}
 
 
 Label = < "[" !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } )
 	a:StartList
 		( !']' Inline { a = cons($$, a); } )*
 			']'>
-	{ $$ = list(LIST, a); }
+	{
+		$$ = list(LIST, a);
+	}
 
 AutoLabel = '[' < (!Newline !'^' !'#' !'%' . )( !Newline !']' !'[' . )+ > ']' &(!(Sp ('(' | '[')))
 {
@@ -736,14 +788,17 @@ Glossary =  &{ ext(EXT_NOTES) }
 
 GlossaryTerm =  < (!Newline !'(' .)+ >
 	{ 
-		$$ = mk_list(LIST, NULL);
+		$$ = list(LIST, NULL);
 		$$->str = 0;
-		$$->children = mk_str(yytext);
+		$$->children = str(yytext);
 		$$->key = GLOSSARYTERM;
 	}
 
 GlossarySortKey = '(' < (!')' !Newline .)* > ')'
-	{ $$ = mk_str(yytext); $$->key = GLOSSARYSORTKEY; }
+	{
+		$$ = str(yytext);
+		$$->key = GLOSSARYSORTKEY;
+	}
 
 Ticks1 = "`" !'`'
 Ticks2 = "``" !'`'
@@ -757,7 +812,10 @@ Code = ( Ticks1 Sp < ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) ( 
        | Ticks4 Sp < ( ( !'`' Nonspacechar )+ | !Ticks4 '`'+ | !( Sp Ticks4 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks4
        | Ticks5 Sp < ( ( !'`' Nonspacechar )+ | !Ticks5 '`'+ | !( Sp Ticks5 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks5
        )
-       { $$ = str(yytext); $$->key = CODE; }
+		{
+       		$$ = str(yytext);
+       		$$->key = CODE;
+       	}
 
 FenceType = Sp &((!'\n' !'\r' !'`' .)* Newline) RawLine
 		{ $$ = str(yytext); $$->key = VERBATIMTYPE; }
@@ -766,7 +824,8 @@ Fenced = NonindentSpace (( Ticks3 a:FenceType < ( (!(NonindentSpace Ticks3) NonM
 		( Ticks4 a:FenceType < ( (!(NonindentSpace Ticks4) NonMatchingRawLine)* ) > NonindentSpace Ticks4 Sp Newline ) |
 		( Ticks5 a:FenceType < ( (!(NonindentSpace Ticks5) NonMatchingRawLine)* ) > NonindentSpace Ticks5 Sp Newline ) )
 	{
-		$$ = str(yytext); $$->key = VERBATIMFENCE;
+		$$ = str(yytext);
+		$$->key = VERBATIMFENCE;
 		$$->children = a;
 	}
 
@@ -797,7 +856,9 @@ SingleQuoted = SingleQuoteStart
 		a:StartList
 		( !SingleQuoteEnd b:Inline { a = cons(b, a); } )*
 		SingleQuoteEnd
-		{ $$ = mk_list(SINGLEQUOTED, a); }
+		{
+			$$ = list(SINGLEQUOTED, a);
+		}
 
 DoubleQuoteStart = '"'
 
@@ -807,7 +868,7 @@ DoubleQuoted =  DoubleQuoteStart
 		a:StartList
 		( !DoubleQuoteEnd !BackTickEnd !BackTickStart b:Inline { a = cons(b, a); } )*
 		DoubleQuoteEnd
-		{ $$ = mk_list(DOUBLEQUOTED, a); }
+		{ $$ = list(DOUBLEQUOTED, a); }
 
 BackTickStart = '``'
 
@@ -817,18 +878,25 @@ BackTickQuoted =  BackTickStart
 		a:StartList
 		( !DoubleQuoteEnd !BackTickEnd b:Inline { a = cons(b, a); } )*
 		BackTickEnd
-		{ $$ = mk_list(DOUBLEQUOTED, a); }
+		{
+			$$ = list(DOUBLEQUOTED, a);
+		}
 
 NonblankIndentedLine = !BlankLine IndentedLine
 
 VerbatimChunk = a:StartList
-		( BlankLine { a = cons(mk_str("\n"), a); } )*
+		( BlankLine { a = cons(str("\n"), a); } )*
 		( NonblankIndentedLine { a = cons($$, a); } )+
-		{ $$ = mk_str_from_list(a, false); }
+		{
+			$$ = mk_str_from_list(a, false);
+		}
 
 Verbatim = BlankLine* a:StartList
 		( VerbatimChunk { a = cons($$, a); } )+ BlankLine*
-		{ $$ = mk_str_from_list(a, false); $$->key = VERBATIM; }
+		{
+			$$ = mk_str_from_list(a, false);
+			$$->key = VERBATIM;
+		}
 
 
 HorizontalRule = NonindentSpace
@@ -836,7 +904,9 @@ HorizontalRule = NonindentSpace
 		| '-' Sp '-' Sp '-' (Sp '-')*
 		| '_' Sp '_' Sp '_' (Sp '_')*)
 		Sp Newline BlankLine*
-		{ $$ = mk_node(HRULE); }
+		{
+			$$ = node(HRULE);
+		}
 
 DefinitionList =  a:StartList &(TermLine+ Newline? NonindentSpace ':')
 		( (Term { a = cons($$, a); } )+
@@ -844,21 +914,26 @@ DefinitionList =  a:StartList &(TermLine+ Newline? NonindentSpace ':')
 			(Definition { a = cons($$, a);})+
 			BlankLine*
 		)+
-		{ $$ = mk_list(LIST, a); $$->key = DEFLIST; }
+		{
+			$$ = list(LIST, a);
+			$$->key = DEFLIST;
+		}
 
 TermLine = !':' !BlankLine (!Newline .)* Newline
 
 Term =  a:StartList !BlankLine !':'
 	(!Newline !Endline Inline {a = cons($$, a);} )+ Sp Newline
-	{ $$ = mk_list(TERM,a); }
+	{
+		$$ = list(TERM,a);
+	}
 
 Definition = (a:StartList b:StartList
-		(BlankLine { b = cons(mk_str("\n"),b); } )?
-		( NonindentSpace ':' Sp RawLine { a = cons(mk_str(yytext), a);}) 
-		( !':' !BlankLine RawLine { a = cons(mk_str(yytext), a);})*
-		( BlankLine {a = cons(mk_str("\n"),a);}
+		(BlankLine { b = cons(str("\n"),b); } )?
+		( NonindentSpace ':' Sp RawLine { a = cons(str(yytext), a);}) 
+		( !':' !BlankLine RawLine { a = cons(str(yytext), a);})*
+		( BlankLine {a = cons(str("\n"),a);}
 			(IndentedLine { a = cons($$,a);})+ 
-			{ a = cons(mk_str("\n"),a);}
+			{ a = cons(str("\n"),a);}
 		)*  )
 		{
 			if (b != NULL) { a = cons(b,a);}
@@ -877,7 +952,9 @@ BulletList = &Bullet (ListTight | ListLoose)
 ListTight = a:StartList
 		( ListItemTight { a = cons($$, a); } )+
 		BlankLine* !(Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoSpace &EmptyList )
-		{ $$ = list(LIST, a); }
+		{
+			$$ = list(LIST, a);
+		}
 
 ListLoose = a:StartList
 		( b:ListItem BlankLine*
@@ -889,7 +966,9 @@ ListLoose = a:StartList
 			strncat(li->str + size, "\n\n", 2);  /* In loose list, \n\n added to end of each element */
 			a = cons(b, a);
 		} )+
-		{ $$ = list(LIST, a); }
+		{
+			$$ = list(LIST, a);
+		}
 
 ListItem = < ( Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoSpace &EmptyList )>
 		a:StartList
@@ -918,12 +997,16 @@ ListItemTight = ( Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoS
 		}
 
 EmptyList = BlankLine
-		{ $$ = mk_str(""); }
+		{
+			$$ = str("");
+		}
 
 ListBlock = a:StartList
 		( EmptyList | !Heading Line ) { a = cons($$, a); }
 		( ListBlockLine { a = cons($$, a); } )*
-		{ $$ = mk_str_from_list(a, false); }
+		{
+			$$ = mk_str_from_list(a, false);
+		}
 
 ListContinuationBlock = a:StartList
 		( < BlankLine* >
@@ -934,7 +1017,9 @@ ListContinuationBlock = a:StartList
 				a = cons(str(yytext), a);
 		} )
 		( Indent !BlankLine ListBlock { a = cons($$, a); } )+
-		{  $$ = mk_str_from_list(a, false); }
+		{
+			$$ = mk_str_from_list(a, false);
+		}
 
 Enumerator = NonindentSpace [0-9]+ '.' Spacechar+
 
@@ -1203,7 +1288,7 @@ HtmlBlock = !MarkdownHtmlTagOpen < ( HtmlBlockInTags | HtmlComment | HtmlBlockSe
 		BlankLine+
 		{
 			if (ext(EXT_FILTER_HTML)) {
-				$$ = mk_list(LIST, NULL);
+				$$ = list(LIST, NULL);
 			} else {
 				$$ = str(yytext);
 				if ( ext(EXT_PROCESS_HTML)) $$->key = RAW;
@@ -1218,16 +1303,19 @@ MarkdownHtmlBlock = &MarkdownHtmlTagOpen < ( HtmlBlockInTags | HtmlComment | Htm
 MarkdownHtmlAttribute = ("markdown" | "MARKDOWN")
 		Spnl '=' Spnl ('"' Spnl)? "1" (Spnl '"')? Spnl
 
-MarkdownHtmlTagOpen = a:StartList '<' {a = cons(mk_str("<"),a);}
-		Spnl <HtmlBlockType> {a = cons(mk_str(yytext),a);} &Spacechar Spnl
+MarkdownHtmlTagOpen = a:StartList '<' {a = cons(str("<"),a);}
+		Spnl <HtmlBlockType> {a = cons(str(yytext),a);} &Spacechar Spnl
 		(!MarkdownHtmlAttribute
-			<HtmlAttribute> {a = cons(mk_str(" "),a);
-				a = cons(mk_str(yytext),a);})*
+			<HtmlAttribute> {a = cons(str(" "),a);
+				a = cons(str(yytext),a);})*
 			MarkdownHtmlAttribute
-			(<HtmlAttribute> {a = cons(mk_str(" "),a);
-				a = cons(mk_str(yytext),a);})*
-			'>' { a = cons(mk_str(">"),a);}
-			{ $$ = mk_str_from_list(a,false); $$->key = HTML; }
+			(<HtmlAttribute> {a = cons(str(" "),a);
+				a = cons(str(yytext),a);})*
+			'>' { a = cons(str(">"),a);}
+			{
+				$$ = mk_str_from_list(a,false);
+				$$->key = HTML;
+			}
 
 HtmlBlockSelfClosing = '<' Spnl HtmlBlockType Spnl HtmlAttribute* '/' Spnl '>'
 
@@ -1246,9 +1334,9 @@ StyleBlock  = < InStyleTags >
 		BlankLine*
 		{
 			if (ext(EXT_FILTER_STYLES)) {
-				$$ = mk_list(LIST, NULL);
+				$$ = list(LIST, NULL);
 			} else {
-				$$ = mk_str(yytext);
+				$$ = str(yytext);
 				$$->key = HTMLBLOCK;
 			}
 		}
@@ -1272,13 +1360,17 @@ Table = a:StartList b:StartList (TableCaption { b = cons($$, b);})?
 		}
 
 TableBody = a:StartList (TableRow {a = cons($$, a);})+
-		{ $$ = list(TABLEBODY, a);}
+		{
+			$$ = list(TABLEBODY, a);
+		}
 
 TableRow = a:StartList
 		(!SeparatorLine &(TableLine)
 		CellDivider?
 		(TableCell { a = cons($$, a); })+ ) Sp <Newline>
-		{ $$ = list(TABLEROW, a); }
+		{
+			$$ = list(TABLEROW, a);
+		}
 
 TableLine = (!Newline !CellDivider .)* CellDivider
 
@@ -1295,10 +1387,14 @@ ExtendedCell = (EmptyCell | FullCell) <CellDivider+>
 
 FullCell = Sp a:StartList  ((!Newline !Endline !CellDivider !(Sp &CellDivider) Inline ) { a = cons($$,a)})+
     <Sp> ( CellDivider )?
-		{ $$ = list(TABLECELL,a); }
+		{
+			$$ = list(TABLECELL,a);
+		}
 
 EmptyCell = <Sp> CellDivider
-		{ $$ = node(TABLECELL); }
+		{
+			$$ = node(TABLECELL);
+		}
 
 SeparatorLine = a:StartList 
 		&(TableLine)
@@ -1316,22 +1412,22 @@ AlignmentCell = Sp (!CellDivider ( LeftAlignWrap | CenterAlignWrap | RightAlignW
 		Sp ( CellDivider )?
 
 LeftAlignWrap = ':'? ('-'+ | '='+) '+' &(!'-' !'=' !':')
-		{ $$ = mk_str("L");}
+		{ $$ = str("L");}
 
 LeftAlign = ':'? ('-'+ | '='+) &(!'-' !':')
-		{ $$ = mk_str("l");}
+		{ $$ = str("l");}
 
 CenterAlignWrap = ':' ('-'+ | '='+)? '+' ':' &(!'-' !'=' !':')
-		{ $$ = mk_str("C");}
+		{ $$ = str("C");}
 
 CenterAlign = ':' ('-'+ | '='+)? ':' &(!'-' !'=' !':')
-		{ $$ = mk_str("c");}
+		{ $$ = str("c");}
 
 RightAlignWrap = ('-'+ | '='+) ':' '+' &(!'-' !'=' !':')
-		{ $$ = mk_str("R");}
+		{ $$ = str("R");}
 
 RightAlign = ('-'+ | '='+)':' &(!'-' !'=' !':')
-		{ $$ = mk_str("r");}
+		{ $$ = str("r");}
 
 CellDivider = '|'
 
@@ -1354,7 +1450,9 @@ TableCaption = b:StartList a:StartList (< BracketedText >
 		}
 
 RawNoteReference = ( "[^" | "[#" ) < ( !Newline !']' . )+ > ']'
-		{ $$ = str(yytext); }
+		{
+			$$ = str(yytext);
+		}
 
 Note = &{ ext(EXT_NOTES) }
 		NonindentSpace ref:RawNoteReference ':' Sp
@@ -1375,7 +1473,10 @@ Note = &{ ext(EXT_NOTES) }
 RawNoteBlock = a:StartList
 		( !BlankLine !(NonindentSpace RawNoteReference ':') OptionallyIndentedLine { a = cons($$, a); } )+
 		( < BlankLine* > { a = cons(str(yytext), a); } )
-		{ $$ = mk_str_from_list(a, true); $$->key = RAW; }
+		{
+			$$ = mk_str_from_list(a, true);
+			$$->key = RAW;
+		}
 
 DocForOPML = BOM? a:StartList 
 		( &{ !ext(EXT_COMPATIBILITY) }
@@ -1388,7 +1489,7 @@ OPMLBlock = BlankLine* ( OPMLHeadingSection | OPMLPlain )
 
 OPMLHeadingSection = a:StartList OPMLHeading { a = cons($$, a); }
 		(OPMLSectionBlock {a = cons($$, a); })*
-		{ $$ = mk_list(HEADINGSECTION, a);}
+		{ $$ = list(HEADINGSECTION, a);}
 
 OPMLHeading = OPMLAtxHeading | OPMLSetextHeading
 
@@ -1412,7 +1513,7 @@ OPMLSetextHeading2 = < (!'\r' !'\n' .)* > Newline SetextBottom2
 OPMLSectionBlock = BlankLine* !OPMLHeading OPMLPlain
 
 OPMLPlain = a:StartList (!BlankLine !Heading Line { a = cons($$,a); })+
-		{ $$ = mk_list(PLAIN, a); }
+		{ $$ = list(PLAIN, a); }
 
 DocForTOC = BOM? a: StartList
 		(&( (YAMLStart)? MetaDataKey Sp ':' Sp (!Newline)) z:MetaData { free_node_tree(z); } )?
@@ -1424,7 +1525,7 @@ TOCBlock = BlankLine* TOCHeadingSection
 
 TOCHeadingSection = a:StartList Heading { a = cons($$, a); }
 	(TOCSectionBlock )*
-	{ $$ = mk_list(HEADINGSECTION, a); }
+	{ $$ = list(HEADINGSECTION, a); }
 
 TOCSectionBlock = BlankLine* !Heading TOCPlain
 
@@ -1436,25 +1537,45 @@ TOCPlain = ( (y:Fenced { free_node_tree(y); } ) | (!BlankLine !Heading z:Line { 
 CriticMarkup = CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment
 
 CriticAddition = ('{++' < (!'++}' .)* > '++}')
-	{ $$ = str(yytext); $$->key = CRITICADDITION; }
+	{
+		$$ = str(yytext);
+		$$->key = CRITICADDITION;
+	}
 
 CriticDeletion = ('{--' < (!'--}' .)* > '--}')
-	{ $$ = str(yytext); $$->key = CRITICDELETION; }
+	{
+		$$ = str(yytext);
+		$$->key = CRITICDELETION;
+	}
 
 CriticSubstitution = a:StartList ( '{~~' CriticSubstDel { a = cons($$,a); } '~>' CriticSubstAdd { a = cons($$,a); } '~~}')
-	{ $$ = list(CRITICSUBSTITUTION, a); }
+	{
+		$$ = list(CRITICSUBSTITUTION, a);
+	}
 
 CriticSubstDel = < (!'~>' .)* >
-	{ $$ = str(yytext); $$->key = CRITICDELETION; }
+	{
+		$$ = str(yytext);
+		$$->key = CRITICDELETION;
+	}
 
 CriticSubstAdd = < (!'~~}' .)* >
-	{ $$ = str(yytext); $$->key = CRITICADDITION; }
+	{
+		$$ = str(yytext);
+		$$->key = CRITICADDITION;
+	}
 
 CriticHighlight = ('{==' < (!'==}' .)* > '==}')
-	{ $$ = str(yytext); $$->key = CRITICHIGHLIGHT; }
+	{
+		$$ = str(yytext);
+		$$->key = CRITICHIGHLIGHT;
+	}
 
 CriticComment = ('{>>' < (!'<<}' .)* > '<<}')
-	{ $$ = str(yytext); $$->key = CRITICCOMMENT; }
+	{
+		$$ = str(yytext);
+		$$->key = CRITICCOMMENT;
+	}
 
 DocForCritic = BOM? a:StartList
 		( CriticString { a = cons($$, a); } | RawString { a = cons($$, a); } | FalseMatch { a = cons($$, a); } )*
@@ -1524,6 +1645,7 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 	return n;
 }
 
+
 node * markdown_chunk_to_node(const char * source, unsigned long extensions) {
 	/* 
 		Designed for parsing 'chunks' of markdown from inside a specific range,
@@ -1553,8 +1675,8 @@ node * markdown_chunk_to_node(const char * source, unsigned long extensions) {
 	return result;
 }
 
-char * markdown_to_string(const char * source, unsigned long extensions, int format) {
-	char *out;
+
+node * parse_markdown(const char * source, unsigned long extensions, int format) {
 	char *formatted;
 	char *critic_resolved;
 	char *target_meta_key = FALSE;
@@ -1610,14 +1732,18 @@ char * markdown_to_string(const char * source, unsigned long extensions, int for
 	}
 
 	if (((parser_data *)g.data)->parse_aborted) {
+		/*
+			2015-11-28 - I don't believe this error had occurred in years.  More recently,
+			however, the check_timeout() function has been disabled. - FTP
+		*/
+
 		/* clean up */
 		free_parser_data((parser_data *)g.data);
 		yydeinit(&g);
 		
 		free(formatted);
 		
-		out = strdup("MultiMarkdown was unable to parse this file.");
-		return out;
+		return NULL;
 	}
 
 	refined = process_raw_blocks(((parser_data *)g.data)->result, extensions);    /* iteratively parse RAW bits */
@@ -1631,16 +1757,35 @@ char * markdown_to_string(const char * source, unsigned long extensions, int for
 //		fprintf(stderr, "No autolabels\n");
 	}
 	
-	/* Show what we got */
-	out = export_node_tree(refined, format, extensions);
-	
 	/* clean up */
-	free_parser_data((parser_data *)g.data);
+	free_parser_data_preserving_result((parser_data *)g.data);
 	yydeinit(&g);
 	
 	free(formatted);
-	return out;
+
+	return refined;
 }
+
+
+char * markdown_to_string(const char * source, unsigned long extensions, int format) { 
+	char * output;
+	node * parse_tree;
+
+	/* Parse source (Multi)Markdown text */
+	parse_tree = parse_markdown(source, extensions, format);
+
+	if (parse_tree == NULL) {
+		output = strdup("");
+		return output;
+	}
+
+	/* Convert to desired output format */
+	output = export_node_tree(parse_tree, format, extensions);
+
+	free_node_tree(parse_tree);
+	return output;
+}
+
 
 /* has_metadata -- determine whether metadata exists or not */
 bool has_metadata(const char *source, unsigned long extensions) {
@@ -1668,6 +1813,7 @@ bool has_metadata(const char *source, unsigned long extensions) {
 	return answer;
 }
 
+
 /* extract_metadata_keys -- return list of metadata keys as "\n" separated list */
 char * extract_metadata_keys(const char *source, unsigned long extensions) {
 	char *out;
@@ -1693,6 +1839,7 @@ char * extract_metadata_keys(const char *source, unsigned long extensions) {
 	free(formatted);
 	return out;
 }
+
 
 /* extract_metadata_value -- find the value and return it */
 char * extract_metadata_value(const char *source, unsigned long extensions, char *key) {
@@ -1720,4 +1867,3 @@ char * extract_metadata_value(const char *source, unsigned long extensions, char
 	free(formatted);
 	return out;
 }
-
