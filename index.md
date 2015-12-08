@@ -2,7 +2,7 @@ latex input:	mmd-tufte-handout-header
 Title:	MultiMarkdown User's Guide
 Author:	Fletcher T. Penney
 Version:	{{version.txt}}
-Revised:	2015-11-20  
+Revised:	2015-12-08  
 Keywords:	MultiMarkdown, Markdown, LaTeX, PDF, RTF, LyX, HTML
 Base Header Level:	2
 CSS:	{{css.txt}}

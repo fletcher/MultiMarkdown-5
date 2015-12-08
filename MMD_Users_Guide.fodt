@@ -261,7 +261,7 @@
 User's Guide</meta:user-defined>
 <meta:user-defined meta:name="Author">Fletcher T. Penney</meta:user-defined>
 <meta:user-defined meta:name="Version">5.0.0</meta:user-defined>
-<meta:user-defined meta:name="Revised">2015-11-15</meta:user-defined>
+<meta:user-defined meta:name="Revised">2015-12-08</meta:user-defined>
 <meta:keyword>MultiMarkdown, Markdown, LaTeX, PDF, RTF, LyX, HTML</meta:keyword>
 <meta:user-defined meta:name="MMD Footer">links.txt</meta:user-defined>
 </office:meta>
@@ -269,7 +269,7 @@ User's Guide</meta:user-defined>
 <office:text>
 <text:h text:outline-level="2"><text:bookmark text:name="title"/>MultiMarkdown User's Guide<text:bookmark-end text:name="title"/></text:h>
 
-<text:p text:style-name="Quotations">Version 5.0.0<text:line-break/>Revised 2015-11-15</text:p>
+<text:p text:style-name="Quotations">Version 5.0.0<text:line-break/>Revised 2015-12-08</text:p>
 
 <text:h text:outline-level="2"><text:bookmark text:name="introduction"/>Introduction<text:bookmark-end text:name="introduction"/></text:h>
 
@@ -280,8 +280,8 @@ User's Guide</meta:user-defined>
 <text:h text:outline-level="3"><text:bookmark text:name="whatismarkdown"/>What is Markdown?<text:bookmark-end text:name="whatismarkdown"/></text:h>
 
 <text:p text:style-name="Standard">To understand what MultiMarkdown is, you first should be familiar with
-<text:a xlink:type="simple" xlink:href="http://daringfireball.net/projects/markdown/" office:name="Daring Fireball:
-Markdown">Markdown</text:a>. The best description of what Markdown is comes from John Gruber&#8217;s
+<text:a xlink:type="simple" xlink:href="http://daringfireball.net/projects/markdown/">Markdown</text:a>(http://daringfireball.net/projects/markdown/ &#8220;Daring Fireball:
+Markdown&#8221;). The best description of what Markdown is comes from John Gruber&#8217;s
 Markdown web site:</text:p>
 
 <text:p text:style-name="Quotations">Markdown is a text-to-HTML conversion tool for web writers. Markdown
@@ -545,7 +545,7 @@ versions of MMD as well.</text:p>
 <text:list text:style-name="L1"><text:list-item>
 <text:p text:style-name="P1">Download the source from the <text:a xlink:type="simple" xlink:href="https://github.com/fletcher/MultiMarkdown-5">github</text:a> web site:</text:p>
 
-<text:p text:style-name="Preformatted Text">git https://github.com/fletcher/MultiMarkdown-5.git<text:line-break/></text:p>
+<text:p text:style-name="Preformatted Text">git clone https://github.com/fletcher/MultiMarkdown-5.git<text:line-break/></text:p>
 </text:list-item>
 <text:list-item>
 <text:p text:style-name="P1">Update the submodules, including <text:span text:style-name="Source_20_Text">greg</text:span></text:p>
@@ -1569,8 +1569,7 @@ find.</text:p>
 <text:p text:style-name="Quotations">Here is some text containing a footnote.<text:note text:id="" text:note-class="footnote"><text:note-body>
 <text:p text:style-name="Footnote">Here is the text of the footnote itself.</text:p>
 </text:note-body>
-</text:note>
-</text:p>
+</text:note></text:p>
 
 <text:p text:style-name="Standard">You can also use &#8220;inline footnotes&#8221;:</text:p>
 
@@ -1846,8 +1845,8 @@ you typeset your document once with this engine, and then continue to process
 it normally with the usual LaTeX engine. Your glossary should be compiled
 appropriately. If you use <text:a xlink:type="simple" xlink:href="http://www.uoregon.edu/~koch/texshop/" office:name="TeXShop Homepage">TeXShop</text:a>, this is the way to go.</text:p>
 
-<text:p text:style-name="Standard"><text:span text:style-name="MMD-Bold">Note</text:span>: <text:span text:style-name="MMD-Italic">Getting glossaries to work is a slightly more advanced LaTeX
-feature, and might take some trial and error the first few times.</text:span></text:p>
+<text:p text:style-name="Standard"><text:span text:style-name="MMD-Bold">Note</text:span>: *Getting glossaries to work is a slightly more advanced LaTeX
+feature, and might take some trial and error the first few times.*</text:p>
 
 <text:p text:style-name="Preformatted Text">#!/bin/ <text:line-break/><text:line-break/>set path = ($path /usr/local/teTeX/bin/powerpc-apple-darwin-current <text:line-break/><text:tab/>/usr/local/bin) # This is actually a continuation of the line above<text:line-break/><text:line-break/>set basefile = `basename &quot;$1&quot; .tex`<text:line-break/><text:line-break/>makeindex -s `kpsewhich basic.gst` -o &quot;${basefile}.gls&quot; &quot;${basefile}.glo&quot;<text:line-break/></text:p>
 

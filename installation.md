@@ -2,7 +2,7 @@ latex input:	mmd-tufte-handout-header
 Title:	Installation
 Author:	Fletcher T. Penney
 Version:	{{version.txt}}
-Revised:	2015-03-10  
+Revised:	2015-12-08  
 Base Header Level:	3
 CSS:	{{css.txt}}
 MMD Footer:	links.txt
@@ -91,7 +91,7 @@ If you want to compile manually, you should be able to follow the directions for
 
 *	Download the source from the [github] web site:
 
-		git https://github.com/fletcher/MultiMarkdown-5.git
+		git clone https://github.com/fletcher/MultiMarkdown-5.git
 
 *	Update the submodules, including `greg`
 
