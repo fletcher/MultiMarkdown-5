@@ -104,7 +104,7 @@ PROGRAM = multimarkdown
 
 OBJS = build/multimarkdown.o build/parse_utilities.o build/parser.o build/GLibFacade.o build/writer.o build/text.o build/html.o build/latex.o build/memoir.o build/beamer.o build/lyx.o build/lyxbeamer.o build/opml.o build/odf.o build/critic.o build/rng.o build/rtf.o build/transclude.o build/toc.o 
 
-build/%.o: src/%.c src/parser.h src/version.h
+build/%.o: src/%.c src/parser.h src/version.h $(BUILD_DIR)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 src/version.h: $(BUILD_DIR)
@@ -121,4 +121,4 @@ deprecated: $(GREG) build/$(PROGRAM)
 
 build/$(PROGRAM): $(OBJS) $(BUILD_DIR) src/version.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS); \
-	rm src/parser.c; rm src/version.h
+	rm src/parser.c
