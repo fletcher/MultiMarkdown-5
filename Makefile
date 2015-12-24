@@ -102,14 +102,13 @@ CHANGELOG:
 CFLAGS ?= -Wall -g -O3 -include src/GLibFacade.h -include src/version.h -include src/parser.h
 PROGRAM = multimarkdown
 
-OBJS = build/multimarkdown.o build/parse_utilities.o build/parser.o build/GLibFacade.o build/writer.o build/text.o build/html.o build/latex.o build/memoir.o build/beamer.o build/lyx.o build/lyxbeamer.o build/opml.o build/odf.o build/critic.o build/rng.o build/rtf.o build/transclude.o build/toc.o
+OBJS = build/multimarkdown.o build/parse_utilities.o build/parser.o build/GLibFacade.o build/writer.o build/text.o build/html.o build/latex.o build/memoir.o build/beamer.o build/lyx.o build/lyxbeamer.o build/opml.o build/odf.o build/critic.o build/rng.o build/rtf.o build/transclude.o build/toc.o 
 
 build/%.o: src/%.c src/parser.h src/version.h
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 src/version.h: $(BUILD_DIR)
 	cd $(BUILD_DIR); touch README.html; \
-	cmake -DVERSION_ONLY=1 ..; cd ..; cp build/version.h src/version.h
 
 build/parser.o: src/parser.c src/parser.h
 	$(CC) -c $(CFLAGS) -o $@ $<
