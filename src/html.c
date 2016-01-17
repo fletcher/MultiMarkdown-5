@@ -1128,6 +1128,10 @@ void print_col_group(GString *out,scratch_pad *scratch) {
 			g_string_append_printf(out, "<col style=\"text-align:center;\" class=\"extended\"/>\n");
 		} else if ( strncmp(&temp[lev],"L",1) == 0) {
 			g_string_append_printf(out, "<col style=\"text-align:left;\" class=\"extended\"/>\n");
+		} else if ( strncmp(&temp[lev],"N",1) == 0) {
+			g_string_append_printf(out, "<col class=\"extended\"/>\n");
+		} else if ( strncmp(&temp[lev],"n",1) == 0) {
+			g_string_append_printf(out, "<col/>\n");
 		} else {
 			g_string_append_printf(out, "<col style=\"text-align:left;\"/>\n");
 		}

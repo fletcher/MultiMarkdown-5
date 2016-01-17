@@ -1408,8 +1408,14 @@ SeparatorLine = a:StartList
 
 HeaderAlignmentCell = Sp ':'? '='+
 
-AlignmentCell = Sp (!CellDivider ( LeftAlignWrap | CenterAlignWrap | RightAlignWrap | LeftAlign | CenterAlign | RightAlign))
+AlignmentCell = Sp (!CellDivider ( NaturalAlignWrap | LeftAlignWrap | CenterAlignWrap | RightAlignWrap | NaturalAlign | LeftAlign | CenterAlign | RightAlign))
 		Sp ( CellDivider )?
+
+NaturalAlignWrap = ('-'+ | '='+) '+' &(!'-' !'=' !':')
+		{ $$ = str("N");}
+
+NaturalAlign = ('-'+ | '='+) &(!'-' !':')
+		{ $$ = str("n");}
 
 LeftAlignWrap = ':'? ('-'+ | '='+) '+' &(!'-' !'=' !':')
 		{ $$ = str("L");}

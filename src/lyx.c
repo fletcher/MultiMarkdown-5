@@ -1586,6 +1586,8 @@ void print_lyx_node(GString *out, node *n, scratch_pad *scratch, bool no_newline
 					break;
 				case 'l':
 				case 'L':
+				case 'N':
+				case 'n':
 					g_string_append(temp_str,"left");
 				    break;
 		      }
@@ -1667,6 +1669,8 @@ void print_lyx_node(GString *out, node *n, scratch_pad *scratch, bool no_newline
 					break;
 				case 'l':
 				case 'L':
+				case 'N':
+				case 'n':
 					g_string_append(temp_str,"left");
 				    break;
 			}
