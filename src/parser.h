@@ -53,6 +53,7 @@ typedef struct {
 	int   table_column;          /* Track the current column number */
 	bool  inside_footnote;       /* Are we inside a footnote? */
 	char  cell_type;             /* What sort of cell type are we in? */
+	bool  header_column;         /* Should the first column be treated like a header? */
 	bool  printing_notes;        /* Are we printing notes/glossary/etc.? */
 	node *notes;                 /* Store reference notes */
 	node *links;                 /* ... links */

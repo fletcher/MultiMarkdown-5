@@ -46,6 +46,7 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 	char *width = NULL;
 	char *height = NULL;
 	GString *temp_str;
+	size_t temp_size;
 
 	if (n == NULL)
 		return;
@@ -776,6 +777,7 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			scratch->cell_type = 0;
 			scratch->padded = 1;
 			scratch->table_alignment = NULL;
+			scratch->header_column = 0;
 			break;
 		case TABLESEPARATOR:
 			scratch->table_alignment = n->str;
@@ -825,6 +827,10 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			} else {
 				temp_type = scratch->cell_type;
 			}
+			
+			if (scratch->header_column && (scratch->table_column == 0))
+				temp_type = 'h';
+
 			lev = scratch->table_column;
 			if ( strncmp(&temp[lev],"r",1) == 0) {
 				g_string_append_printf(out, "\t<t%c style=\"text-align:right;\"", temp_type);
@@ -834,6 +840,10 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 				g_string_append_printf(out, "\t<t%c style=\"text-align:center;\"", temp_type);
 			} else if ( strncmp(&temp[lev],"C",1) == 0) {
 				g_string_append_printf(out, "\t<t%c style=\"text-align:center;\"", temp_type);
+			} else if ( strncmp(&temp[lev],"N",1) == 0) {
+				g_string_append_printf(out, "\t<t%c", temp_type);
+			} else if ( strncmp(&temp[lev],"n",1) == 0) {
+				g_string_append_printf(out, "\t<t%c", temp_type);
 			} else {
 				g_string_append_printf(out, "\t<t%c style=\"text-align:left;\"", temp_type);
 			}
@@ -843,7 +853,18 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			}
 			g_string_append_printf(out, ">");
 			scratch->padded = 2;
+			temp_size = out->currentStringLength;
 			print_html_node_tree(out, n->children, scratch);
+			
+			/* We have an empty leading cell, so first column is shown as headers */
+			/* Disabled for now while I decide whether this should be reimplemented -- was in v2 */
+			/* if (scratch->table_column == 0) {
+				if (temp_size == out->currentStringLength) {
+					scratch->header_column = 1;
+				}
+			}
+			*/
+
 			g_string_append_printf(out, "</t%c>\n", temp_type);
 			scratch->table_column++;
 			break;
