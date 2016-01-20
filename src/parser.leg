@@ -951,7 +951,7 @@ BulletList = &Bullet (ListTight | ListLoose)
 
 ListTight = a:StartList
 		( ListItemTight { a = cons($$, a); } )+
-		BlankLine* !(Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoSpace &EmptyList )
+		BlankLine* (&Heading | !(Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoSpace &EmptyList ))
 		{
 			$$ = list(LIST, a);
 		}
