@@ -472,13 +472,13 @@ EmphMatch =	&{ !ext(EXT_NO_EMPH) } (EmphStar | EmphUl)
 EmphStar = '*' !Whitespace
 		(StrongMatch |
 		BracketedText |
-		(!'*' !BlankLine .) )+
+		(!'*' !(BlankLine BlankLine) .) )+
 		'*'
 
 EmphUl = '_' !Whitespace
 		(StrongMatch |
 		BracketedText |
-		(!'_' !BlankLine .) )+
+		(!'_' !(BlankLine BlankLine) .) )+
 		'_'
 
 Strong = < StrongMatch >
@@ -499,13 +499,13 @@ StrongMatch = &{ !ext(EXT_NO_STRONG) } (StrongStar | StrongUl)
 StrongStar = "**" !Whitespace
 		(EmphMatch |
 		BracketedText |
-		(!"**" !BlankLine .) )+
+		(!"**" !(BlankLine BlankLine) .) )+
 		"**"
 		
 StrongUl = "__" !Whitespace
 		(EmphMatch |
 		BracketedText |
-		(!"__" !BlankLine .) )+
+		(!"__" !(BlankLine BlankLine) .) )+
 		"__"
 
 StrongAndEmph = EmphAndStrongStar | EmphAndStrongUl
