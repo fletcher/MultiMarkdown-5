@@ -449,7 +449,7 @@ UlOrStarLine =  (UlLine | StarLine) { $$ = str(yytext); }
 StarLine =      < "****" '*'* > | < Spacechar '*'+ &Spacechar >
 UlLine   =      < "____" '_'* > | < Spacechar '_'+ &Spacechar >
 
-Whitespace =  Spacechar | Newline
+Whitespace =  Spacechar | Newline | Eof
 
 Emph = < EmphMatch >
 	{
@@ -473,13 +473,13 @@ EmphStar = '*' !Whitespace
 		(StrongMatch |
 		BracketedText |
 		(!'*' !(BlankLine BlankLine) .) )+
-		'*'
+		'*' &(SpecialChar | Whitespace)
 
 EmphUl = '_' !Whitespace
 		(StrongMatch |
 		BracketedText |
 		(!'_' !(BlankLine BlankLine) .) )+
-		'_'
+		'_' &(SpecialChar | Whitespace)
 
 Strong = < StrongMatch >
 		{
@@ -500,13 +500,13 @@ StrongStar = "**" !Whitespace
 		(EmphMatch |
 		BracketedText |
 		(!"**" !(BlankLine BlankLine) .) )+
-		"**"
+		"**" &(SpecialChar | Whitespace)
 		
 StrongUl = "__" !Whitespace
 		(EmphMatch |
 		BracketedText |
 		(!"__" !(BlankLine BlankLine) .) )+
-		"__"
+		"__" &(SpecialChar | Whitespace)
 
 StrongAndEmph = EmphAndStrongStar | EmphAndStrongUl
 
