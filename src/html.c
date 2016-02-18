@@ -257,6 +257,8 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(n->str, "mmdfooter") == 0) {
 			} else if (strcmp(n->str, "mmdheader") == 0) {
 			} else if (strcmp(n->str, "lang") == 0) {
+			} else if (strcmp(n->str, "transcludebase") == 0) {
+			} else if (strcmp(n->str, "latexmode") == 0) {
 			} else {
 				g_string_append_printf(out,"\t<meta name=\"%s\" content=\"",n->str);
 				print_html_node(out,n->children,scratch);
