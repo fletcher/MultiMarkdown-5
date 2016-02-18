@@ -22,9 +22,9 @@ project (${My_Project_Title})
 
 
 # Search for included files here
+include_directories(${PROJECT_BINARY_DIR})
 include_directories( ${PROJECT_SOURCE_DIR}/src )
 include_directories( ${PROJECT_SOURCE_DIR}/test )
-include_directories(${PROJECT_BINARY_DIR})
 
 string(TOUPPER ${My_Project_Title} My_Project_Title_Caps  )
 string(REGEX REPLACE " " "_" My_Project_Title_Caps ${My_Project_Title_Caps} )

@@ -74,6 +74,7 @@ documentation: $(BUILD_DIR) $(GREG)
 .PHONY : clean
 clean:
 	rm -rf $(BUILD_DIR)/*
+	-rm src/version.h
 
 # Ensure greg is compiled
 $(GREG):
@@ -109,6 +110,7 @@ build/%.o: src/%.c src/parser.h src/version.h $(BUILD_DIR)
 
 src/version.h: $(BUILD_DIR)
 	cd $(BUILD_DIR); touch README.html; \
+	cp ../tools/version.h ../src/version.h
 
 build/parser.o: src/parser.c src/parser.h
 	$(CC) -c $(CFLAGS) -o $@ $<
