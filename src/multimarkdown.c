@@ -18,7 +18,7 @@
 
 /*
 
-	Copyright © 2013-2015 Fletcher T. Penney.
+	Copyright © 2013-2016 Fletcher T. Penney.
 
 	MultiMarkdown 4 and 5 are derived from peg-multimarkdown, which was
 	forked from peg-markdown, which is (c) 2008 John MacFarlane

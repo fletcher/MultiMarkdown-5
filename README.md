@@ -5,7 +5,7 @@
 | Title:     | MultiMarkdown        |  
 | Author:    | Fletcher T. Penney       |  
 | Date:      | 2015-12-01 |  
-| Copyright: | Copyright © 2013-2015 Fletcher T. Penney.    |  
+| Copyright: | Copyright © 2013-2016 Fletcher T. Penney.    |  
 | Version:   | 5.0.1      |  
 
 
