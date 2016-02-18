@@ -718,7 +718,7 @@ Image = '!' ( !AutoLink Link )
 		}
 
 
-Label = < "[" !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } )
+Label = < "[" (&"[%" | !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } ))
 	a:StartList
 		( !']' Inline { a = cons($$, a); } )*
 			']'>
