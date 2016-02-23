@@ -4,7 +4,7 @@
 	parser.leg -> parser.c -- Parse (Multi)Markdown plain text for
 		conversion into other formats
 	
-	(c) 2013-2015 Fletcher T. Penney (http://fletcherpenney.net/).
+	(c) 2013-2016 Fletcher T. Penney (http://fletcherpenney.net/).
 
 	Derived from peg-multimarkdown, which was forked from peg-markdown,
 	which is (c) 2008 John MacFarlane (jgm at berkeley dot edu), and 
@@ -449,7 +449,7 @@ UlOrStarLine =  (UlLine | StarLine) { $$ = str(yytext); }
 StarLine =      < "****" '*'* > | < Spacechar '*'+ &Spacechar >
 UlLine   =      < "____" '_'* > | < Spacechar '_'+ &Spacechar >
 
-Whitespace =  Spacechar | Newline
+Whitespace =  Spacechar | Newline | Eof
 
 Emph = < EmphMatch >
 	{
@@ -472,14 +472,14 @@ EmphMatch =	&{ !ext(EXT_NO_EMPH) } (EmphStar | EmphUl)
 EmphStar = '*' !Whitespace
 		(StrongMatch |
 		BracketedText |
-		(!'*' !BlankLine .) )+
-		'*'
+		(!'*' !(BlankLine BlankLine) .) )+
+		'*' &(SpecialChar | Whitespace)
 
 EmphUl = '_' !Whitespace
 		(StrongMatch |
 		BracketedText |
-		(!'_' !BlankLine .) )+
-		'_'
+		(!'_' !(BlankLine BlankLine) .) )+
+		'_' &(SpecialChar | Whitespace)
 
 Strong = < StrongMatch >
 		{
@@ -499,14 +499,14 @@ StrongMatch = &{ !ext(EXT_NO_STRONG) } (StrongStar | StrongUl)
 StrongStar = "**" !Whitespace
 		(EmphMatch |
 		BracketedText |
-		(!"**" !BlankLine .) )+
-		"**"
+		(!"**" !(BlankLine BlankLine) .) )+
+		"**" &(SpecialChar | Whitespace)
 		
 StrongUl = "__" !Whitespace
 		(EmphMatch |
 		BracketedText |
-		(!"__" !BlankLine .) )+
-		"__"
+		(!"__" !(BlankLine BlankLine) .) )+
+		"__" &(SpecialChar | Whitespace)
 
 StrongAndEmph = EmphAndStrongStar | EmphAndStrongUl
 
@@ -718,7 +718,7 @@ Image = '!' ( !AutoLink Link )
 		}
 
 
-Label = < "[" !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } )
+Label = < "[" (&"[%" | !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } ))
 	a:StartList
 		( !']' Inline { a = cons($$, a); } )*
 			']'>
@@ -951,7 +951,7 @@ BulletList = &Bullet (ListTight | ListLoose)
 
 ListTight = a:StartList
 		( ListItemTight { a = cons($$, a); } )+
-		BlankLine* !(Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoSpace &EmptyList )
+		BlankLine* (&Heading | !(Bullet | Enumerator | BulletNoSpace &EmptyList | EnumeratorNoSpace &EmptyList ))
 		{
 			$$ = list(LIST, a);
 		}
@@ -1002,7 +1002,7 @@ EmptyList = BlankLine
 		}
 
 ListBlock = a:StartList
-		( EmptyList | !Heading Line ) { a = cons($$, a); }
+		( EmptyList | !SetextHeading Line ) { a = cons($$, a); }
 		( ListBlockLine { a = cons($$, a); } )*
 		{
 			$$ = mk_str_from_list(a, false);
@@ -1408,8 +1408,14 @@ SeparatorLine = a:StartList
 
 HeaderAlignmentCell = Sp ':'? '='+
 
-AlignmentCell = Sp (!CellDivider ( LeftAlignWrap | CenterAlignWrap | RightAlignWrap | LeftAlign | CenterAlign | RightAlign))
+AlignmentCell = Sp (!CellDivider ( NaturalAlignWrap | LeftAlignWrap | CenterAlignWrap | RightAlignWrap | NaturalAlign | LeftAlign | CenterAlign | RightAlign))
 		Sp ( CellDivider )?
+
+NaturalAlignWrap = ('-'+ | '='+) '+' &(!'-' !'=' !':')
+		{ $$ = str("N");}
+
+NaturalAlign = ('-'+ | '='+) &(!'-' !':')
+		{ $$ = str("n");}
 
 LeftAlignWrap = ':'? ('-'+ | '='+) '+' &(!'-' !'=' !':')
 		{ $$ = str("L");}

@@ -8,26 +8,104 @@ cmake_minimum_required (VERSION 2.6)
 set (My_Project_Title "MultiMarkdown")
 set (My_Project_Description "MultiMarkdown - lightweight markup processor")
 set (My_Project_Author "Fletcher T. Penney")
-set (My_Project_Revised_Date "2015-12-01")
+set (My_Project_Revised_Date "2016-02-22")
 set (My_Project_Version_Major 5)
-set (My_Project_Version_Minor 0)
-set (My_Project_Version_Patch 1)
+set (My_Project_Version_Minor 1)
+set (My_Project_Version_Patch 0)
 
 set (My_Project_Version "${My_Project_Version_Major}.${My_Project_Version_Minor}.${My_Project_Version_Patch}")
 
-set (My_Project_Copyright_Date "2013-2015")
+set (My_Project_Copyright_Date "2013-2016")
 set (My_Project_Copyright "Copyright © ${My_Project_Copyright_Date} ${My_Project_Author}.")
 
 project (${My_Project_Title})
 
 
 # Search for included files here
+include_directories(${PROJECT_BINARY_DIR})
 include_directories( ${PROJECT_SOURCE_DIR}/src )
 include_directories( ${PROJECT_SOURCE_DIR}/test )
-include_directories(${PROJECT_BINARY_DIR})
 
 string(TOUPPER ${My_Project_Title} My_Project_Title_Caps  )
 string(REGEX REPLACE " " "_" My_Project_Title_Caps ${My_Project_Title_Caps} )
+
+
+# =================
+# Macro Definitions
+# =================
+
+MACRO(ADD_PUBLIC_HEADER target filename)
+	# Add filename to public_header_files list, flag it as 
+	# public header for libraries and OS X Frameworks
+
+	# This will work for creating one library/framework with public headers
+	# per project. If you need more than one, you will need to customize
+	# the workflow as appropriate, since there is only one 
+	# public_header_files list.
+
+	SET_TARGET_PROPERTIES(${target} PROPERTIES PUBLIC_HEADER ${filename})
+
+	LIST(APPEND public_header_files ${filename})
+
+	SET_SOURCE_FILES_PROPERTIES(
+		${filename}
+		PROPERTIES
+		MACOSX_PACKAGE_LOCATION
+		PUBLIC_HEADER
+	)
+
+	# Set Xcode project to configure public header location to allow
+	# use when this project is used in another workspace.
+	# NOTE: You must manually add a "Headers" build phase and add
+	# the desired public headers to that list for Xcode to use them.
+	#
+	# TODO: If anyone knows how to automate that in Cmake, I would be very
+	# greatful!!
+
+	SET_TARGET_PROPERTIES(${target} PROPERTIES
+		XCODE_ATTRIBUTE_PUBLIC_HEADERS_FOLDER_PATH
+		"include/$(TARGET_NAME)"
+	)
+
+	SET_TARGET_PROPERTIES(${target} PROPERTIES
+		XCODE_ATTRIBUTE_PRIVATE_HEADERS_FOLDER_PATH
+		"$(PUBLIC_HEADERS_FOLDER_PATH)/Private"
+	)
+	
+	# Set Xcode target to include settings for OS X and iOS
+	
+	SET_TARGET_PROPERTIES(${target} PROPERTIES
+		XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS
+		"macos iphonesimulator iphoneos"
+	)
+
+	SET_TARGET_PROPERTIES(${target} PROPERTIES
+		XCODE_ATTRIBUTE_VALID_ARCHITECTURES
+		"x86_64 i386 armv6 armv7 armv7s arm64"
+	)
+
+ENDMACRO(ADD_PUBLIC_HEADER)
+
+
+# The target should be an OS X Bundle with a PList
+
+MACRO(MAKE_TARGET_BUNDLE targetname)
+
+	set_target_properties(
+		${targetname}
+		PROPERTIES
+		MACOSX_BUNDLE_INFO_PLIST
+		${PROJECT_SOURCE_DIR}/templates/plist.in
+	)
+
+ENDMACRO(MAKE_TARGET_BUNDLE)
+
+
+MACRO(ADD_LINKED_FRAMEWORK frame)
+
+	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGES} -framework ${frame}")
+
+ENDMACRO(ADD_LINKED_FRAMEWORK)
 
 
 # ======================
@@ -78,9 +156,14 @@ add_custom_command (
 set(src_files
 )
 
-# primary header files
+# Primary header files, also for doxygen documentation
 set(header_files
 	src/libMultiMarkdown.h
+)
+
+# Public headers, will be installed in 'include'
+# Do not manually add files here, use the ADD_PUBLIC_HEADER() macro
+set(public_header_files
 )
 
 # Utility source files will not be included in doxygen
@@ -281,6 +364,8 @@ add_library(libMultiMarkdown STATIC
 # remove the extra "lib" from "liblibFOO"
 SET_TARGET_PROPERTIES(libMultiMarkdown PROPERTIES PREFIX "")
 
+ADD_PUBLIC_HEADER(libMultiMarkdown src/libMultiMarkdown.h)
+
 # Create command-line app
 add_executable(multimarkdown
 	src/multimarkdown.c
@@ -295,10 +380,6 @@ set_target_properties(multimarkdown PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH 
 
 # Link the library to the app
 target_link_libraries(multimarkdown libMultiMarkdown)
-
-# Xcode settings for fat binaries
-# set_target_properties(libFOO PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-# set_target_properties(main PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
 
 
 # ==========================
@@ -342,9 +423,14 @@ install (FILES ${scripts}
 	PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
 )
 
-install (FILES ${PROJECT_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_BINARY_DIR}/README.html
-	DESTINATION notes
-)
+# install (FILES ${PROJECT_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_BINARY_DIR}/README.html
+# 	DESTINATION notes
+# )
+
+# Use something like this to install public header files (after adding them
+# with the ADD_PUBLIC_HEADER() macro)
+
+# install (FILES ${public_header_files} DESTINATION local/include/libMultiMarkdown) 
 
 set (CPACK_COMPONENT_SCRIPTS_DISPLAY_NAME "Convenience scripts")
 set (CPACK_COMPONENT_SCRIPTS_DESCRIPTION 

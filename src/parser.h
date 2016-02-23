@@ -15,7 +15,7 @@
 #define TABSTOP 4
 
 #define MMD_COPYRIGHT \
-	"Copyright (c) 2013-2015 Fletcher T. Penney.\n\n" \
+	"Copyright (c) 2013-2016 Fletcher T. Penney.\n\n" \
 	"LyX export code (c) 2013-2014 Charles R. Cowan,\n" \
 	"licensed under the MIT licenses.\n\n" \
 	"portions based on peg-markdown - Copyright (c) 2008-2009 John MacFarlane.\n" \
@@ -53,6 +53,7 @@ typedef struct {
 	int   table_column;          /* Track the current column number */
 	bool  inside_footnote;       /* Are we inside a footnote? */
 	char  cell_type;             /* What sort of cell type are we in? */
+	bool  header_column;         /* Should the first column be treated like a header? */
 	bool  printing_notes;        /* Are we printing notes/glossary/etc.? */
 	node *notes;                 /* Store reference notes */
 	node *links;                 /* ... links */

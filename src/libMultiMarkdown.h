@@ -22,7 +22,7 @@
 
 /*
 
-	Copyright © 2013-2015 Fletcher T. Penney.
+	Copyright © 2013-2016 Fletcher T. Penney.
 
 
 	The `c-template` project is released under the MIT License.
