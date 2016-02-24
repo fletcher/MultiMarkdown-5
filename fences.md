@@ -2,7 +2,7 @@ latex input:	mmd-tufte-handout-header
 Title:	Fenced Code Blocks
 Author:	Fletcher T. Penney
 Version:	{{version.txt}}
-Revised:	2015-02-20 
+Revised:	2016-02-24 
 Base Header Level:	2
 CSS:	{{css.txt}}
 html header:	<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css">
@@ -17,6 +17,19 @@ latex footer:	mmd-tufte-footer
 ## Fenced Code Blocks ##
 
 In addition to the regular indented code block that Markdown uses, you can use "fenced" code blocks in MultiMarkdown.  These code blocks do not have to be indented, and can also be configured to be compatible with a third party syntax highlighter.  These code blocks should begin with 3 to 5 backticks, an optional language specifier (if using a syntax highlighter), and should end with the same number of backticks you started with:
+
+````
+```perl
+# Demonstrate Syntax Highlighting if you link to highlight.js #
+# http://softwaremaniacs.org/soft/highlight/en/
+print "Hello, world!\n";
+$a = 0;
+while ($a < 10) {
+print "$a...\n";
+$a++;
+}
+```
+````
 
 ```perl
 # Demonstrate Syntax Highlighting if you link to highlight.js #

@@ -260,7 +260,7 @@
 <meta:user-defined meta:name="latex title">MultiMarkdown \\
 User's Guide</meta:user-defined>
 <meta:user-defined meta:name="Author">Fletcher T. Penney</meta:user-defined>
-<meta:user-defined meta:name="Version">5.0.0</meta:user-defined>
+<meta:user-defined meta:name="Version">5.1.0</meta:user-defined>
 <meta:user-defined meta:name="Revised">2015-12-08</meta:user-defined>
 <meta:keyword>MultiMarkdown, Markdown, LaTeX, PDF, RTF, LyX, HTML</meta:keyword>
 <meta:user-defined meta:name="MMD Footer">links.txt</meta:user-defined>
@@ -269,7 +269,7 @@ User's Guide</meta:user-defined>
 <office:text>
 <text:h text:outline-level="2"><text:bookmark text:name="title"/>MultiMarkdown User's Guide<text:bookmark-end text:name="title"/></text:h>
 
-<text:p text:style-name="Quotations">Version 5.0.0<text:line-break/>Revised 2015-12-08</text:p>
+<text:p text:style-name="Quotations">Version 5.1.0<text:line-break/>Revised 2015-12-08</text:p>
 
 <text:h text:outline-level="2"><text:bookmark text:name="introduction"/>Introduction<text:bookmark-end text:name="introduction"/></text:h>
 
@@ -280,8 +280,8 @@ User's Guide</meta:user-defined>
 <text:h text:outline-level="3"><text:bookmark text:name="whatismarkdown"/>What is Markdown?<text:bookmark-end text:name="whatismarkdown"/></text:h>
 
 <text:p text:style-name="Standard">To understand what MultiMarkdown is, you first should be familiar with
-<text:a xlink:type="simple" xlink:href="http://daringfireball.net/projects/markdown/">Markdown</text:a>(http://daringfireball.net/projects/markdown/ &#8220;Daring Fireball:
-Markdown&#8221;). The best description of what Markdown is comes from John Gruber&#8217;s
+<text:a xlink:type="simple" xlink:href="http://daringfireball.net/projects/markdown/" office:name="Daring Fireball:
+Markdown">Markdown</text:a>. The best description of what Markdown is comes from John Gruber&#8217;s
 Markdown web site:</text:p>
 
 <text:p text:style-name="Quotations">Markdown is a text-to-HTML conversion tool for web writers. Markdown
@@ -1569,7 +1569,8 @@ find.</text:p>
 <text:p text:style-name="Quotations">Here is some text containing a footnote.<text:note text:id="" text:note-class="footnote"><text:note-body>
 <text:p text:style-name="Footnote">Here is the text of the footnote itself.</text:p>
 </text:note-body>
-</text:note></text:p>
+</text:note>
+</text:p>
 
 <text:p text:style-name="Standard">You can also use &#8220;inline footnotes&#8221;:</text:p>
 
@@ -1735,6 +1736,9 @@ prefer the <text:span text:style-name="Source_20_Text">&lt;p&gt;</text:span> tag
 
 <text:p text:style-name="Standard">In addition to the regular indented code block that Markdown uses, you can use &#8220;fenced&#8221; code blocks in MultiMarkdown. These code blocks do not have to be indented, and can also be configured to be compatible with a third party syntax highlighter. These code blocks should begin with 3 to 5 backticks, an optional language specifier (if using a syntax highlighter), and should end with the same number of backticks you started with:</text:p>
 
+<text:p text:style-name="Preformatted Text">```perl<text:line-break/># Demonstrate Syntax Highlighting if you link to highlight.js #<text:line-break/># http://softwaremaniacs.org/soft/highlight/en/<text:line-break/>print &quot;Hello, world!\n&quot;;<text:line-break/>$a = 0;<text:line-break/>while ($a &lt; 10) {<text:line-break/>print &quot;$a...\n&quot;;<text:line-break/>$a++;<text:line-break/>}<text:line-break/>```<text:line-break/></text:p>
+
+
 <text:p text:style-name="Preformatted Text"># Demonstrate Syntax Highlighting if you link to highlight.js #<text:line-break/># http://softwaremaniacs.org/soft/highlight/en/<text:line-break/>print &quot;Hello, world!\n&quot;;<text:line-break/>$a = 0;<text:line-break/>while ($a &lt; 10) {<text:line-break/>print &quot;$a...\n&quot;;<text:line-break/>$a++;<text:line-break/>}<text:line-break/></text:p>
 
 
@@ -1845,8 +1849,8 @@ you typeset your document once with this engine, and then continue to process
 it normally with the usual LaTeX engine. Your glossary should be compiled
 appropriately. If you use <text:a xlink:type="simple" xlink:href="http://www.uoregon.edu/~koch/texshop/" office:name="TeXShop Homepage">TeXShop</text:a>, this is the way to go.</text:p>
 
-<text:p text:style-name="Standard"><text:span text:style-name="MMD-Bold">Note</text:span>: *Getting glossaries to work is a slightly more advanced LaTeX
-feature, and might take some trial and error the first few times.*</text:p>
+<text:p text:style-name="Standard"><text:span text:style-name="MMD-Bold">Note</text:span>: <text:span text:style-name="MMD-Italic">Getting glossaries to work is a slightly more advanced LaTeX
+feature, and might take some trial and error the first few times.</text:span></text:p>
 
 <text:p text:style-name="Preformatted Text">#!/bin/ <text:line-break/><text:line-break/>set path = ($path /usr/local/teTeX/bin/powerpc-apple-darwin-current <text:line-break/><text:tab/>/usr/local/bin) # This is actually a continuation of the line above<text:line-break/><text:line-break/>set basefile = `basename &quot;$1&quot; .tex`<text:line-break/><text:line-break/>makeindex -s `kpsewhich basic.gst` -o &quot;${basefile}.gls&quot; &quot;${basefile}.glo&quot;<text:line-break/></text:p>
 
@@ -2280,6 +2284,98 @@ improving Markdown and MultiMarkdown:</text:p>
 <text:p text:style-name="Standard">and others I have surely forgotten&#8230;.</text:p>
 
 <text:h text:outline-level="2"><text:bookmark text:name="releasenotes"/>Release Notes<text:bookmark-end text:name="releasenotes"/></text:h>
+
+<text:h text:outline-level="3"><text:bookmark text:name="-2016-02-22"/><text:a xlink:type="simple" xlink:href="https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.1.0">5.1.0</text:a> - 2016&#8211;02&#8211;22<text:bookmark-end text:name="-2016-02-22"/></text:h>
+
+<text:list text:style-name="L1"><text:list-item>
+<text:p text:style-name="P1">ADDED: Add script to build drag and drop apps on OS X</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">ADDED: Beginning code for public header file support; ADDED: Beginning configuration for OS X Bundle/Framework targets</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">ADDED: Include support for Xcode libraries to be iOS compatible</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CHANGED: Update copyright info for 2016</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CHANGED: Update test suite</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Allow ATX Headers inside lists</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Allow &#8216;naturally&#8217; aligned table cells like MMD 2 allowed</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Allow metadata variables inside links (e.g. [[%foo]][bar])</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Allow newline inside strong/emph (Fixes #10)</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Change handling of version.h file for deprecated make to keep it separate from cmake alternative</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Don&#8217;t delete src/version.h</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Fix problem with strong/emph matching incorrectly</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Fix regression in list/heading fix that was overeager</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Include &#8216;fake&#8217; version.h for make deprecate</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Include additional standard metadata keys in the list to <text:span text:style-name="MMD-Italic">not</text:span> be included in HTML headers</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Remove unneeded install directive; FIXED: Fix public header install prefix (I think)</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Update MMD test suite for recent table alignment change</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: fix &#8216;make deprecate&#8217; so that it truly doesn&#8217;t require cmake</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIXED: Improve tight vs loose list detection with unusual setext headers</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Fixed git clone instructions in documentation</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Update test suite</text:p></text:list-item>
+</text:list>
+
+<text:h text:outline-level="3"><text:bookmark text:name="-2015-12-01"/><text:a xlink:type="simple" xlink:href="https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.0.1">5.0.1</text:a> - 2015&#8211;12&#8211;01<text:bookmark-end text:name="-2015-12-01"/></text:h>
+
+<text:list text:style-name="L1"><text:list-item>
+<text:p text:style-name="P1">IMPORTANT: Fix major error in last Makefile! (Only in build branch for a few minutes)</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">ADDED: Improve empty list item detection in ODF output</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CHANGED: Remove unused node creation utilities</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CHANGED: Update documentation</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CHANGED: Use &#8216;const&#8217; char * in g_string_new</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CODE: Improve doxygen support in libMultiMarkdown.h</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CODE: Refactor markdown_to_string() to separate parsing input text and writing output text via the intermediate node tree.</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">CODE: Use node creation shortcuts for consistency and future flexibility</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIX: Add 32 bit flag to older MinGW toolchain</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIX: Add label for 32 bit builds</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIX: Don&#8217;t run valgrind tests unless in &#8216;make debug&#8217; mode</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIX: Don&#8217;t static link when using &#8216;make debug&#8217; for valgrind testing</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">FIX: Fix memory leaks in transclude_source()</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Add developer notes to the README information</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Additional doxygen support</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Autogenerate changelog since last commit to master</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Begin tracking release notes in &#8216;CHANGELOG.md&#8217;</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Change empty listitem detection logic for ODF output</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Change whitespace for easier diffing</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Remove redundant developer note in README</text:p></text:list-item>
+<text:list-item>
+<text:p text:style-name="P1">NOTE: Use tab instead of leading spaces in CHANGELOG-UNRELEASED</text:p></text:list-item>
+</text:list>
 
 <text:h text:outline-level="3"><text:bookmark text:name="5.0"/>5.0<text:bookmark-end text:name="5.0"/></text:h>
 

@@ -5,8 +5,8 @@
 	<meta name="latexinput" content="mmd-tufte-handout-header"/>
 	<title>Release Notes</title>
 	<meta name="author" content="Fletcher T. Penney"/>
-	<meta name="version" content="5.0.0"/>
-	<meta name="revised" content="2015-11-15"/>
+	<meta name="version" content="5.1.0"/>
+	<meta name="revised" content="2016-02-4"/>
 	<link type="text/css" rel="stylesheet" href="http://fletcher.github.io/MultiMarkdown-5/css/document.css"/>
 <script type="text/javascript"
 src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -18,6 +18,58 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <body>
 
 <h2 id="releasenotes">Release Notes</h2>
+
+<h3 id="-2016-02-22"><a href="https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.1.0">5.1.0</a> - 2016&#8211;02&#8211;22</h3>
+
+<ul>
+<li>ADDED: Add script to build drag and drop apps on OS X</li>
+<li>ADDED: Beginning code for public header file support; ADDED: Beginning configuration for OS X Bundle/Framework targets</li>
+<li>ADDED: Include support for Xcode libraries to be iOS compatible</li>
+<li>CHANGED: Update copyright info for 2016</li>
+<li>CHANGED: Update test suite</li>
+<li>FIXED: Allow ATX Headers inside lists</li>
+<li>FIXED: Allow &#8216;naturally&#8217; aligned table cells like MMD 2 allowed</li>
+<li>FIXED: Allow metadata variables inside links (e.g. [[%foo]][bar])</li>
+<li>FIXED: Allow newline inside strong/emph (Fixes #10)</li>
+<li>FIXED: Change handling of version.h file for deprecated make to keep it separate from cmake alternative</li>
+<li>FIXED: Don&#8217;t delete src/version.h</li>
+<li>FIXED: Fix problem with strong/emph matching incorrectly</li>
+<li>FIXED: Fix regression in list/heading fix that was overeager</li>
+<li>FIXED: Include &#8216;fake&#8217; version.h for make deprecate</li>
+<li>FIXED: Include additional standard metadata keys in the list to <em>not</em> be included in HTML headers</li>
+<li>FIXED: Remove unneeded install directive; FIXED: Fix public header install prefix (I think)</li>
+<li>FIXED: Update MMD test suite for recent table alignment change</li>
+<li>FIXED: fix &#8216;make deprecate&#8217; so that it truly doesn&#8217;t require cmake</li>
+<li>FIXED: Improve tight vs loose list detection with unusual setext headers</li>
+<li>NOTE: Fixed git clone instructions in documentation</li>
+<li>NOTE: Update test suite</li>
+</ul>
+
+<h3 id="-2015-12-01"><a href="https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.0.1">5.0.1</a> - 2015&#8211;12&#8211;01</h3>
+
+<ul>
+<li>IMPORTANT: Fix major error in last Makefile! (Only in build branch for a few minutes)</li>
+<li>ADDED: Improve empty list item detection in ODF output</li>
+<li>CHANGED: Remove unused node creation utilities</li>
+<li>CHANGED: Update documentation</li>
+<li>CHANGED: Use &#8216;const&#8217; char * in g_string_new</li>
+<li>CODE: Improve doxygen support in libMultiMarkdown.h</li>
+<li>CODE: Refactor markdown_to_string() to separate parsing input text and writing output text via the intermediate node tree.</li>
+<li>CODE: Use node creation shortcuts for consistency and future flexibility</li>
+<li>FIX: Add 32 bit flag to older MinGW toolchain</li>
+<li>FIX: Add label for 32 bit builds</li>
+<li>FIX: Don&#8217;t run valgrind tests unless in &#8216;make debug&#8217; mode</li>
+<li>FIX: Don&#8217;t static link when using &#8216;make debug&#8217; for valgrind testing</li>
+<li>FIX: Fix memory leaks in transclude_source()</li>
+<li>NOTE: Add developer notes to the README information</li>
+<li>NOTE: Additional doxygen support</li>
+<li>NOTE: Autogenerate changelog since last commit to master</li>
+<li>NOTE: Begin tracking release notes in &#8216;CHANGELOG.md&#8217;</li>
+<li>NOTE: Change empty listitem detection logic for ODF output</li>
+<li>NOTE: Change whitespace for easier diffing</li>
+<li>NOTE: Remove redundant developer note in README</li>
+<li>NOTE: Use tab instead of leading spaces in CHANGELOG-UNRELEASED</li>
+</ul>
 
 <h3 id="5.0">5.0</h3>
 

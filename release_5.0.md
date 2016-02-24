@@ -1,5 +1,5 @@
 latex input:  mmd-tufte-handout-header  
-Title:  Version 4.7 Release Notes  
+Title:  Version 5.0 Release Notes  
 Author: Fletcher T. Penney  
 Version:  {{version.txt}}  
 Revised:  2015-11-12  
