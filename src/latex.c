@@ -260,6 +260,7 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(n->str, "css") == 0) {
 			} else if (strcmp(n->str, "xhtmlheader") == 0) {
 			} else if (strcmp(n->str, "htmlheader") == 0) {
+			} else if (strcmp(n->str, "htmlfooter") == 0) {
 			} else if (strcmp(n->str, "mmdfooter") == 0) {
 			} else if (strcmp(n->str, "mmdheader") == 0) {
 			} else if (strcmp(n->str, "lang") == 0) {

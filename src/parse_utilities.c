@@ -256,6 +256,7 @@ scratch_pad * mk_scratch_pad(unsigned long extensions) {
 	result->footnote_para_counter = 0;
 	result->max_footnote_num = 0;
 	result->obfuscate  = 0;
+	result->html_footer = NULL;
 	result->no_latex_footnote = 0;
 	result->latex_footer = NULL;
 	result->odf_list_needs_end_p = FALSE;
@@ -305,6 +306,9 @@ void free_scratch_pad(scratch_pad *scratch) {
 	free_node_tree(scratch->abbreviations);
 	
 	g_string_free(scratch->lyx_debug_pad, true);    /* CRC - initally, no indent */
+
+	if (scratch->html_footer != NULL)
+		free(scratch->html_footer);
 	
 	if (scratch->latex_footer != NULL)
 		free(scratch->latex_footer);
