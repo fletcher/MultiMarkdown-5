@@ -1199,6 +1199,12 @@ installation (not provided by me):</text:p>
 <text:p text:style-name="Preformatted Text">HTML header:  &lt;script type=&quot;text/javascript&quot;<text:line-break/><text:tab/>src=&quot;http://example.net/mathjax/MathJax.js&quot;&gt;<text:line-break/><text:tab/>&lt;/script&gt;<text:line-break/></text:p>
 
 
+<text:h text:outline-level="4"><text:bookmark text:name="htmlfooter"/>HTML Footer<text:bookmark-end text:name="htmlfooter"/></text:h>
+
+<text:p text:style-name="Standard">Raw HTML can be included here, and will be appended at the very end of the
+document, after footnotes, etc. Useful for linking to scripts that must
+be included after footnotes.</text:p>
+
 <text:h text:outline-level="4"><text:bookmark text:name="quoteslanguage"/>Quotes Language<text:bookmark-end text:name="quoteslanguage"/></text:h>
 
 <text:p text:style-name="Standard">This is used to specify which style of &#8220;smart&#8221; quotes to use in the output document. The available options are:</text:p>

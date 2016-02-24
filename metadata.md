@@ -153,6 +153,12 @@ installation (not provided by me):
 		src="http://example.net/mathjax/MathJax.js">
 		</script>
 
+### HTML Footer ###
+
+Raw HTML can be included here, and will be appended at the very end of the
+document, after footnotes, etc.  Useful for linking to scripts that must 
+be included after footnotes.
+
 
 ### Quotes Language ###
 
