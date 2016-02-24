@@ -374,7 +374,7 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 				if (temp[1] == '$') {
 					if (strncmp(&temp[2],"\\begin",5) == 0) {
 						temp[strlen(temp)-2] = '\0';
-						g_string_append_printf(out, "%s",&temp[1]);
+						g_string_append_printf(out, "%s",&temp[2]);
 					} else {
 						g_string_append_printf(out, "%s",temp);
 					}
