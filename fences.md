@@ -45,8 +45,8 @@ $a++;
 I don't recommend any specific syntax highlighter, but have used the following metadata to set things up.  It may or may not work for you:
 
 ```
-html header:	<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css">
-	<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+HTML Header:	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
 	<script>hljs.initHighlightingOnLoad();</script>
 ```
 
