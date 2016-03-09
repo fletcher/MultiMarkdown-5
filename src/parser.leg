@@ -321,32 +321,8 @@ Inline = #&{ check_timeout((parser_data *)G->data) }
 		| Endline
 		| UlOrStarLine
 		| Space
-		| StrongAndEmph
 		| Strong
 		| Emph
-		| &{ !ext(EXT_COMPATIBILITY) } CitationReference
-		| &{ !ext(EXT_COMPATIBILITY) } Variable
-		| Image
-		| Link
-		| NoteReference
-		| Code
-		| MarkdownHtmlTagOpen
-		| RawHtml
-		| Entity
-		| EscapedChar
-		| Smart
-		| Symbol
-
-InlineNoEmph = #&{ check_timeout((parser_data *)G->data) }
-# TODO: the check_timeout function still slows us down -- do we still need it??
-		&{ ext(EXT_CRITIC) } CriticMarkup
-		| &{ !ext(EXT_COMPATIBILITY) } DollarMath
-		| Str
-		| &{ !ext(EXT_COMPATIBILITY) } MathSpan
-		| Endline
-		| UlOrStarLine
-		| Space
-		| Strong
 		| &{ !ext(EXT_COMPATIBILITY) } CitationReference
 		| &{ !ext(EXT_COMPATIBILITY) } Variable
 		| Image
@@ -454,11 +430,6 @@ Whitespace =  Spacechar | Newline | Eof
 Emph = < EmphMatch >
 	{
 		yytext[strlen(yytext) - 1] = '\0';
-		/*
-			$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_EMPH);
-
-			Applying the EXT_NO_EMPH extension allows forbidding `<em> foo <em>bar</em> foo</em>`
-		*/
 
 		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
 		if ($$ != NULL) {
@@ -466,27 +437,23 @@ Emph = < EmphMatch >
 		}
 	}
 
-
-EmphMatch =	&{ !ext(EXT_NO_EMPH) } (EmphStar | EmphUl)
+EmphMatch =	(EmphStar | EmphUl)
 
 EmphStar = '*' !Whitespace
-		(StrongMatch |
-		BracketedText |
-		(!'*' !(BlankLine BlankLine) .) )+
-		'*' &(SpecialChar | Whitespace)
+	(StrongMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
+	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
+	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	)*
+	'*'
 
 EmphUl = '_' !Whitespace
-		(StrongMatch |
-		BracketedText |
-		(!'_' !(BlankLine BlankLine) .) )+
-		'_' &(SpecialChar | Whitespace)
+	(StrongMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
+	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
+	'_' &('_'* (SpecialChar | Whitespace))
 
 Strong = < StrongMatch >
 		{
 			yytext[strlen(yytext) - 2] = '\0';
-			/*
-				$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions | EXT_NO_STRONG);
-			*/
 
 			$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions );
 			if ($$ != NULL) {
@@ -494,41 +461,19 @@ Strong = < StrongMatch >
 			}
 		}
 
-StrongMatch = &{ !ext(EXT_NO_STRONG) } (StrongStar | StrongUl)
+StrongMatch = (StrongStar | StrongUl)
 
 StrongStar = "**" !Whitespace
-		(EmphMatch |
-		BracketedText |
-		(!"**" !(BlankLine BlankLine) .) )+
-		"**" &(SpecialChar | Whitespace)
-		
+	(EmphMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
+	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
+	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	)*
+	"**"
+
 StrongUl = "__" !Whitespace
-		(EmphMatch |
-		BracketedText |
-		(!"__" !(BlankLine BlankLine) .) )+
-		"__" &(SpecialChar | Whitespace)
-
-StrongAndEmph = EmphAndStrongStar | EmphAndStrongUl
-
-EmphAndStrongStar = "*" &(PossibleEmphStrongStar)
-		a:StartList 
-		( !('*' !'*') b:InlineNoEmph { a = cons(b, a); })+
-		<"*">
-		{
-			$$ = list(EMPH, a);
-		}
-
-PossibleEmphStrongStar = "**" (!'\n' !'*' .)+ "**" (!'\n' !'*' .)+ '*'
-
-EmphAndStrongUl = "_" &(PossibleEmphStrongUl)
-		a:StartList 
-		( !('_' !'_') b:InlineNoEmph { a = cons(b, a); })+
-		<"_">
-		{
-			$$ = list(EMPH, a); 
-		}
-
-PossibleEmphStrongUl = "__" (!'\n' !'_' .)+ "__" (!'\n' !'_' .)+ '_'
+	(EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
+	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
+	"__" &('_'* (SpecialChar | Whitespace))
 
 Link = ExplicitLink | ReferenceLink | AutoLink
 
