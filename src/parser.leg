@@ -1487,40 +1487,81 @@ TOCPlain = ( (y:Fenced { free_node_tree(y); } ) | (!BlankLine !Heading z:Line { 
 
 CriticMarkup = CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment
 
-CriticAddition = ('{++' < (!'++}' .)* > '++}')
+CriticClean = CleanAddition | CleanDeletion | CleanSubstitution | CleanHighlight | CleanComment
+
+AddStart = '{++'
+
+AddStop = '++}'
+
+DelStart = '{--'
+
+DelStop = '--}'
+
+HiStart = '{=='
+
+HiStop = '==}'
+
+ComStart = '{>>'
+
+ComStop = '<<}'
+
+SubStart = '{~~'
+
+SubStop = '~~}'
+
+SubDivider = '~>'
+
+AddString = < ((!AddStop !CriticClean .)+) >
+	{ $$ = str(yytext); }
+
+DelString = < (!DelStop !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+HiString = < (!HiStop !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+SubDelString = < (!SubDivider !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+SubAddString = < (!SubStop !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+CleanAddition = AddStart (CriticClean | (!AddStop .))* AddStop
+
+CriticAddition = a:StartList AddStart ((CriticMarkup | AddString) { a = cons($$, a); })* AddStop
 	{
-		$$ = str(yytext);
-		$$->key = CRITICADDITION;
+		$$ = list(CRITICADDITION, a);
 	}
 
-CriticDeletion = ('{--' < (!'--}' .)* > '--}')
+CleanDeletion = DelStart (CriticClean | (!DelStop .))* DelStop
+
+CriticDeletion = a:StartList DelStart ((CriticMarkup | DelString) { a = cons($$, a); })* DelStop
 	{
-		$$ = str(yytext);
-		$$->key = CRITICDELETION;
+		$$ = list(CRITICDELETION, a);
 	}
 
-CriticSubstitution = a:StartList ( '{~~' CriticSubstDel { a = cons($$,a); } '~>' CriticSubstAdd { a = cons($$,a); } '~~}')
+CleanSubstitution = SubStart (CriticClean | (!SubDivider !SubStop .))* SubDivider (CriticClean | (!SubStop .))* SubStop
+
+CriticSubstitution = a:StartList ( SubStart CriticSubstDel { a = cons($$,a); } SubDivider CriticSubstAdd { a = cons($$,a); } SubStop)
 	{
 		$$ = list(CRITICSUBSTITUTION, a);
 	}
 
-CriticSubstDel = < (!'~>' .)* >
+CriticSubstDel = a:StartList ((CriticMarkup | SubDelString) { a = cons($$, a); })*
 	{
-		$$ = str(yytext);
-		$$->key = CRITICDELETION;
+		$$ = list(CRITICDELETION, a);
 	}
 
-CriticSubstAdd = < (!'~~}' .)* >
+CriticSubstAdd = a:StartList ((CriticMarkup | SubAddString) { a = cons($$, a); })*
 	{
-		$$ = str(yytext);
-		$$->key = CRITICADDITION;
+		$$ = list(CRITICADDITION, a);
+	}
+CriticHighlight = a:StartList HiStart ((CriticMarkup | HiString) { a = cons($$, a); })* HiStop
+	{
+		$$ = list(CRITICHIGHLIGHT, a);
 	}
 
-CriticHighlight = ('{==' < (!'==}' .)* > '==}')
-	{
-		$$ = str(yytext);
-		$$->key = CRITICHIGHLIGHT;
-	}
+CleanHighlight = HiStart (CriticClean | (!HiStop .))* HiStop
 
 CriticComment = ('{>>' < (!'<<}' .)* > '<<}')
 	{
@@ -1528,12 +1569,12 @@ CriticComment = ('{>>' < (!'<<}' .)* > '<<}')
 		$$->key = CRITICCOMMENT;
 	}
 
+CleanComment = ComStart (CriticClean | (!ComStop .))* ComStop
+
 DocForCritic = BOM? a:StartList
-		( CriticString { a = cons($$, a); } | RawString { a = cons($$, a); } | FalseMatch { a = cons($$, a); } )*
+		( CriticMarkup { a = cons($$, a); } | RawString { a = cons($$, a); } | FalseMatch { a = cons($$, a); } )*
 		( RawString { a = cons($$, a); } )* Eof
 		{ ((parser_data *)G->data)->result = reverse_list(a); }
-
-CriticString = CriticMarkup
 
 RawString = < (!( "{++" | "{--" | "{~~" | "{==" | "{>>" ) .)+ >
 		{ $$ = str(yytext); }
@@ -1661,7 +1702,8 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 		} else {
 			critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_ACCEPT_FORMAT , extensions);
 		}
-		
+		fprintf(stderr, "%s\n\n", critic_resolved);
+
 		free_parser_data((parser_data *)g.data);
 		yydeinit(&g);
 		yyinit(&g);
