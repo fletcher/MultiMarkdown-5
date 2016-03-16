@@ -1702,7 +1702,6 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 		} else {
 			critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_ACCEPT_FORMAT , extensions);
 		}
-		fprintf(stderr, "%s\n\n", critic_resolved);
 
 		free_parser_data((parser_data *)g.data);
 		yydeinit(&g);
