@@ -11,7 +11,7 @@
 *	CHANGED: Update documentation for HTML Footer metadata
 *	CHANGED: Update test suite
 *	CHANGED: recursive support for CriticMarkup syntax (e.g. an addition can be included inside a substitution).
-*	FIXED: Fix bug in handling of '41971' delimited math
+*	FIXED: Fix bug in handling of '$' delimited math
 *	FIXED: Improve accuracy of strong/emph parsing;
 *	FIXED: Remove debugging statement in recent CriticMarkup changes
 
