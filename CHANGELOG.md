@@ -1,6 +1,21 @@
 # MultiMarkdown Change Log #
 
 
+## [5.2.0] - 2016-03-16 ##
+
+*	ADDED: Add additional test cases
+*	ADDED: Add support for 'HTML FOOTER' metadata -- appended at very end of HTML documents (after footnotes)
+*	CHANGED: Allow nested strong/emph spans (though effect of output is not defined for all formats)
+*	CHANGED: Update Math test suite
+*	CHANGED: Update documentation for 5.1.0
+*	CHANGED: Update documentation for HTML Footer metadata
+*	CHANGED: Update test suite
+*	CHANGED: recursive support for CriticMarkup syntax (e.g. an addition can be included inside a substitution).
+*	FIXED: Fix bug in handling of '41971' delimited math
+*	FIXED: Improve accuracy of strong/emph parsing;
+*	FIXED: Remove debugging statement in recent CriticMarkup changes
+
+
 ## [5.1.0] - 2016-02-22 ##
 
 *	ADDED: Add script to build drag and drop apps on OS X
@@ -80,3 +95,4 @@
 [5.0.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.0
 [5.0.1]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.0.1
 [5.1.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.1.0
+[5.2.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.2.0
