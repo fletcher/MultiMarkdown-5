@@ -321,32 +321,8 @@ Inline = #&{ check_timeout((parser_data *)G->data) }
 		| Endline
 		| UlOrStarLine
 		| Space
-		| StrongAndEmph
 		| Strong
 		| Emph
-		| &{ !ext(EXT_COMPATIBILITY) } CitationReference
-		| &{ !ext(EXT_COMPATIBILITY) } Variable
-		| Image
-		| Link
-		| NoteReference
-		| Code
-		| MarkdownHtmlTagOpen
-		| RawHtml
-		| Entity
-		| EscapedChar
-		| Smart
-		| Symbol
-
-InlineNoEmph = #&{ check_timeout((parser_data *)G->data) }
-# TODO: the check_timeout function still slows us down -- do we still need it??
-		&{ ext(EXT_CRITIC) } CriticMarkup
-		| &{ !ext(EXT_COMPATIBILITY) } DollarMath
-		| Str
-		| &{ !ext(EXT_COMPATIBILITY) } MathSpan
-		| Endline
-		| UlOrStarLine
-		| Space
-		| Strong
 		| &{ !ext(EXT_COMPATIBILITY) } CitationReference
 		| &{ !ext(EXT_COMPATIBILITY) } Variable
 		| Image
@@ -454,11 +430,6 @@ Whitespace =  Spacechar | Newline | Eof
 Emph = < EmphMatch >
 	{
 		yytext[strlen(yytext) - 1] = '\0';
-		/*
-			$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_EMPH);
-
-			Applying the EXT_NO_EMPH extension allows forbidding `<em> foo <em>bar</em> foo</em>`
-		*/
 
 		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
 		if ($$ != NULL) {
@@ -466,27 +437,23 @@ Emph = < EmphMatch >
 		}
 	}
 
-
-EmphMatch =	&{ !ext(EXT_NO_EMPH) } (EmphStar | EmphUl)
+EmphMatch =	(EmphStar | EmphUl)
 
 EmphStar = '*' !Whitespace
-		(StrongMatch |
-		BracketedText |
-		(!'*' !(BlankLine BlankLine) .) )+
-		'*' &(SpecialChar | Whitespace)
+	(StrongMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
+	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
+	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	)*
+	'*'
 
 EmphUl = '_' !Whitespace
-		(StrongMatch |
-		BracketedText |
-		(!'_' !(BlankLine BlankLine) .) )+
-		'_' &(SpecialChar | Whitespace)
+	(StrongMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
+	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
+	'_' &('_'* (SpecialChar | Whitespace))
 
 Strong = < StrongMatch >
 		{
 			yytext[strlen(yytext) - 2] = '\0';
-			/*
-				$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions | EXT_NO_STRONG);
-			*/
 
 			$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions );
 			if ($$ != NULL) {
@@ -494,41 +461,19 @@ Strong = < StrongMatch >
 			}
 		}
 
-StrongMatch = &{ !ext(EXT_NO_STRONG) } (StrongStar | StrongUl)
+StrongMatch = (StrongStar | StrongUl)
 
 StrongStar = "**" !Whitespace
-		(EmphMatch |
-		BracketedText |
-		(!"**" !(BlankLine BlankLine) .) )+
-		"**" &(SpecialChar | Whitespace)
-		
+	(EmphMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
+	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
+	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	)*
+	"**"
+
 StrongUl = "__" !Whitespace
-		(EmphMatch |
-		BracketedText |
-		(!"__" !(BlankLine BlankLine) .) )+
-		"__" &(SpecialChar | Whitespace)
-
-StrongAndEmph = EmphAndStrongStar | EmphAndStrongUl
-
-EmphAndStrongStar = "*" &(PossibleEmphStrongStar)
-		a:StartList 
-		( !('*' !'*') b:InlineNoEmph { a = cons(b, a); })+
-		<"*">
-		{
-			$$ = list(EMPH, a);
-		}
-
-PossibleEmphStrongStar = "**" (!'\n' !'*' .)+ "**" (!'\n' !'*' .)+ '*'
-
-EmphAndStrongUl = "_" &(PossibleEmphStrongUl)
-		a:StartList 
-		( !('_' !'_') b:InlineNoEmph { a = cons(b, a); })+
-		<"_">
-		{
-			$$ = list(EMPH, a); 
-		}
-
-PossibleEmphStrongUl = "__" (!'\n' !'_' .)+ "__" (!'\n' !'_' .)+ '_'
+	(EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
+	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
+	"__" &('_'* (SpecialChar | Whitespace))
 
 Link = ExplicitLink | ReferenceLink | AutoLink
 
@@ -1542,40 +1487,81 @@ TOCPlain = ( (y:Fenced { free_node_tree(y); } ) | (!BlankLine !Heading z:Line { 
 
 CriticMarkup = CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment
 
-CriticAddition = ('{++' < (!'++}' .)* > '++}')
+CriticClean = CleanAddition | CleanDeletion | CleanSubstitution | CleanHighlight | CleanComment
+
+AddStart = '{++'
+
+AddStop = '++}'
+
+DelStart = '{--'
+
+DelStop = '--}'
+
+HiStart = '{=='
+
+HiStop = '==}'
+
+ComStart = '{>>'
+
+ComStop = '<<}'
+
+SubStart = '{~~'
+
+SubStop = '~~}'
+
+SubDivider = '~>'
+
+AddString = < ((!AddStop !CriticClean .)+) >
+	{ $$ = str(yytext); }
+
+DelString = < (!DelStop !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+HiString = < (!HiStop !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+SubDelString = < (!SubDivider !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+SubAddString = < (!SubStop !CriticClean .)+ >
+	{ $$ = str(yytext); }
+
+CleanAddition = AddStart (CriticClean | (!AddStop .))* AddStop
+
+CriticAddition = a:StartList AddStart ((CriticMarkup | AddString) { a = cons($$, a); })* AddStop
 	{
-		$$ = str(yytext);
-		$$->key = CRITICADDITION;
+		$$ = list(CRITICADDITION, a);
 	}
 
-CriticDeletion = ('{--' < (!'--}' .)* > '--}')
+CleanDeletion = DelStart (CriticClean | (!DelStop .))* DelStop
+
+CriticDeletion = a:StartList DelStart ((CriticMarkup | DelString) { a = cons($$, a); })* DelStop
 	{
-		$$ = str(yytext);
-		$$->key = CRITICDELETION;
+		$$ = list(CRITICDELETION, a);
 	}
 
-CriticSubstitution = a:StartList ( '{~~' CriticSubstDel { a = cons($$,a); } '~>' CriticSubstAdd { a = cons($$,a); } '~~}')
+CleanSubstitution = SubStart (CriticClean | (!SubDivider !SubStop .))* SubDivider (CriticClean | (!SubStop .))* SubStop
+
+CriticSubstitution = a:StartList ( SubStart CriticSubstDel { a = cons($$,a); } SubDivider CriticSubstAdd { a = cons($$,a); } SubStop)
 	{
 		$$ = list(CRITICSUBSTITUTION, a);
 	}
 
-CriticSubstDel = < (!'~>' .)* >
+CriticSubstDel = a:StartList ((CriticMarkup | SubDelString) { a = cons($$, a); })*
 	{
-		$$ = str(yytext);
-		$$->key = CRITICDELETION;
+		$$ = list(CRITICDELETION, a);
 	}
 
-CriticSubstAdd = < (!'~~}' .)* >
+CriticSubstAdd = a:StartList ((CriticMarkup | SubAddString) { a = cons($$, a); })*
 	{
-		$$ = str(yytext);
-		$$->key = CRITICADDITION;
+		$$ = list(CRITICADDITION, a);
+	}
+CriticHighlight = a:StartList HiStart ((CriticMarkup | HiString) { a = cons($$, a); })* HiStop
+	{
+		$$ = list(CRITICHIGHLIGHT, a);
 	}
 
-CriticHighlight = ('{==' < (!'==}' .)* > '==}')
-	{
-		$$ = str(yytext);
-		$$->key = CRITICHIGHLIGHT;
-	}
+CleanHighlight = HiStart (CriticClean | (!HiStop .))* HiStop
 
 CriticComment = ('{>>' < (!'<<}' .)* > '<<}')
 	{
@@ -1583,12 +1569,12 @@ CriticComment = ('{>>' < (!'<<}' .)* > '<<}')
 		$$->key = CRITICCOMMENT;
 	}
 
+CleanComment = ComStart (CriticClean | (!ComStop .))* ComStop
+
 DocForCritic = BOM? a:StartList
-		( CriticString { a = cons($$, a); } | RawString { a = cons($$, a); } | FalseMatch { a = cons($$, a); } )*
+		( CriticMarkup { a = cons($$, a); } | RawString { a = cons($$, a); } | FalseMatch { a = cons($$, a); } )*
 		( RawString { a = cons($$, a); } )* Eof
 		{ ((parser_data *)G->data)->result = reverse_list(a); }
-
-CriticString = CriticMarkup
 
 RawString = < (!( "{++" | "{--" | "{~~" | "{==" | "{>>" ) .)+ >
 		{ $$ = str(yytext); }
@@ -1716,7 +1702,7 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 		} else {
 			critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_ACCEPT_FORMAT , extensions);
 		}
-		
+
 		free_parser_data((parser_data *)g.data);
 		yydeinit(&g);
 		yyinit(&g);

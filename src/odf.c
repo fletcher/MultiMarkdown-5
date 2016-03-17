@@ -249,8 +249,9 @@ void print_odf_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(temp, "css") == 0) {
 			} else if (strcmp(temp, "xhtmlheader") == 0) {
 			} else if (strcmp(temp, "htmlheader") == 0) {
-			} else if (strcmp(n->str, "mmdfooter") == 0) {
-			} else if (strcmp(n->str, "mmdheader") == 0) {
+			} else if (strcmp(temp, "htmlfooter") == 0) {
+			} else if (strcmp(temp, "mmdfooter") == 0) {
+			} else if (strcmp(temp, "mmdheader") == 0) {
 			} else if (strcmp(temp, "baseheaderlevel") == 0) {
 				scratch->baseheaderlevel = atoi(n->children->str);
 			} else if (strcmp(temp, "odfheaderlevel") == 0) {

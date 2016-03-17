@@ -82,6 +82,13 @@ char * export_node_tree(node *list, int format, unsigned long extensions) {
 #ifdef DEBUG_ON
 	fprintf(stderr, "finished printing html endnotes\n");
 #endif
+
+			if (scratch->html_footer != NULL) {
+				// Print html footer if present
+				pad(out, 2, scratch);
+				g_string_append_printf(out,"%s\n", scratch->html_footer);
+			}
+
 			if (scratch->extensions & EXT_COMPLETE) {
 				pad(out,2, scratch);
 				g_string_append_printf(out, "</body>\n</html>");

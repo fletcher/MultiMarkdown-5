@@ -65,6 +65,7 @@ typedef struct {
 	int   footnote_to_print;     /* set while we are printing so we can reverse link */
 	int   footnote_para_counter; /* so we know which para is last */
 	int   max_footnote_num;      /* so we know if current note is new or repeat */
+	char *html_footer;           /* store for appending at the end */
 	bool  obfuscate;             /* flag that we need to mask email addresses */
 	char *latex_footer;          /* store for appending at the end */
 	bool  no_latex_footnote;     /* can't use footnotes in some places */

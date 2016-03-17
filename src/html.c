@@ -223,6 +223,10 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(n->str, "htmlheaderlevel") == 0) {
 				scratch->baseheaderlevel = atoi(n->children->str);
 				break;
+			} else if (strcmp(n->str, "htmlfooter") == 0) {
+				trim_trailing_whitespace(n->children->str);
+				scratch->html_footer = strdup(n->children->str);
+				break;
 			} else if (strcmp(n->str, "quoteslanguage") == 0) {
 				temp = label_from_node_tree(n->children);
 				if ((strcmp(temp, "nl") == 0) || (strcmp(temp, "dutch") == 0)) { scratch->language = DUTCH; }   else 
@@ -258,6 +262,7 @@ void print_html_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(n->str, "mmdheader") == 0) {
 			} else if (strcmp(n->str, "lang") == 0) {
 			} else if (strcmp(n->str, "transcludebase") == 0) {
+			} else if (strcmp(n->str, "htmlfooter") == 0) {
 			} else if (strcmp(n->str, "latexmode") == 0) {
 			} else if (strcmp(n->str, "latexinput") == 0) {
 			} else if (strcmp(n->str, "latexfooter") == 0) {

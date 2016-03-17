@@ -47,13 +47,13 @@ void print_critic_accept_node(GString *out, node *n, scratch_pad *scratch) {
 	switch (n->key) {
 		case LIST:
 		case CRITICSUBSTITUTION:
+		case CRITICADDITION:
+		case CRITICHIGHLIGHT:
 			print_critic_accept_node_tree(out, n->children, scratch);
 			break;
 		case CRITICDELETION:
 		case CRITICCOMMENT:
 			break;
-		case CRITICHIGHLIGHT:
-		case CRITICADDITION:
 		default:
 			g_string_append_printf(out,"%s",n->str);
 			break;
@@ -67,13 +67,13 @@ void print_critic_reject_node(GString *out, node *n, scratch_pad *scratch) {
 	switch (n->key) {
 		case LIST:
 		case CRITICSUBSTITUTION:
+		case CRITICDELETION:
+		case CRITICHIGHLIGHT:
 			print_critic_reject_node_tree(out, n->children, scratch);
 			break;
 		case CRITICADDITION:
 		case CRITICCOMMENT:
 			break;
-		case CRITICHIGHLIGHT:
-		case CRITICDELETION:
 		default:
 			g_string_append_printf(out,"%s",n->str);
 			break;
@@ -92,17 +92,23 @@ void print_critic_html_highlight_node(GString *out, node *n, scratch_pad *scratc
 			print_critic_html_highlight_node_tree(out, n->children, scratch);
 			break;
 		case CRITICADDITION:
-			g_string_append_printf(out,"<ins>%s</ins>",n->str);
+			g_string_append_printf(out, "<ins>");
+			print_critic_html_highlight_node_tree(out, n->children, scratch);
+			g_string_append_printf(out, "</ins>");
 			break;
 		case CRITICCOMMENT:
 			/* Hide comments for now */
 			/* g_string_append_printf(out, "<span class=\"critic comment\">%s</span>", n->str); */
 			break;
 		case CRITICHIGHLIGHT:
-			g_string_append_printf(out,"<mark>%s</mark>",n->str);
+			g_string_append_printf(out, "<mark>");
+			print_critic_html_highlight_node_tree(out, n->children, scratch);
+			g_string_append_printf(out, "</mark>");
 			break;
 		case CRITICDELETION:
-			g_string_append_printf(out,"<del>%s</del>",n->str);
+			g_string_append_printf(out, "<del>");
+			print_critic_html_highlight_node_tree(out, n->children, scratch);
+			g_string_append_printf(out, "</del>");
 			break;
 		default:
 			g_string_append_printf(out,"%s",n->str);

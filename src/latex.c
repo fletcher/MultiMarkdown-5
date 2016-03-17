@@ -260,6 +260,7 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 			} else if (strcmp(n->str, "css") == 0) {
 			} else if (strcmp(n->str, "xhtmlheader") == 0) {
 			} else if (strcmp(n->str, "htmlheader") == 0) {
+			} else if (strcmp(n->str, "htmlfooter") == 0) {
 			} else if (strcmp(n->str, "mmdfooter") == 0) {
 			} else if (strcmp(n->str, "mmdheader") == 0) {
 			} else if (strcmp(n->str, "lang") == 0) {
@@ -374,7 +375,7 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 				if (temp[1] == '$') {
 					if (strncmp(&temp[2],"\\begin",5) == 0) {
 						temp[strlen(temp)-2] = '\0';
-						g_string_append_printf(out, "%s",&temp[1]);
+						g_string_append_printf(out, "%s",&temp[2]);
 					} else {
 						g_string_append_printf(out, "%s",temp);
 					}

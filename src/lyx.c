@@ -995,7 +995,7 @@ void print_lyx_node(GString *out, node *n, scratch_pad *scratch, bool no_newline
 				if (n->str[1] == '$') {
 					if (strncmp(&n->str[2],"\\begin",5) == 0) {
 						n->str[strlen(n->str)-2] = '\0';
-						g_string_append_printf(out, "\n\\begin_inset Formula %s\n\\end_inset\n",&n->str[1]);
+						g_string_append_printf(out, "\n\\begin_inset Formula %s\n\\end_inset\n",&n->str[2]);
 					} else {
 						g_string_append_printf(out, "\n\\begin_inset Formula %s\n\\end_inset\n",n->str);
 					}
