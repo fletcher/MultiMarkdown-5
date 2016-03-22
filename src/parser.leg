@@ -407,17 +407,27 @@ SingleDollarMathStart = '$' !(Spacechar | Newline | '$' )
 
 SingleDollarMathEnd = (!'\\' !'$' Nonspacechar) '$' !NonPunctuation
 
-SingleDollarMath = < SingleDollarMathStart (!SingleDollarMathEnd !(BlankLine BlankLine) .)*  SingleDollarMathEnd >
+SingleDollarMath = < SingleDollarMathText >
 		{ $$ = str(yytext); $$->key = MATHSPAN; }
 
 DoubleDollarMathStart = '$' '$' !(Spacechar | Newline)
 
 DoubleDollarMathEnd = (!'\\' Nonspacechar) '$' '$' !NonPunctuation
 
-DoubleDollarMath = < DoubleDollarMathStart (!DoubleDollarMathEnd !(BlankLine BlankLine) .)*  DoubleDollarMathEnd >
+DoubleDollarMath = < DoubleDollarMathText >
 		{ $$ = str(yytext); $$->key = MATHSPAN; }
 
 DollarMath = SingleDollarMath | DoubleDollarMath
+
+
+MathText = &{ !ext(EXT_COMPATIBILITY) }
+	(MathSpanText | SingleDollarMathText | DoubleDollarMathText)
+
+MathSpanText = '\\' ( ('\\[' (!'\\\\]' .)* '\\\\]') | ('\\(' (!'\\\\)' .)* '\\\\)') )
+
+SingleDollarMathText = SingleDollarMathStart (!SingleDollarMathEnd !(BlankLine BlankLine) .)* SingleDollarMathEnd
+
+DoubleDollarMathText = DoubleDollarMathStart (!DoubleDollarMathEnd !(BlankLine BlankLine) .)*  DoubleDollarMathEnd
 
 # This keeps the parser from getting bogged down on long strings of '*' or '_',
 # or strings of '*' or '_' with space on each side:
@@ -439,16 +449,23 @@ Emph = < EmphMatch >
 
 EmphMatch =	(EmphStar | EmphUl)
 
-EmphStar = '*' !Whitespace
+EmphStar = '*' !Whitespace !MathText
 	(StrongMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
-	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
-	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	(
+		!MathText
+		(
+			(Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
+			(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+		)
 	)*
 	'*'
 
-EmphUl = '_' !Whitespace
+EmphUl = '_' !Whitespace !MathText
 	(StrongMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
-	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
+	(
+		!MathText
+		(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .))
+	)*
 	'_' &('_'* (SpecialChar | Whitespace))
 
 Strong = < StrongMatch >
@@ -463,16 +480,23 @@ Strong = < StrongMatch >
 
 StrongMatch = (StrongStar | StrongUl)
 
-StrongStar = "**" !Whitespace
+StrongStar = "**" !Whitespace !MathText
 	(EmphMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
-	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
-	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	(
+		!MathText
+		(
+			(Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
+			(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+		)
 	)*
 	"**"
 
-StrongUl = "__" !Whitespace
+StrongUl = "__" !Whitespace !MathText
 	(EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
-	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
+	(
+		!MathText
+		(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .))
+	)*
 	"__" &('_'* (SpecialChar | Whitespace))
 
 Link = ExplicitLink | ReferenceLink | AutoLink
