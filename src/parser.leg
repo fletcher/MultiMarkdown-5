@@ -449,24 +449,40 @@ Emph = < EmphMatch >
 
 EmphMatch =	(EmphStar | EmphUl)
 
-EmphStar = '*' !Whitespace !MathText
-	(StrongMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
-	(
-		!MathText
-		(
-			(Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
-			(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
-		)
-	)*
-	'*'
+EmphStarOpen = '*' !Whitespace
 
-EmphUl = '_' !Whitespace !MathText
-	(StrongMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
+EmphStarClose = '*'
+
+EmphStar = EmphStarOpen
+	(StrongMatch | BracketedText | MathText | (!'*' .) )
 	(
-		!MathText
-		(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .))
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) | 
+		MathText |
+		BracketedText |
+		(!'*' !Whitespace .) |
+		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
 	)*
-	'_' &('_'* (SpecialChar | Whitespace))
+	EmphStarClose
+
+EmphUlOpen = '_' !Whitespace
+
+EmphUlClose = '_' &('__'? !'_' (SpecialChar | Whitespace | Eof))
+
+EmphUl = EmphUlOpen
+	(StrongMatch | BracketedText | MathText | (!'_' .) )
+	(
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) | 
+		MathText |
+		BracketedText | 
+		(!'_' !(BlankLine BlankLine) .)
+	)*
+	EmphUlClose
 
 Strong = < StrongMatch >
 		{
@@ -480,24 +496,40 @@ Strong = < StrongMatch >
 
 StrongMatch = (StrongStar | StrongUl)
 
-StrongStar = "**" !Whitespace !MathText
-	(EmphMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
-	(
-		!MathText
-		(
-			(Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
-			(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
-		)
-	)*
-	"**"
+StrongStarOpen = '**' !Whitespace
 
-StrongUl = "__" !Whitespace !MathText
-	(EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
+StrongStarClose = '**'
+
+StrongStar = StrongStarOpen
+	(EmphMatch | BracketedText | MathText | (!'*' .) )
 	(
-		!MathText
-		(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .))
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) | 
+		MathText | 
+		BracketedText |
+		(!'*' !Whitespace .) |
+		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
 	)*
-	"__" &('_'* (SpecialChar | Whitespace))
+	StrongStarClose
+
+StrongUlOpen = '__' !Whitespace
+
+StrongUlClose = '__' &('_'? !'_' (SpecialChar | Whitespace))
+
+StrongUl = StrongUlOpen
+	(EmphMatch | BracketedText | MathText | (!'_' .) )
+	(
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) |
+		MathText | 
+		BracketedText |
+		(!'_' !(BlankLine BlankLine) .)
+	)*
+	StrongUlClose
 
 Link = ExplicitLink | ReferenceLink | AutoLink
 
