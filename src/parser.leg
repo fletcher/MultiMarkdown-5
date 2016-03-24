@@ -102,7 +102,7 @@ YAMLStop = ("---"|"...") BlankLine
 DocForMetaDataOnly = BOM? a:StartList
 		( &( YAMLStart? MetaDataKey Sp ':' Sp (!Newline)) MetaData
 			{ a = cons($$, a); } )?
-		( SkipBlock )*
+		( . )*
 		BlankLine*
 		{
 			((parser_data *)G->data)->result = reverse_list(a);
@@ -251,8 +251,7 @@ SpecialChar =   '*' | '_' | '`' | '&' | '[' | ']' | '(' | ')' | '<' | '!' | '#' 
 ExtendedSpecialChar = &{ ext(EXT_SMART) } ('.' | '-' | '\'' | '"')
 		| &{ ext(EXT_NOTES) } ( '^' )
 		| &{ ext(EXT_CRITIC) } ( '{' )
-		| &{ !ext(EXT_COMPATIBILITY) } ( '~' )
-		| &{ !ext(EXT_COMPATIBILITY) } ( '|' )
+		| &{ !ext(EXT_COMPATIBILITY) } ( '~' | '|' )
 Punctuation = '.' | ',' | '?' | '!' | ';' | ':' | '。' | '、'
 NonPunctuation = !(Punctuation | SpecialChar | Spacechar | Newline) .
 
@@ -453,15 +452,26 @@ EmphStarOpen = '*' !Whitespace
 
 EmphStarClose = '*'
 
+OneStar = '*' !'*'
+
+TwoStar = '**' !'*'
+
+OneTwoStar = '*' '*'? !'*'
+
+ThreeStar = '***' !'*'
+
 EmphStar = EmphStarOpen
 	(StrongMatch | BracketedText | MathText | (!'*' .) )
 	(
 		&(Whitespace) (
 			Whitespace
 			(StrongMatch | EmphMatch)
-		) | 
-		MathText |
+		) |
+		&TwoStar (
+			StrongStar
+		) |
 		BracketedText |
+		MathText |
 		(!'*' !Whitespace .) |
 		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
 	)*
@@ -477,9 +487,12 @@ EmphUl = EmphUlOpen
 		&(Whitespace) (
 			Whitespace
 			(StrongMatch | EmphMatch)
-		) | 
-		MathText |
+		) |
+		&OneTwoStar (
+			StrongStar | EmphStar
+		) |
 		BracketedText | 
+		MathText |
 		(!'_' !(BlankLine BlankLine) .)
 	)*
 	EmphUlClose
@@ -506,9 +519,12 @@ StrongStar = StrongStarOpen
 		&(Whitespace) (
 			Whitespace
 			(StrongMatch | EmphMatch)
-		) | 
+		) |
+		&OneStar (
+			EmphStar
+		) |
+		BracketedText | 
 		MathText | 
-		BracketedText |
 		(!'*' !Whitespace .) |
 		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
 	)*
@@ -525,8 +541,11 @@ StrongUl = StrongUlOpen
 			Whitespace
 			(StrongMatch | EmphMatch)
 		) |
+		&OneTwoStar (
+			StrongStar | EmphStar
+		) |
+		BracketedText | 
 		MathText | 
-		BracketedText |
 		(!'_' !(BlankLine BlankLine) .)
 	)*
 	StrongUlClose
@@ -1541,9 +1560,9 @@ TOCPlain = ( (y:Fenced { free_node_tree(y); } ) | (!BlankLine !Heading z:Line { 
 
 # Critic Markup
 
-CriticMarkup = CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment
+CriticMarkup = &'{' (CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment)
 
-CriticClean = CleanAddition | CleanDeletion | CleanSubstitution | CleanHighlight | CleanComment
+CriticClean = &'{' (CleanAddition | CleanDeletion | CleanSubstitution | CleanHighlight | CleanComment)
 
 AddStart = '{++'
 
