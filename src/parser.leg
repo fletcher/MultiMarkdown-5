@@ -102,7 +102,7 @@ YAMLStop = ("---"|"...") BlankLine
 DocForMetaDataOnly = BOM? a:StartList
 		( &( YAMLStart? MetaDataKey Sp ':' Sp (!Newline)) MetaData
 			{ a = cons($$, a); } )?
-		( SkipBlock )*
+		( . )*
 		BlankLine*
 		{
 			((parser_data *)G->data)->result = reverse_list(a);
@@ -251,8 +251,7 @@ SpecialChar =   '*' | '_' | '`' | '&' | '[' | ']' | '(' | ')' | '<' | '!' | '#' 
 ExtendedSpecialChar = &{ ext(EXT_SMART) } ('.' | '-' | '\'' | '"')
 		| &{ ext(EXT_NOTES) } ( '^' )
 		| &{ ext(EXT_CRITIC) } ( '{' )
-		| &{ !ext(EXT_COMPATIBILITY) } ( '~' )
-		| &{ !ext(EXT_COMPATIBILITY) } ( '|' )
+		| &{ !ext(EXT_COMPATIBILITY) } ( '~' | '|' )
 Punctuation = '.' | ',' | '?' | '!' | ';' | ':' | '。' | '、'
 NonPunctuation = !(Punctuation | SpecialChar | Spacechar | Newline) .
 
@@ -315,22 +314,27 @@ Inlines =	a:StartList ( !Endline Inline { a = cons($$, a); }
 Inline = #&{ check_timeout((parser_data *)G->data) }
 # TODO: the check_timeout function still slows us down -- do we still need it??
 		&{ ext(EXT_CRITIC) } CriticMarkup
-		| &{ !ext(EXT_COMPATIBILITY) } DollarMath
+		| &'$' &{ !ext(EXT_COMPATIBILITY) } DollarMath
 		| Str
-		| &{ !ext(EXT_COMPATIBILITY) } MathSpan
+		| &'\\\\' &{ !ext(EXT_COMPATIBILITY) } MathSpan
 		| Endline
 		| UlOrStarLine
 		| Space
 		| Strong
 		| Emph
-		| &{ !ext(EXT_COMPATIBILITY) } CitationReference
-		| &{ !ext(EXT_COMPATIBILITY) } Variable
-		| Image
-		| Link
-		| NoteReference
+		| &'[' (
+			&{ !ext(EXT_COMPATIBILITY) } CitationReference
+			| &{ !ext(EXT_COMPATIBILITY) } Variable
+			| NoteReference
+			| Link
+		)
+		| &'![' Image
 		| Code
-		| MarkdownHtmlTagOpen
-		| RawHtml
+		| &'<' (
+			Link
+			| MarkdownHtmlTagOpen
+			| RawHtml
+		)
 		| Entity
 		| EscapedChar
 		| Smart
@@ -407,17 +411,27 @@ SingleDollarMathStart = '$' !(Spacechar | Newline | '$' )
 
 SingleDollarMathEnd = (!'\\' !'$' Nonspacechar) '$' !NonPunctuation
 
-SingleDollarMath = < SingleDollarMathStart (!SingleDollarMathEnd !(BlankLine BlankLine) .)*  SingleDollarMathEnd >
+SingleDollarMath = < SingleDollarMathText >
 		{ $$ = str(yytext); $$->key = MATHSPAN; }
 
 DoubleDollarMathStart = '$' '$' !(Spacechar | Newline)
 
 DoubleDollarMathEnd = (!'\\' Nonspacechar) '$' '$' !NonPunctuation
 
-DoubleDollarMath = < DoubleDollarMathStart (!DoubleDollarMathEnd !(BlankLine BlankLine) .)*  DoubleDollarMathEnd >
+DoubleDollarMath = < DoubleDollarMathText >
 		{ $$ = str(yytext); $$->key = MATHSPAN; }
 
 DollarMath = SingleDollarMath | DoubleDollarMath
+
+
+MathText = &{ !ext(EXT_COMPATIBILITY) }
+	(MathSpanText | SingleDollarMathText | DoubleDollarMathText)
+
+MathSpanText = '\\' ( ('\\[' (!'\\\\]' .)* '\\\\]') | ('\\(' (!'\\\\)' .)* '\\\\)') )
+
+SingleDollarMathText = SingleDollarMathStart (!SingleDollarMathEnd !(BlankLine BlankLine) .)* SingleDollarMathEnd
+
+DoubleDollarMathText = DoubleDollarMathStart (!DoubleDollarMathEnd !(BlankLine BlankLine) .)*  DoubleDollarMathEnd
 
 # This keeps the parser from getting bogged down on long strings of '*' or '_',
 # or strings of '*' or '_' with space on each side:
@@ -439,17 +453,54 @@ Emph = < EmphMatch >
 
 EmphMatch =	(EmphStar | EmphUl)
 
-EmphStar = '*' !Whitespace
-	(StrongMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
-	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
-	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
-	)*
-	'*'
+EmphStarOpen = '*' !Whitespace
 
-EmphUl = '_' !Whitespace
-	(StrongMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
-	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
-	'_' &('_'* (SpecialChar | Whitespace))
+EmphStarClose = '*'
+
+OneStar = '*' !'*'
+
+TwoStar = '**' !'*'
+
+OneTwoStar = '*' '*'? !'*'
+
+ThreeStar = '***' !'*'
+
+EmphStar = EmphStarOpen
+	(StrongMatch | BracketedText | MathText | (!'*' .) )
+	(
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) |
+		&TwoStar (
+			StrongStar
+		) |
+		BracketedText |
+		MathText |
+		(!'*' !Whitespace .) |
+		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	)*
+	EmphStarClose
+
+EmphUlOpen = '_' !Whitespace
+
+EmphUlClose = '_' &('__'? !'_' ( Whitespace | Punctuation | SpecialChar | Eof))
+
+EmphUl = EmphUlOpen
+	(StrongMatch | BracketedText | MathText | (!'_' .) )
+	(
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) |
+		&OneTwoStar (
+			StrongStar | EmphStar
+		) |
+		BracketedText | 
+		MathText |
+		(!'_' !(BlankLine BlankLine) .)
+	)*
+	EmphUlClose
 
 Strong = < StrongMatch >
 		{
@@ -463,17 +514,46 @@ Strong = < StrongMatch >
 
 StrongMatch = (StrongStar | StrongUl)
 
-StrongStar = "**" !Whitespace
-	(EmphMatch | BracketedText | (!'*' !(BlankLine BlankLine) .) )
-	((Whitespace? StrongMatch) | (Whitespace? EmphMatch) | (Whitespace? BracketedText) |
-	(!'*' !(BlankLine BlankLine) !Whitespace .) | (!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
-	)*
-	"**"
+StrongStarOpen = '**' !Whitespace
 
-StrongUl = "__" !Whitespace
-	(EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )
-	(StrongMatch | EmphMatch | BracketedText | (!'_' !(BlankLine BlankLine) .) )*
-	"__" &('_'* (SpecialChar | Whitespace))
+StrongStarClose = '**'
+
+StrongStar = StrongStarOpen
+	(EmphMatch | BracketedText | MathText | (!'*' .) )
+	(
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) |
+		&OneStar (
+			EmphStar
+		) |
+		BracketedText | 
+		MathText | 
+		(!'*' !Whitespace .) |
+		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
+	)*
+	StrongStarClose
+
+StrongUlOpen = '__' !Whitespace
+
+StrongUlClose = '__' &('_'? !'_' ( Whitespace | Punctuation | SpecialChar | Eof))
+
+StrongUl = StrongUlOpen
+	(EmphMatch | BracketedText | MathText | (!'_' .) )
+	(
+		&(Whitespace) (
+			Whitespace
+			(StrongMatch | EmphMatch)
+		) |
+		&OneTwoStar (
+			StrongStar | EmphStar
+		) |
+		BracketedText | 
+		MathText | 
+		(!'_' !(BlankLine BlankLine) .)
+	)*
+	StrongUlClose
 
 Link = ExplicitLink | ReferenceLink | AutoLink
 
@@ -497,7 +577,7 @@ ReferenceLinkSingle = ( a:Label < (Spnl "[]")? > )
 
 CitationReference = CitationReferenceDouble | CitationReferenceSingle
 	
-CitationReferenceDouble = !"[]" a:Label < Spnl > !"[]" b:RawCitationReference
+CitationReferenceDouble = !"[]" !"[#" a:Label < Spnl > !"[]" b:RawCitationReference
 	{
 		char *label;
 		label = label_from_node_tree(a);
@@ -662,8 +742,19 @@ Image = '!' ( !AutoLink Link )
 			$$->key = IMAGE;
 		}
 
+Label = &( '[' )
+	< BracketedText > 
+	{
+		yytext[strlen(yytext) - 1] = '\0';
+		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
+		if ($$ == NULL) {
+			$$ = str("");
+		} else {
+			$$->key = LIST;		
+		}
+	}
 
-Label = < "[" (&"[%" | !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } ))
+Label2 = < "[" (&"[%" | !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } ))
 	a:StartList
 		( !']' Inline { a = cons($$, a); } )*
 			']'>
@@ -1382,7 +1473,11 @@ RightAlign = ('-'+ | '='+)':' &(!'-' !'=' !':')
 
 CellDivider = '|'
 
-BracketedText = '[' ((!'[' !']' .) | BracketedText )* ']'	# Matches text within [...], but allows for recursive brackets
+BracketedTextz = &('[' (!(Endline Endline) !']' .)* ']') BracketedText2
+
+BracketedText = &('[' (!(BlankLine BlankLine) !']' .)* ']') BracketedText2
+
+BracketedText2 = '[' ( ('\\' .) | (!'[' !']' .) | BracketedText2 )* ']'	# Matches text within [...], but allows for recursive brackets
 
 TableCaption = b:StartList a:StartList (< BracketedText >
 	{
@@ -1485,9 +1580,9 @@ TOCPlain = ( (y:Fenced { free_node_tree(y); } ) | (!BlankLine !Heading z:Line { 
 
 # Critic Markup
 
-CriticMarkup = CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment
+CriticMarkup = &'{' (CriticAddition | CriticDeletion | CriticSubstitution | CriticHighlight | CriticComment)
 
-CriticClean = CleanAddition | CleanDeletion | CleanSubstitution | CleanHighlight | CleanComment
+CriticClean = &'{' (CleanAddition | CleanDeletion | CleanSubstitution | CleanHighlight | CleanComment)
 
 AddStart = '{++'
 
