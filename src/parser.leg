@@ -314,22 +314,27 @@ Inlines =	a:StartList ( !Endline Inline { a = cons($$, a); }
 Inline = #&{ check_timeout((parser_data *)G->data) }
 # TODO: the check_timeout function still slows us down -- do we still need it??
 		&{ ext(EXT_CRITIC) } CriticMarkup
-		| &{ !ext(EXT_COMPATIBILITY) } DollarMath
+		| &'$' &{ !ext(EXT_COMPATIBILITY) } DollarMath
 		| Str
-		| &{ !ext(EXT_COMPATIBILITY) } MathSpan
+		| &'\\\\' &{ !ext(EXT_COMPATIBILITY) } MathSpan
 		| Endline
 		| UlOrStarLine
 		| Space
 		| Strong
 		| Emph
-		| &{ !ext(EXT_COMPATIBILITY) } CitationReference
-		| &{ !ext(EXT_COMPATIBILITY) } Variable
-		| Image
-		| Link
-		| NoteReference
+		| &'[' (
+			&{ !ext(EXT_COMPATIBILITY) } CitationReference
+			| &{ !ext(EXT_COMPATIBILITY) } Variable
+			| NoteReference
+			| Link
+		)
+		| &'![' Image
 		| Code
-		| MarkdownHtmlTagOpen
-		| RawHtml
+		| &'<' (
+			Link
+			| MarkdownHtmlTagOpen
+			| RawHtml
+		)
 		| Entity
 		| EscapedChar
 		| Smart
@@ -479,7 +484,7 @@ EmphStar = EmphStarOpen
 
 EmphUlOpen = '_' !Whitespace
 
-EmphUlClose = '_' &('__'? !'_' (SpecialChar | Whitespace | Eof))
+EmphUlClose = '_' &('__'? !'_' ( Whitespace | Punctuation | SpecialChar | Eof))
 
 EmphUl = EmphUlOpen
 	(StrongMatch | BracketedText | MathText | (!'_' .) )
@@ -532,7 +537,7 @@ StrongStar = StrongStarOpen
 
 StrongUlOpen = '__' !Whitespace
 
-StrongUlClose = '__' &('_'? !'_' (SpecialChar | Whitespace))
+StrongUlClose = '__' &('_'? !'_' ( Whitespace | Punctuation | SpecialChar | Eof))
 
 StrongUl = StrongUlOpen
 	(EmphMatch | BracketedText | MathText | (!'_' .) )
@@ -572,7 +577,7 @@ ReferenceLinkSingle = ( a:Label < (Spnl "[]")? > )
 
 CitationReference = CitationReferenceDouble | CitationReferenceSingle
 	
-CitationReferenceDouble = !"[]" a:Label < Spnl > !"[]" b:RawCitationReference
+CitationReferenceDouble = !"[]" !"[#" a:Label < Spnl > !"[]" b:RawCitationReference
 	{
 		char *label;
 		label = label_from_node_tree(a);
@@ -737,8 +742,19 @@ Image = '!' ( !AutoLink Link )
 			$$->key = IMAGE;
 		}
 
+Label = &( '[' )
+	< BracketedText > 
+	{
+		yytext[strlen(yytext) - 1] = '\0';
+		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
+		if ($$ == NULL) {
+			$$ = str("");
+		} else {
+			$$->key = LIST;		
+		}
+	}
 
-Label = < "[" (&"[%" | !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } ))
+Label2 = < "[" (&"[%" | !'[' ( !'^' !'#' &{ ext(EXT_NOTES) } | &. &{ !ext(EXT_NOTES) } ))
 	a:StartList
 		( !']' Inline { a = cons($$, a); } )*
 			']'>
@@ -1457,7 +1473,11 @@ RightAlign = ('-'+ | '='+)':' &(!'-' !'=' !':')
 
 CellDivider = '|'
 
-BracketedText = '[' ((!'[' !']' .) | BracketedText )* ']'	# Matches text within [...], but allows for recursive brackets
+BracketedTextz = &('[' (!(Endline Endline) !']' .)* ']') BracketedText2
+
+BracketedText = &('[' (!(BlankLine BlankLine) !']' .)* ']') BracketedText2
+
+BracketedText2 = '[' ( ('\\' .) | (!'[' !']' .) | BracketedText2 )* ']'	# Matches text within [...], but allows for recursive brackets
 
 TableCaption = b:StartList a:StartList (< BracketedText >
 	{
