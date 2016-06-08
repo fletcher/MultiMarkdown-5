@@ -1,5 +1,14 @@
 # MultiMarkdown Change Log #
 
+## [5.3.0] - 2016-06-08 ##
+
+*	CHANGED: Update test suite
+*	FIXED: Don't allow math spans inside strong/emph
+*	FIXED: Fix additional edge case in emph/strong parser
+*	FIXED: Fix slow parsing of complex strong/emph (Fixes #18)
+*	FIXED: Improve accuracy and performance of strong/emph
+*	FIXED: Improve performance
+
 
 ## [5.2.0] - 2016-03-16 ##
 
@@ -96,3 +105,4 @@
 [5.0.1]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.0.1
 [5.1.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.1.0
 [5.2.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.2.0
+[5.3.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.3.0
