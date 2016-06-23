@@ -1486,9 +1486,10 @@ TableCaption = b:StartList a:StartList (< BracketedText >
 	} )
 		( c:AutoLabel { b = c; b->key = TABLELABEL;})? Sp Newline
 		{
-			$$ = a;
-			$$->key = TABLECAPTION;
-
+			if ( a != NULL ) {
+				$$ = a;
+				$$->key = TABLECAPTION;
+			}
 			if ( (b != NULL) && (b->key == TABLELABEL) ) {
 				b->next = $$->children;
 				$$->children = b;
