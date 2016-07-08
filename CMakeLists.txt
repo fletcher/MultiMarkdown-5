@@ -331,22 +331,29 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Some libraries need to be linked on some Linux builds
 	if (DEFINED TEST)
 		# target_link_libraries(run_tests m)
-	else (DEFINE TEST)
-		# Statically link libraries -- might make the binary slightly more
-		# compatible across Linux distributions, for example
-		#
-		# It will likely cause large numbers of errors on valgrind, 
-		# so use "make debug" for valgrind testing
-		#
-		# You may wish to disable this.
-		#
-		
-		set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-		set (BUILD_SHARED_LIBRARIES OFF)
-		set (CMAKE_EXE_LINKER_FLAGS "-static")
 	endif (DEFINED TEST)
 
 endif (WIN32)
+
+
+# =======================================
+# Option to link against static libraries
+# =======================================
+
+if (DEFINED STATICBUILD)
+	# Statically link libraries -- might make the binary slightly more
+	# compatible across Linux distributions, for example
+	#
+	# It will likely cause large numbers of errors on valgrind, 
+	# so use "make debug" for valgrind testing
+	#
+	# You may wish to disable this.
+	#
+	
+	set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+	set (BUILD_SHARED_LIBRARIES OFF)
+	set (CMAKE_EXE_LINKER_FLAGS "-static")
+endif (DEFINED STATICBUILD)
 
 
 # ==============
