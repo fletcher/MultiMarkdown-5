@@ -492,6 +492,8 @@ endif (WIN32)
 
 set (CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT})
 
+set (CPACK_PACKAGE_CONTACT "fletcher@fletcherpenney.net")
+
 include (CPack)
 
 
