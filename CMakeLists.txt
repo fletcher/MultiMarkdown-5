@@ -8,9 +8,9 @@ cmake_minimum_required (VERSION 2.6)
 set (My_Project_Title "MultiMarkdown")
 set (My_Project_Description "MultiMarkdown - lightweight markup processor")
 set (My_Project_Author "Fletcher T. Penney")
-set (My_Project_Revised_Date "2016-06-08")
+set (My_Project_Revised_Date "2016-08-05")
 set (My_Project_Version_Major 5)
-set (My_Project_Version_Minor 3)
+set (My_Project_Version_Minor 4)
 set (My_Project_Version_Patch 0)
 
 set (My_Project_Version "${My_Project_Version_Major}.${My_Project_Version_Minor}.${My_Project_Version_Patch}")
@@ -331,22 +331,29 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Some libraries need to be linked on some Linux builds
 	if (DEFINED TEST)
 		# target_link_libraries(run_tests m)
-	else (DEFINE TEST)
-		# Statically link libraries -- might make the binary slightly more
-		# compatible across Linux distributions, for example
-		#
-		# It will likely cause large numbers of errors on valgrind, 
-		# so use "make debug" for valgrind testing
-		#
-		# You may wish to disable this.
-		#
-		
-		set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-		set (BUILD_SHARED_LIBRARIES OFF)
-		set (CMAKE_EXE_LINKER_FLAGS "-static")
 	endif (DEFINED TEST)
 
 endif (WIN32)
+
+
+# =======================================
+# Option to link against static libraries
+# =======================================
+
+if (DEFINED STATICBUILD)
+	# Statically link libraries -- might make the binary slightly more
+	# compatible across Linux distributions, for example
+	#
+	# It will likely cause large numbers of errors on valgrind, 
+	# so use "make debug" for valgrind testing
+	#
+	# You may wish to disable this.
+	#
+	
+	set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+	set (BUILD_SHARED_LIBRARIES OFF)
+	set (CMAKE_EXE_LINKER_FLAGS "-static")
+endif (DEFINED STATICBUILD)
 
 
 # ==============
@@ -484,6 +491,8 @@ else (WIN32)
 endif (WIN32)
 
 set (CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT})
+
+set (CPACK_PACKAGE_CONTACT "fletcher@fletcherpenney.net")
 
 include (CPack)
 

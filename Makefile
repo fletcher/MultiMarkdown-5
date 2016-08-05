@@ -8,6 +8,12 @@ release: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
 	cmake -DCMAKE_BUILD_TYPE=Release ..
 
+# Build release linking to static libraries
+.PHONY : static
+static: $(BUILD_DIR) $(GREG)
+	cd $(BUILD_DIR); touch README.html; \
+	cmake -DCMAKE_BUILD_TYPE=Release -DSTATICBUILD=1 ..
+
 # Build zip file package
 .PHONY : zip
 zip: $(BUILD_DIR) $(GREG)

@@ -335,9 +335,15 @@ void find_abbreviations(node *list, scratch_pad *scratch) {
 			case STRONG:
 			case EMPH:
 			case TABLE:
+			case TABLEHEAD:
 			case TABLEBODY:
 			case TABLEROW:
 			case TABLECELL:
+			case TABLECAPTION:
+			case DEFLIST:
+			case DEFINITION:
+			case TERM:
+			case IMAGEBLOCK:
 				/* Check children of these elements */
 				find_abbreviations(list->children, scratch);
 				break;

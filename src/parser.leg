@@ -1487,9 +1487,15 @@ TableCaption = b:StartList a:StartList (< BracketedText >
 		( c:AutoLabel { b = c; b->key = TABLELABEL;})? Sp Newline
 		{
 			$$ = a;
-			$$->key = TABLECAPTION;
+
+			if ($$ != NULL) {
+				$$->key = TABLECAPTION;
+			}
 
 			if ( (b != NULL) && (b->key == TABLELABEL) ) {
+				if ($$ == NULL)
+					$$ = node(TABLECAPTION);
+
 				b->next = $$->children;
 				$$->children = b;
 			}
@@ -1700,7 +1706,30 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 			current->key = LIST;
 			g.data = mk_parser_data(contents, (extensions | EXT_NO_METADATA ));
 			
-			while (yyparse(&g));
+			/*
+				An endless loop was discovered by a user:
+
+				https://github.com/fletcher/MultiMarkdown-5/issues/30
+
+				It seems that for some reason, a list item consisting only of a "\",
+				under certain circumstances, generates an endless loop:
+
+					1. \
+
+				The parser repeatedly asks for yy_input_func, which returns 0.  And the 
+				parser then cycles through every possible match over and over and over.
+
+				I haven't found the problem, but can institute a failsafe by ensuring that
+				there is something left in the buffer.
+
+				TODO: \todo: Would like to actually fix this, and not just avoid it.
+			*/
+
+			parser_data * d = (parser_data *)g.data;
+
+			//while (yyparse(&g));
+
+			while ((yyparse(&g)) && (*d->charbuf != '\0'));
 			
 			current->children = ((parser_data *)g.data)->result;
 			
