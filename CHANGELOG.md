@@ -1,5 +1,15 @@
 # MultiMarkdown Change Log #
 
+## [5.4.0] - 2016-08-05
+
+*	ADDED: Add email address to cpack settings (addresses #31)
+*	ADDED: Move static library options to separate make target
+*	CHANGED: Increase list of syntax structures that are evaluated for abbreviations (Thanks, David!)
+*	CHANGED: Update README
+*	FIXED: Avoids problem mentioned on github (#30), but doesn't actually solve it. Any help appreciated!
+*	FIXED: Fix crash with empty table label
+
+
 ## [5.3.0] - 2016-06-08 ##
 
 *	CHANGED: Update test suite
@@ -106,3 +116,4 @@
 [5.1.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.1.0
 [5.2.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.2.0
 [5.3.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.3.0
+[5.4.0]: https://github.com/fletcher/MultiMarkdown-5/releases/tag/5.4.0
