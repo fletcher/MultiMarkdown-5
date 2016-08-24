@@ -482,6 +482,8 @@ if (DEFINED SHAREDBUILD)
 	set (CPACK_COMPONENT_SHAREDLIB_DESCRIPTION "MultiMarkdown shared library for use with third party software.")
 
 	set (CPACK_COMPONENTS_ALL application scripts sharedlib)
+
+	set (CPACK_COMPONENT_SHAREDLIB_GROUP "MultiMarkdown")
 endif (DEFINED SHAREDBUILD)
 
 
@@ -491,12 +493,8 @@ set (CPACK_COMPONENT_SCRIPTS_DESCRIPTION
 
 include (InstallRequiredSystemLibraries)
 
-set (CPACK_COMPONENTS_ALL application scripts sharedlib)
-
-
 set (CPACK_COMPONENT_APPLICATION_GROUP "MultiMarkdown")
 set (CPACK_COMPONENT_SCRIPTS_GROUP "MultiMarkdown")
-set (CPACK_COMPONENT_SHAREDLIB_GROUP "MultiMarkdown")
 
 set (CPACK_COMPONENT_GROUP_MULTIMARKDOWN_DESCRIPTION
    "The basic MultiMarkdown utility and convenience scripts.")
