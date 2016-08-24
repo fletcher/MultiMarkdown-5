@@ -14,6 +14,12 @@ static: $(BUILD_DIR) $(GREG)
 	cd $(BUILD_DIR); touch README.html; \
 	cmake -DCMAKE_BUILD_TYPE=Release -DSTATICBUILD=1 ..
 
+# Build shared library as well
+.PHONY : shared
+shared: $(BUILD_DIR) $(GREG)
+	cd $(BUILD_DIR); touch README.html; \
+	cmake -DCMAKE_BUILD_TYPE=Release -DSHAREDBUILD=1 ..
+
 # Build zip file package
 .PHONY : zip
 zip: $(BUILD_DIR) $(GREG)
