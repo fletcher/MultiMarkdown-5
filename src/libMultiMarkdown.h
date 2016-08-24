@@ -61,6 +61,7 @@
 #ifndef LIB_MULTIMARKDOWN_H
 #define LIB_MULTIMARKDOWN_H
 
+#include <stdbool.h>
 
 /* Main API commands */
 

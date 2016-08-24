@@ -296,6 +296,9 @@ if (APPLE)
 
 	# Xcode settings
 	set (XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+
+	#Eliminate warnings about Policy CMP0042
+	set(CMAKE_MACOSX_RPATH 1)
 endif (APPLE)
 
 # Windows Builds
@@ -360,13 +363,29 @@ endif (DEFINED STATICBUILD)
 # Define targets
 # ==============
 
-# Create a library?
-add_library(libMultiMarkdown STATIC
+# Create object library for reuse between libraries
+add_library(objMultiMarkdown OBJECT
 	${src_files}
 	${src_utility_files}
 	${header_files}
 	${header_utility_files}
 )
+
+if (SHAREDBUILD)
+	# Shared objects require PIC, this minimizes impact on purely static build
+	SET_TARGET_PROPERTIES(objMultiMarkdown PROPERTIES POSITION_INDEPENDENT_CODE 1)
+
+	add_library(libMultiMarkdownShared SHARED $<TARGET_OBJECTS:objMultiMarkdown>)
+
+	# remove the extra "lib" from "liblibFOO"
+	SET_TARGET_PROPERTIES(libMultiMarkdownShared PROPERTIES PREFIX "")
+	set_target_properties(libMultiMarkdownShared PROPERTIES
+		OUTPUT_NAME libMultiMarkdown
+	)
+endif (SHAREDBUILD)
+
+# Create static library
+add_library(libMultiMarkdown STATIC $<TARGET_OBJECTS:objMultiMarkdown>)
 
 # remove the extra "lib" from "liblibFOO"
 SET_TARGET_PROPERTIES(libMultiMarkdown PROPERTIES PREFIX "")
@@ -419,6 +438,14 @@ install (TARGETS multimarkdown
 	COMPONENT application
 )
 
+#Installation commands for shared build setup
+if (SHAREDBUILD)
+	# Install libMultiMarkdown for external usage/integration.
+	install (TARGETS libMultiMarkdownShared ARCHIVE LIBRARY DESTINATION lib)
+
+	install (FILES ${public_header_files} DESTINATION include/multimarkdown)
+endif (SHAREDBUILD)
+
 set (CPACK_COMPONENT_APPLICATION_DISPLAY_NAME "MultiMarkdown")
 set (CPACK_COMPONENT_APPLICATION_DESCRIPTION 
    "Install the actual `multimarkdown` program.")
@@ -433,11 +460,6 @@ install (FILES ${scripts}
 # install (FILES ${PROJECT_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_BINARY_DIR}/README.html
 # 	DESTINATION notes
 # )
-
-# Use something like this to install public header files (after adding them
-# with the ADD_PUBLIC_HEADER() macro)
-
-# install (FILES ${public_header_files} DESTINATION local/include/libMultiMarkdown) 
 
 set (CPACK_COMPONENT_SCRIPTS_DISPLAY_NAME "Convenience scripts")
 set (CPACK_COMPONENT_SCRIPTS_DESCRIPTION 
