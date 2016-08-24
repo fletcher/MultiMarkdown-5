@@ -4,14 +4,14 @@ GREG = submodules/greg/greg
 
 # The release target will perform additional optimization
 .PHONY : release
-release: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+release: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_BUILD_TYPE=Release ..
 
 # Build release linking to static libraries
 .PHONY : static
-static: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+static: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_BUILD_TYPE=Release -DSTATICBUILD=1 ..
 
 # Also build a shared library
@@ -22,14 +22,14 @@ shared: $(BUILD_DIR) $(GREG)
 
 # Build zip file package
 .PHONY : zip
-zip: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+zip: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_BUILD_TYPE=Release -DZIP=1 ..
 
 # debug target enables CuTest unit testing
 .PHONY : debug
-debug: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+debug: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	../tools/enumsToPerl.pl ../src/libMultiMarkdown.h enumMap.txt; \
 	cmake -DTEST=1 ..
 
@@ -38,8 +38,8 @@ debug: $(BUILD_DIR) $(GREG)
 # 'scan-build -V make' will show the results graphically in your
 # web browser
 .PHONY : analyze
-analyze: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+analyze: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	scan-build cmake -DTEST=1 ..
 
 # Create xcode project
@@ -47,38 +47,38 @@ analyze: $(BUILD_DIR) $(GREG)
 #	xcodebuild -configuration Debug
 #	xcodebuild -configuration Release
 .PHONY : xcode
-xcode: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+xcode: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -G Xcode ..
 
 # Cross-compile for Windows using MinGW on *nix
 .PHONY : windows
-windows: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+windows: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_TOOLCHAIN_FILE=../tools/Toolchain-MinGW-w64-64bit.cmake -DCMAKE_BUILD_TYPE=Release ..
 
 # Build Windows zip file using MinGW on *nix
 .PHONY : windows-zip
-windows-zip: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+windows-zip: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_TOOLCHAIN_FILE=../tools/Toolchain-MinGW-w64-64bit.cmake -DCMAKE_BUILD_TYPE=Release -DZIP=1 ..
 
 # Cross-compile for Windows using MinGW on *nix (32-bit)
 .PHONY : windows-32
-windows-32: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+windows-32: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_TOOLCHAIN_FILE=../tools/Toolchain-MinGW-w64-32bit.cmake -DCMAKE_BUILD_TYPE=Release ..
 
 # Build Windows zip file using MinGW on *nix (32-bit)
 .PHONY : windows-zip-32
-windows-zip-32: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+windows-zip-32: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DCMAKE_TOOLCHAIN_FILE=../tools/Toolchain-MinGW-w64-32bit.cmake -DCMAKE_BUILD_TYPE=Release -DZIP=1 ..
 
 # Build the documentation using doxygen
 .PHONY : documentation
-documentation: $(BUILD_DIR) $(GREG)
-	cd $(BUILD_DIR); touch README.html; \
+documentation: $(BUILD_DIR)
+	cd $(BUILD_DIR); \
 	cmake -DDOCUMENTATION=1 ..; cd ..; \
 	doxygen build/doxygen.conf
 
@@ -121,7 +121,7 @@ build/%.o: src/%.c src/parser.h src/version.h $(BUILD_DIR)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 src/version.h: $(BUILD_DIR)
-	cd $(BUILD_DIR); touch README.html; \
+	cd $(BUILD_DIR); \
 	cp ../tools/version.h ../src/version.h
 
 build/parser.o: src/parser.c src/parser.h

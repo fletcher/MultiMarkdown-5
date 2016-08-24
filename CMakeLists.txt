@@ -129,7 +129,7 @@ configure_file (
 # Update the project README, to pull in new version #, etc.
 configure_file (
 	"${PROJECT_SOURCE_DIR}/templates/README.md.in"
-	"${CMAKE_CURRENT_LIST_DIR}/README.md"
+	"${PROJECT_SOURCE_DIR}/README.md"
 )
 
 configure_file (
@@ -147,9 +147,17 @@ endif ()
 # ============
 
 # Need to build parser.c via greg
+
+add_custom_target(
+	greg
+	COMMAND make
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/submodules/greg
+)
+
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.c
 	COMMAND ${PROJECT_SOURCE_DIR}/submodules/greg/greg -o ${CMAKE_CURRENT_BINARY_DIR}/parser.c ${PROJECT_SOURCE_DIR}/src/parser.leg
+	DEPENDS greg
 )
 
 # src_files are the primary files, and will be included in doxygen documentation
@@ -418,19 +426,25 @@ target_link_libraries(multimarkdown libMultiMarkdown)
 
 # Create HTML version of README
 
+# Need an existing file to appease CPack check
+
+execute_process(COMMAND touch ${PROJECT_BINARY_DIR}/README.html
+)
+
+
 if (DEFINED IS_CROSSCOMPILING)
 	# Need to use installed MMD when cross compiling
 	add_custom_command(
 		TARGET multimarkdown
 		POST_BUILD
-		COMMAND multimarkdown -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
+		COMMAND multimarkdown -f ${PROJECT_SOURCE_DIR}/README.md > ${PROJECT_BINARY_DIR}/README.html
 	)
 else ()
 	# Use mmd binary we just built
 	add_custom_command(
 		TARGET multimarkdown
 		POST_BUILD
-		COMMAND $<TARGET_FILE:multimarkdown> -f ${CMAKE_CURRENT_LIST_DIR}/README.md > ${CMAKE_CURRENT_BINARY_DIR}/README.html
+		COMMAND $<TARGET_FILE:multimarkdown> -f ${PROJECT_SOURCE_DIR}/README.md > ${PROJECT_BINARY_DIR}/README.html
 	)
 endif()
 
@@ -453,7 +467,7 @@ install (FILES ${scripts}
 	PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
 )
 
-# install (FILES ${PROJECT_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_BINARY_DIR}/README.html
+# install (FILES ${PROJECT_SOURCE_DIR}/LICENSE.txt ${PROJECT_CURRENT_BINARY_DIR}/README.html
 # 	DESTINATION notes
 # )
 
@@ -506,8 +520,8 @@ set (CPACK_PACKAGE_VERSION_MAJOR "${My_Project_Version_Major}")
 set (CPACK_PACKAGE_VERSION_MINOR "${My_Project_Version_Minor}")
 set (CPACK_PACKAGE_VERSION_PATCH "My_Project_Version_Patch")
 
-set (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_BINARY_DIR}/README.html")
-set (CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.html")
+set (CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_BINARY_DIR}/README.html")
+set (CPACK_RESOURCE_FILE_README "${PROJECT_BINARY_DIR}/README.html")
 set (CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.txt")
 
 set (ZIP_NAME "")
