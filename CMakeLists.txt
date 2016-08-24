@@ -482,7 +482,7 @@ if (DEFINED SHAREDBUILD)
 	set (CPACK_COMPONENT_SHAREDLIB_DESCRIPTION "MultiMarkdown shared library for use with third party software.")
 
 	set (CPACK_COMPONENTS_ALL application scripts sharedlib)
-endif (DEFINE SHAREDBUILD)
+endif (DEFINED SHAREDBUILD)
 
 
 set (CPACK_COMPONENT_SCRIPTS_DISPLAY_NAME "Convenience scripts")
