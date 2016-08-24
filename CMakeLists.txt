@@ -296,6 +296,9 @@ if (APPLE)
 
 	# Xcode settings
 	set (XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+
+	#Eliminate warnings about Policy CMP0042
+	set(CMAKE_MACOSX_RPATH 1)
 endif (APPLE)
 
 # Windows Builds
