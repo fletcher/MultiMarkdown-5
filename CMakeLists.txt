@@ -296,6 +296,9 @@ if (APPLE)
 
 	# Xcode settings
 	set (XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+
+	# Eliminate warnings about Policy CMP0042
+	set (CMAKE_MACOSX_RPATH 1)
 endif (APPLE)
 
 # Windows Builds
@@ -373,6 +376,26 @@ SET_TARGET_PROPERTIES(libMultiMarkdown PROPERTIES PREFIX "")
 
 ADD_PUBLIC_HEADER(libMultiMarkdown src/libMultiMarkdown.h)
 
+# Create a shared library?
+if (DEFINED SHAREDBUILD)
+	add_library(libMultiMarkdownShared SHARED
+		${src_files}
+		${src_utility_files}
+		${header_files}
+		${header_utility_files}
+	)
+
+	# Shared libraries require position independent code
+	SET_TARGET_PROPERTIES(libMultiMarkdownShared PROPERTIES POSITION_INDEPENDENT_CODE 1)
+
+	# remove the extra "lib" from "liblibFOO"
+	SET_TARGET_PROPERTIES(libMultiMarkdownShared PROPERTIES PREFIX "")
+
+	# Rename library
+	SET_TARGET_PROPERTIES(libMultiMarkdownShared PROPERTIES OUTPUT_NAME libMultiMarkdown)
+
+endif (DEFINED SHAREDBUILD)
+
 # Create command-line app
 add_executable(multimarkdown
 	src/multimarkdown.c
@@ -439,17 +462,41 @@ install (FILES ${scripts}
 
 # install (FILES ${public_header_files} DESTINATION local/include/libMultiMarkdown) 
 
+set (CPACK_COMPONENTS_ALL application scripts)
+
+# Install Shared Library?
+if (DEFINED SHAREDBUILD)
+	install (TARGETS libMultiMarkdownShared
+		ARCHIVE
+		LIBRARY
+		DESTINATION lib
+		COMPONENT sharedlib
+	)
+
+	install (FILES ${public_header_files}
+		DESTINATION include/multimarkdown
+		COMPONENT sharedlib
+	)
+
+	set (CPACK_COMPONENT_SHAREDLIB_DISPLAY_NAME "Shared Library")
+	set (CPACK_COMPONENT_SHAREDLIB_DESCRIPTION "MultiMarkdown shared library for use with third party software.")
+
+	set (CPACK_COMPONENTS_ALL application scripts sharedlib)
+endif (DEFINE SHAREDBUILD)
+
+
 set (CPACK_COMPONENT_SCRIPTS_DISPLAY_NAME "Convenience scripts")
 set (CPACK_COMPONENT_SCRIPTS_DESCRIPTION 
    "Install convenience scripts for common MultiMarkdown shortcuts, e.g. `mmd`, `mmd2tex`, etc.")
 
 include (InstallRequiredSystemLibraries)
 
-set (CPACK_COMPONENTS_ALL application scripts)
+set (CPACK_COMPONENTS_ALL application scripts sharedlib)
 
 
 set (CPACK_COMPONENT_APPLICATION_GROUP "MultiMarkdown")
 set (CPACK_COMPONENT_SCRIPTS_GROUP "MultiMarkdown")
+set (CPACK_COMPONENT_SHAREDLIB_GROUP "MultiMarkdown")
 
 set (CPACK_COMPONENT_GROUP_MULTIMARKDOWN_DESCRIPTION
    "The basic MultiMarkdown utility and convenience scripts.")
