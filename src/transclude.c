@@ -87,10 +87,20 @@ char * source_without_metadata(char * source, unsigned long extensions ) {
 		/* If we have metadata, then return just the body */
 		/* TODO: This could miss YAML Metadata that does not contain
 			blank line afterwards */
-		result = strstr(source, "\n\n");
+
+		char *result = strstr(result, "\n");
+		while (result != NULL) {
+			if (*result == '\n') {
+				break;
+			} else if (isspace(*result)) {
+				++result;
+			} else {
+				result = strstr(result, "\n");
+			}
+		}
 
 		if (result != NULL)
-			return result + 2;
+			return result;
 	}
 
 	/* No metadata, so return original pointer */
