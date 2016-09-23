@@ -481,9 +481,8 @@ set (CPACK_COMPONENTS_ALL application scripts)
 # Install Shared Library?
 if (DEFINED SHAREDBUILD)
 	install (TARGETS libMultiMarkdownShared
-		ARCHIVE
-		LIBRARY
-		DESTINATION lib
+		ARCHIVE DESTINATION lib
+		LIBRARY DESTINATION lib
 		COMPONENT sharedlib
 	)
 
