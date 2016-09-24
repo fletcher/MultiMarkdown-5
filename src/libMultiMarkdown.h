@@ -61,6 +61,12 @@
 #ifndef LIB_MULTIMARKDOWN_H
 #define LIB_MULTIMARKDOWN_H
 
+#ifdef _WIN32
+#define DllExport   __declspec( dllexport )
+#else
+#define DllExport
+#endif
+
 #include <stdbool.h>
 
 /* Main API commands */
@@ -68,7 +74,7 @@
 /// Convert source string to output string, based on provided `parser_extensions`
 /// and requested `export_format`.
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * markdown_to_string(
+DllExport char * markdown_to_string(
 	const char * source,			//!< Pointer to c-string of the source text
 	unsigned long extensions,       //!< Bit field of parser_extensions
 	int format                      //!< Specify export_format to be used
@@ -76,21 +82,21 @@ char * markdown_to_string(
 
 /// Does the source string have metadata, using provided `parser_extensions`?
 ///
-bool   has_metadata(
+DllExport bool   has_metadata(
 	const char *source,             //!< Pointer to c-string of the source text
 	unsigned long extensions 		//!< Bit field of parser_extensions
 );
 
 /// List all metadata keys, using provided `parser_extensions`.
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * extract_metadata_keys(
+DllExport char * extract_metadata_keys(
 	const char *source,             //!< Pointer to c-string of the source text
 	unsigned long extensions        //!< Bit field of parser_extensions
 );
 
 /// Extract the value for the specified metadata key, using provided `parser_extensions`.
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * extract_metadata_value(
+DllExport char * extract_metadata_value(
 	const char *source,             //!< Pointer to c-string of the source text
 	unsigned long extensions, 		//!< Bit field of parser_extensions
 	char *key                       //!< C-string of the key we need to find
@@ -98,7 +104,7 @@ char * extract_metadata_value(
 
 /// Return the version string for this build of libMultiMarkdown
 /// The returned `char *` will need to be freed after it is no longer needed.
-char * mmd_version(void);
+DllExport char * mmd_version(void);
 
 
 /// These are the basic extensions that enable or disable MultiMarkdown features
