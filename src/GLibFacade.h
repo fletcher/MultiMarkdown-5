@@ -34,6 +34,7 @@
 
 #include <stdbool.h>
 #include <ctype.h>
+#include <string.h>
 
 typedef int gboolean;
 typedef char gchar;
