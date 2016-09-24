@@ -416,6 +416,14 @@ set_target_properties(multimarkdown PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH 
 # Link the library to the app
 target_link_libraries(multimarkdown libMultiMarkdown)
 
+if (WIN32)
+	find_library (GETOPT wingetopt
+	)
+	target_link_libraries (multimarkdown wingetopt
+	)
+	include_directories (${PROJECT_SOURCE_DIR}/submodules/greg/MSVC
+	)
+endif()
 
 # ==========================
 # Build Installer with CPack
