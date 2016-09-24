@@ -19,7 +19,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <libgen.h>
 #include "GLibFacade.h"
 
 char *	source_without_metadata(char * source, unsigned long extensions);

@@ -21,7 +21,6 @@
 
 #include "parser.h"
 #include "version.h"
-#include <libgen.h>
 
 #pragma mark - Parse Tree
 

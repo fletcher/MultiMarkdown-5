@@ -32,11 +32,6 @@
 #ifndef __MARKDOWN_GLIB_FACADE__
 #define __MARKDOWN_GLIB_FACADE__
 
-/* peg_markdown uses the link symbol for its own purposes */
-#define link MARKDOWN_LINK_IGNORED
-#include <unistd.h>
-#undef link
-
 #include <stdbool.h>
 #include <ctype.h>
 

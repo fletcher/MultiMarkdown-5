@@ -49,25 +49,25 @@
  */
 
 /* Solaris and Windows do not provide vasprintf() or asprintf(). */
-#if defined(__WIN32) || (defined(__SVR4) && defined(__sun))
-int vasprintf( char **sptr, char *fmt, va_list argv ) 
-{ 
-    int wanted = vsnprintf( *sptr = NULL, 0, fmt, argv ); 
-    if( (wanted > 0) && ((*sptr = malloc( 1 + wanted )) != NULL) ) 
-        return vsprintf( *sptr, fmt, argv ); 
- 
-    return wanted; 
-} 
- 
-int asprintf( char **sptr, char *fmt, ... ) 
-{ 
-    int retval; 
-    va_list argv; 
-    va_start( argv, fmt ); 
-    retval = vasprintf( sptr, fmt, argv ); 
-    va_end( argv ); 
-    return retval; 
-} 
+#if defined(__WIN32) || defined(_WIN32) || (defined(__SVR4) && defined(__sun))
+int vasprintf( char **sptr, char *fmt, va_list argv )
+{
+    int wanted = vsnprintf( *sptr = NULL, 0, fmt, argv );
+    if( (wanted > 0) && ((*sptr = malloc( 1 + wanted )) != NULL) )
+        return vsprintf( *sptr, fmt, argv );
+
+    return wanted;
+}
+
+int asprintf( char **sptr, char *fmt, ... )
+{
+    int retval;
+    va_list argv;
+    va_start( argv, fmt );
+    retval = vasprintf( sptr, fmt, argv );
+    va_end( argv );
+    return retval;
+}
 #endif
 
 
