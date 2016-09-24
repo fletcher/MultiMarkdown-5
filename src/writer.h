@@ -13,6 +13,12 @@
 #include "critic.h"
 #include "toc.h"
 
+# if _WIN32
+#define strdup _strdup
+#define setmode _setmode
+#define fileno _fileno
+#endif
+
 char * export_node_tree(node *list, int format, unsigned long extensions);
 
 void extract_references(node *list, scratch_pad *scratch);
