@@ -41,7 +41,8 @@ char * export_node_tree(node *list, int format, unsigned long extensions) {
 	if ((format != OPML_FORMAT) &&
 		(format != CRITIC_ACCEPT_FORMAT) &&
 		(format != CRITIC_REJECT_FORMAT) &&
-		(format != CRITIC_HTML_HIGHLIGHT_FORMAT)) {
+		(format != CRITIC_HTML_HIGHLIGHT_FORMAT) &&
+		(format != CRITIC_LATEX_HIGHLIGHT_FORMAT)) {
 			/* Find defined abbreviations */
 			extract_abbreviations(list, scratch);
 			/* Apply those abbreviations to source text */
@@ -102,6 +103,12 @@ char * export_node_tree(node *list, int format, unsigned long extensions) {
 				print_latex_node_tree(out, scratch->abbreviations, scratch);
 			}
 			print_latex_node_tree(out, list, scratch);
+			break;
+		case CRITIC_LATEX_HIGHLIGHT_FORMAT:
+			if ((list != NULL) && (list->key != METADATA)) {
+				print_critic_latex_highlight_node_tree(out, scratch->abbreviations, scratch);
+			}
+			print_critic_latex_highlight_node_tree(out, list, scratch);
 			break;
 		case MEMOIR_FORMAT:
 			if ((list != NULL) && (list->key != METADATA)) {

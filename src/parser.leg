@@ -1819,8 +1819,13 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 		while (yyparse_from(&g, yy_DocForCritic));
 		
 		if (extensions & EXT_CRITIC_REJECT) {
-			if ((extensions & EXT_CRITIC_ACCEPT) && (format == HTML_FORMAT))
-				critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_HTML_HIGHLIGHT_FORMAT, extensions);
+			if ((extensions & EXT_CRITIC_ACCEPT)) {
+				if(format == HTML_FORMAT) {
+					critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_HTML_HIGHLIGHT_FORMAT, extensions);
+				} else if (format == LATEX_FORMAT) {
+					critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_LATEX_HIGHLIGHT_FORMAT, extensions);
+				}
+			}
 			else
 				critic_resolved = export_node_tree(((parser_data *)g.data)->result, CRITIC_REJECT_FORMAT, extensions);
 		} else {

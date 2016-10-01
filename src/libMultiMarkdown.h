@@ -142,6 +142,7 @@ enum export_formats {
 	CRITIC_HTML_HIGHLIGHT_FORMAT,   //!< Used as a pre-processing step
 	LYX_FORMAT,                     //!< Developed and maintained by Charles R. Cowan
 	TOC_FORMAT,                     //!< Used as a pre-processing step
+	CRITIC_LATEX_HIGHLIGHT_FORMAT   //!< Used as a pre-processing step
 };
 
 /// These are the identifiers for node types
