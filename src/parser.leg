@@ -3,17 +3,17 @@
 
 	parser.leg -> parser.c -- Parse (Multi)Markdown plain text for
 		conversion into other formats
-	
+
 	(c) 2013-2016 Fletcher T. Penney (http://fletcherpenney.net/).
 
 	Derived from peg-multimarkdown, which was forked from peg-markdown,
-	which is (c) 2008 John MacFarlane (jgm at berkeley dot edu), and 
+	which is (c) 2008 John MacFarlane (jgm at berkeley dot edu), and
 	licensed under GNU GPL or MIT.
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License or the MIT
 	license.  See LICENSE for details.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,6 +22,10 @@
 
 #include "parser.h"
 #include "writer.h"
+
+#if _WIN32
+#define strtok_r strtok_s
+#endif
 
 
 /* Define shortcuts to adding nodes, etc. */
@@ -33,7 +37,7 @@
 
 #define YY_INPUT(buf, result, max_size, D) yy_input_func(buf, &result, max_size, (parser_data *)G->data)
 
-/* redefine input buffer so that we draw from the specified source string 
+/* redefine input buffer so that we draw from the specified source string
 	to make it thread/reentrant safe */
 void yy_input_func(char *buf, int *result, int max_size, parser_data *data)
 {                                                      \
@@ -353,7 +357,7 @@ NormalEndline =   Sp Newline !BlankLine !'>' !AtxStart
 		!(RawLine ('='+ | '-'+) Newline)
 		{
 			$$ = str("\n");
-			$$->key = SPACE; 
+			$$->key = SPACE;
 		}
 
 TerminalEndline = Sp Newline Eof
@@ -496,7 +500,7 @@ EmphUl = EmphUlOpen
 		&OneTwoStar (
 			StrongStar | EmphStar
 		) |
-		BracketedText | 
+		BracketedText |
 		MathText |
 		(!'_' !(BlankLine BlankLine) .)
 	)*
@@ -528,8 +532,8 @@ StrongStar = StrongStarOpen
 		&OneStar (
 			EmphStar
 		) |
-		BracketedText | 
-		MathText | 
+		BracketedText |
+		MathText |
 		(!'*' !Whitespace .) |
 		(!'*' !(BlankLine BlankLine) !(Whitespace '*') .)
 	)*
@@ -549,8 +553,8 @@ StrongUl = StrongUlOpen
 		&OneTwoStar (
 			StrongStar | EmphStar
 		) |
-		BracketedText | 
-		MathText | 
+		BracketedText |
+		MathText |
 		(!'_' !(BlankLine BlankLine) .)
 	)*
 	StrongUlClose
@@ -576,14 +580,14 @@ ReferenceLinkSingle = ( a:Label < (Spnl "[]")? > )
 	}
 
 CitationReference = CitationReferenceDouble | CitationReferenceSingle
-	
+
 CitationReferenceDouble = !"[]" !"[#" a:Label < Spnl > !"[]" b:RawCitationReference
 	{
 		char *label;
 		label = label_from_node_tree(a);
 		$$ = mk_link(a, b->str, NULL, NULL, NULL);
 		$$->key = CITATION;
-		
+
 		if (strcmp(label,"notcited") == 0)
 			$$->key = NOCITATION;
 		free(label);
@@ -647,13 +651,13 @@ LinkReference = a:StartList NonindentSpace !"[]" l:Label ':' Spnl s:RefSrc
 		t:RefTitle
 		( &{ !ext(EXT_COMPATIBILITY) } <Attributes { a = reverse_list($$); } )?>
 		BlankLine+
-		{ 
+		{
 			/* Get label for referencing */
 			GString *text = g_string_new("");
 			char *clean;
 			print_raw_node_tree(text, l->children);
 			clean = clean_string(text->str);
-			
+
 			if (a == NULL) {
 				/* no attributes */
 				$$ = mk_link(NULL, clean, s->str, t->str, NULL);
@@ -743,7 +747,7 @@ Image = '!' ( !AutoLink Link )
 		}
 
 Label = &( '[' )
-	< BracketedText > 
+	< BracketedText >
 	{
 		yytext[strlen(yytext) - 1] = '\0';
 
@@ -770,7 +774,7 @@ AutoLabel = '[' < (!Newline !'^' !'#' !'%' . )( !Newline !']' !'[' . )+ > ']' &(
 	node *ref;
 	$$ = str(yytext);
 	$$->key = AUTOLABEL;
-	
+
 	/* And create a LINKREFERENCE so we can use it */
 	char *label = label_from_string(yytext);
 	GString *anchor = g_string_new(label);
@@ -795,13 +799,13 @@ NoteReference = &{ ext(EXT_NOTES) } ( "[^" ) < ( !(Newline BlankLine) !']' RawIn
 		/* Create a note reference */
 		$$ = str(yytext);
 		$$->key = NOTEREFERENCE;
-		
+
 		/* Include RAW version for parsing in case this is an inline footnote */
 		node *raw = str(original->str);
 		raw->key = RAW;
 		node *source = list(NOTESOURCE, raw);
 		source->str = strdup("");
-		
+
 		$$->children = source;
 
 		g_string_free(original, true);
@@ -810,7 +814,7 @@ NoteReference = &{ ext(EXT_NOTES) } ( "[^" ) < ( !(Newline BlankLine) !']' RawIn
 Glossary =  &{ ext(EXT_NOTES) }
 		a:StartList
 		NonindentSpace ref:RawNoteReference ':' Sp
-		"glossary:" Sp (GlossaryTerm { a = cons($$, a); }) 
+		"glossary:" Sp (GlossaryTerm { a = cons($$, a); })
 		(GlossarySortKey { a = cons($$, a); })?
 		Newline
 		( RawNoteBlock { a = cons($$, a); } )
@@ -826,7 +830,7 @@ Glossary =  &{ ext(EXT_NOTES) }
 		}
 
 GlossaryTerm =  < (!Newline !'(' .)+ >
-	{ 
+	{
 		$$ = list(LIST, NULL);
 		$$->str = 0;
 		$$->children = str(yytext);
@@ -968,10 +972,10 @@ Term =  a:StartList !BlankLine !':'
 
 Definition = (a:StartList b:StartList
 		(BlankLine { b = cons(str("\n"),b); } )?
-		( NonindentSpace ':' Sp RawLine { a = cons(str(yytext), a);}) 
+		( NonindentSpace ':' Sp RawLine { a = cons(str(yytext), a);})
 		( !':' !BlankLine RawLine { a = cons(str(yytext), a);})*
 		( BlankLine {a = cons(str("\n"),a);}
-			(IndentedLine { a = cons($$,a);})+ 
+			(IndentedLine { a = cons($$,a);})+
 			{ a = cons(str("\n"),a);}
 		)*  )
 		{
@@ -1383,7 +1387,7 @@ StyleBlock  = < InStyleTags >
 
 Table = a:StartList b:StartList (TableCaption { b = cons($$, b);})?
 		(TableBody { $$->key = TABLEHEAD; a = cons($$, a); })?
-		(SeparatorLine { 
+		(SeparatorLine {
 			if (a == NULL)
 				a = $$;
 			else
@@ -1435,7 +1439,7 @@ EmptyCell = <Sp> CellDivider
 			$$ = node(TABLECELL);
 		}
 
-SeparatorLine = a:StartList 
+SeparatorLine = a:StartList
 		&(TableLine)
 		CellDivider?
 		( &HeaderAlignmentCell AlignmentCell { a = cons(str("h"), a); a = cons($$, a);}
@@ -1521,7 +1525,7 @@ Note = &{ ext(EXT_NOTES) }
 			a = cons(label,a);
 			$$ = list(NOTESOURCE, a);
 			$$->str = strdup(ref->str);
-			
+
 			free_node(ref);
 		}
 
@@ -1533,7 +1537,7 @@ RawNoteBlock = a:StartList
 			$$->key = RAW;
 		}
 
-DocForOPML = BOM? a:StartList 
+DocForOPML = BOM? a:StartList
 		( &{ !ext(EXT_COMPATIBILITY) }
 		&( (YAMLStart)? MetaDataKey Sp ':' Sp (!Newline)) MetaData { a = cons($$, a); })?
 		( OPMLBlock { a = cons($$, a); } )*
@@ -1548,8 +1552,8 @@ OPMLHeadingSection = a:StartList OPMLHeading { a = cons($$, a); }
 
 OPMLHeading = OPMLAtxHeading | OPMLSetextHeading
 
-OPMLAtxHeading = &(Heading) s:AtxStart Sp 
-		< (!Newline !(Sp '#'* Sp Newline) .)* > 
+OPMLAtxHeading = &(Heading) s:AtxStart Sp
+		< (!Newline !(Sp '#'* Sp Newline) .)* >
 		(Sp '#'+)? Sp Newline
 		{
 			$$ = str(yytext);
@@ -1559,7 +1563,7 @@ OPMLAtxHeading = &(Heading) s:AtxStart Sp
 
 OPMLSetextHeading = OPMLSetextHeading1 | OPMLSetextHeading2
 
-OPMLSetextHeading1 = < (!'\r' !'\n' .)* > Newline SetextBottom1 
+OPMLSetextHeading1 = < (!'\r' !'\n' .)* > Newline SetextBottom1
 		{ $$ = str(yytext); $$->key = H1; }
 
 OPMLSetextHeading2 = < (!'\r' !'\n' .)* > Newline SetextBottom2
@@ -1699,16 +1703,16 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 	GREG g;
 
 	current = n;
-	
+
 	while (current != NULL) {
 		if (current->key == RAW) {
 			/* Process this RAW block */
-			
+
 			yyinit(&g);
 			contents = strtok_r(current->str, "\001", &saveptr);
 			current->key = LIST;
 			g.data = mk_parser_data(contents, (extensions | EXT_NO_METADATA ));
-			
+
 			/*
 				An endless loop was discovered by a user:
 
@@ -1719,7 +1723,7 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 
 					1. \
 
-				The parser repeatedly asks for yy_input_func, which returns 0.  And the 
+				The parser repeatedly asks for yy_input_func, which returns 0.  And the
 				parser then cycles through every possible match over and over and over.
 
 				I haven't found the problem, but can institute a failsafe by ensuring that
@@ -1733,18 +1737,18 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 			//while (yyparse(&g));
 
 			while ((yyparse(&g)) && (*d->charbuf != '\0'));
-			
+
 			current->children = ((parser_data *)g.data)->result;
-			
+
 			free((parser_data *)g.data);	/* we're not using free_parser_data to preserve result tree */
-			
+
 			yydeinit(&g);
-			
+
 			last_child = current->children;
 			while ((contents = strtok_r(NULL, "\001", &saveptr))) {
-				while (last_child->next != NULL) 
+				while (last_child->next != NULL)
 					last_child = last_child->next;
-					
+
 					yyinit(&g);
 					g.data = mk_parser_data(contents, (extensions | EXT_NO_METADATA ));
 					while (yyparse(&g));
@@ -1766,11 +1770,11 @@ node * process_raw_blocks(node * n, unsigned long extensions) {
 
 
 node * markdown_chunk_to_node(const char * source, unsigned long extensions) {
-	/* 
+	/*
 		Designed for parsing 'chunks' of markdown from inside a specific range,
 		e.g. a label from '[' ... ']' that can have various markup inside
 
-		Prevents situations where the parser gets greedy and goes beyond the 
+		Prevents situations where the parser gets greedy and goes beyond the
 		intended boundaries.
 	*/
 
@@ -1809,7 +1813,7 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 	if (target_meta_key != NULL) {
 		temp = label_from_string(target_meta_key);
 		if (strcmp(temp, "beamer") == 0) {
-				extensions = extensions | EXT_HEADINGSECTION;				
+				extensions = extensions | EXT_HEADINGSECTION;
 		}
 		free(temp);
 	}
@@ -1820,7 +1824,7 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 		g.data = mk_parser_data(source, extensions);
 
 		while (yyparse_from(&g, yy_DocForCritic));
-		
+
 		if (extensions & EXT_CRITIC_REJECT) {
 			if ((extensions & EXT_CRITIC_ACCEPT)) {
 				if(format == HTML_FORMAT) {
@@ -1844,9 +1848,9 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 	} else {
 		formatted = preformat_text(source);
 	}
-	
+
 	g.data = mk_parser_data(formatted,extensions);
-	
+
 	if (format == OPML_FORMAT) {
 		while (yyparse_from(&g, yy_DocForOPML));	/* We want simpler version */
 	} else if (format == TOC_FORMAT) {
@@ -1864,9 +1868,9 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 		/* clean up */
 		free_parser_data((parser_data *)g.data);
 		yydeinit(&g);
-		
+
 		free(formatted);
-		
+
 		return NULL;
 	}
 
@@ -1876,22 +1880,22 @@ node * parse_markdown(const char * source, unsigned long extensions, int format)
 	if (((parser_data *)g.data)->autolabels != NULL) {
 //		fprintf(stderr, "We have autolabels\n");
 		append_list(((parser_data *)g.data)->autolabels,refined);
-		((parser_data *)g.data)->autolabels = NULL;	
+		((parser_data *)g.data)->autolabels = NULL;
 	} else {
 //		fprintf(stderr, "No autolabels\n");
 	}
-	
+
 	/* clean up */
 	free_parser_data_preserving_result((parser_data *)g.data);
 	yydeinit(&g);
-	
+
 	free(formatted);
 
 	return refined;
 }
 
 
-char * markdown_to_string(const char * source, unsigned long extensions, int format) { 
+char * markdown_to_string(const char * source, unsigned long extensions, int format) {
 	char * output;
 	node * parse_tree;
 
@@ -1918,10 +1922,10 @@ bool has_metadata(const char *source, unsigned long extensions) {
 	yyinit(&g);
 	node *result;
 	bool answer = FALSE;
-	
+
 	formatted = preformat_text(source);
 	g.data = mk_parser_data(formatted, extensions);
-    
+
 	while (yyparse_from(&g, yy_DocForMetaDataOnly));	/* We want simpler version */
 
 	result = ((parser_data *)g.data)->result;
@@ -1932,7 +1936,7 @@ bool has_metadata(const char *source, unsigned long extensions) {
 
 	free_parser_data((parser_data *)g.data);
 	yydeinit(&g);
-	
+
 	free(formatted);
 	return answer;
 }
@@ -1944,11 +1948,11 @@ char * extract_metadata_keys(const char *source, unsigned long extensions) {
 	char *formatted;
 	GREG g;
 	yyinit(&g);
-	
+
 	/* don't preformat if doing syntax highlighting */
 	formatted = preformat_text(source);
 	g.data = mk_parser_data(formatted,extensions);
-	
+
 	while (yyparse_from(&g, yy_DocForMetaDataOnly));	/* We want simpler version */
 
 	if (((parser_data *)g.data)->parse_aborted) {
@@ -1956,10 +1960,10 @@ char * extract_metadata_keys(const char *source, unsigned long extensions) {
 	} else {
 		out = metadata_keys(((parser_data *)g.data)->result);
 	}
-	
+
 	free_parser_data((parser_data *)g.data);
 	yydeinit(&g);
-	
+
 	free(formatted);
 	return out;
 }
@@ -1971,11 +1975,11 @@ char * extract_metadata_value(const char *source, unsigned long extensions, char
 	char *formatted;
 	GREG g;
 	yyinit(&g);
-	
+
 	/* don't preformat if doing syntax highlighting */
 	formatted = preformat_text(source);
 	g.data = mk_parser_data(formatted,extensions);
-	
+
 	while (yyparse_from(&g, yy_DocForMetaDataOnly));	/* We want simpler version */
 
 	if (((parser_data *)g.data)->parse_aborted) {
@@ -1983,11 +1987,11 @@ char * extract_metadata_value(const char *source, unsigned long extensions, char
 	} else {
 		out = metavalue_for_key(key,((parser_data *)g.data)->result);
 	}
-	
-	
+
+
 	free_parser_data((parser_data *)g.data);
 	yydeinit(&g);
-	
+
 	free(formatted);
 	return out;
 }
