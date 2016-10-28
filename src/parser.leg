@@ -445,7 +445,7 @@ Emph = < EmphMatch >
 	{
 		yytext[strlen(yytext) - 1] = '\0';
 
-		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
+		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_METADATA);
 		if ($$ != NULL) {
 			$$->key = EMPH;
 		}
@@ -506,7 +506,7 @@ Strong = < StrongMatch >
 		{
 			yytext[strlen(yytext) - 2] = '\0';
 
-			$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions );
+			$$ = markdown_chunk_to_node(&yytext[2], ((parser_data *)G->data)->extensions | EXT_NO_METADATA);
 			if ($$ != NULL) {
 				$$->key = STRONG;
 			}
@@ -746,7 +746,7 @@ Label = &( '[' )
 	< BracketedText > 
 	{
 		yytext[strlen(yytext) - 1] = '\0';
-		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
+		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_METADATA);
 		if ($$ == NULL) {
 			$$ = str("");
 		} else {
@@ -1482,7 +1482,7 @@ BracketedText2 = '[' ( ('\\' .) | (!'[' !']' .) | BracketedText2 )* ']'	# Matche
 TableCaption = b:StartList a:StartList (< BracketedText >
 	{
 		yytext[strlen(yytext) - 1] = '\0';
-		a = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions);
+		a = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_METADATA);
 	} )
 		( c:AutoLabel { b = c; b->key = TABLELABEL;})? Sp Newline
 		{
