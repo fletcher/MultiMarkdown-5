@@ -1477,7 +1477,7 @@ BracketedTextz = &('[' (!(Endline Endline) !']' .)* ']') BracketedText2
 
 BracketedText = &('[' (!(BlankLine BlankLine) !']' .)* ']') BracketedText2
 
-BracketedText2 = '[' ( ('\\' .) | (!'[' !']' .) | BracketedText2 )* ']'	# Matches text within [...], but allows for recursive brackets
+BracketedText2 = '[' ( ('\\' .) | (!'[' !']' !(BlankLine BlankLine) .) | BracketedText2 )* ']'	# Matches text within [...], but allows for recursive brackets
 
 TableCaption = b:StartList a:StartList (< BracketedText >
 	{
