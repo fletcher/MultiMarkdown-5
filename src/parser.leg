@@ -746,11 +746,14 @@ Label = &( '[' )
 	< BracketedText > 
 	{
 		yytext[strlen(yytext) - 1] = '\0';
-		$$ = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_METADATA);
-		if ($$ == NULL) {
-			$$ = str("");
+
+		node * content = markdown_chunk_to_node(&yytext[1], ((parser_data *)G->data)->extensions | EXT_NO_METADATA);
+
+		if (content == NULL) {
+			$$ = list(LIST, NULL);
 		} else {
-			$$->key = LIST;		
+			$$ = content;
+			$$->key = LIST;
 		}
 	}
 
