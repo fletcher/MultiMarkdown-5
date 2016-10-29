@@ -135,9 +135,9 @@ void print_critic_latex_highlight_node(GString *out, node *n, scratch_pad *scrat
 			print_critic_latex_highlight_node_tree(out, n->children, scratch);
 			break;
 		case CRITICADDITION:
-			g_string_append_printf(out, "<!--{\\color{green}\n-->");
+			g_string_append_printf(out, "<!--\\underline{{\\color{green}\n-->");
 			print_critic_latex_highlight_node_tree(out, n->children, scratch);
-			g_string_append_printf(out, "<!--\n}-->");
+			g_string_append_printf(out, "<!--}\n}-->");
 			break;
 		case CRITICCOMMENT:
 			/* Hide comments for now */
@@ -149,9 +149,9 @@ void print_critic_latex_highlight_node(GString *out, node *n, scratch_pad *scrat
 			g_string_append_printf(out, "<!--\n}-->");
 			break;
 		case CRITICDELETION:
-			g_string_append_printf(out, "<!--{\\color{red}\n-->");
+			g_string_append_printf(out, "<!--\\sout{{\\color{red}\n-->");
 			print_critic_latex_highlight_node_tree(out, n->children, scratch);
-			g_string_append_printf(out, "<!--\n}-->");
+			g_string_append_printf(out, "<!--}\n}-->");
 			break;
 		default:
 			if(n->str)
