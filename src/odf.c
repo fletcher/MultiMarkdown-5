@@ -1113,7 +1113,7 @@ void print_odf_header(GString *out){
     "<style:paragraph-properties fo:text-align=\"start\" style:justify-single-word=\"false\"/>\n" \
     "</style:style>\n" \
 	"<style:style style:name=\"fr1\" style:family=\"graphic\" style:parent-style-name=\"Frame\">\n" \
-	"   <style:graphic-properties style:print-content=\"false\" style:vertical-pos=\"top\"\n" \
+	"   <style:graphic-properties style:print-content=\"true\" style:vertical-pos=\"top\"\n" \
 	"                             style:vertical-rel=\"baseline\"\n" \
 	"                             fo:padding=\"0in\"\n" \
 	"                             fo:border=\"none\"\n" \
