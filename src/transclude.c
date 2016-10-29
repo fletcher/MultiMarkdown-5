@@ -81,26 +81,22 @@ void split_path_file(char** dir, char** file, char *path) {
 /* Return pointer to beginning of text without metadata */
 /* NOTE: This is not a new string, and does not need to be freed separately */
 char * source_without_metadata(char * source, unsigned long extensions ) {
-	char *result;
-
 	if (has_metadata(source, extensions)) {
 		/* If we have metadata, then return just the body */
-		/* TODO: This could miss YAML Metadata that does not contain
-			blank line afterwards */
+		char *result = strstr(source, "\n");
 
-		char *result = strstr(result, "\n");
-		while (result != NULL) {
+		do {
+			++result;
 			if (*result == '\n') {
 				break;
 			} else if (isspace(*result)) {
-				++result;
 			} else {
 				result = strstr(result, "\n");
 			}
-		}
+		} while(result != NULL);
 
 		if (result != NULL)
-			return result;
+			return ++result;
 	}
 
 	/* No metadata, so return original pointer */
