@@ -377,14 +377,16 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 						temp[strlen(temp)-2] = '\0';
 						g_string_append_printf(out, "%s",&temp[2]);
 					} else {
-						g_string_append_printf(out, "%s",temp);
+						temp[strlen(temp)-2] = '\0';
+						g_string_append_printf(out, "\\[%s\\]",&temp[2]);
 					}
 				} else {
 					if (strncmp(&temp[1],"\\begin",5) == 0) {
 						temp[strlen(temp)-1] = '\0';
 						g_string_append_printf(out, "%s",&temp[1]);
 					} else {
-						g_string_append_printf(out, "%s",temp);
+						temp[strlen(temp)-1] = '\0';
+						g_string_append_printf(out, "\\(%s\\)",&temp[1]);
 					}
 				}
 			} else if (strncmp(&temp[2],"\\begin",5) == 0) {
@@ -397,7 +399,7 @@ void print_latex_node(GString *out, node *n, scratch_pad *scratch) {
 					g_string_append_printf(out, "%s\\]", temp);
 				} else {
 					temp[strlen(temp)-3] = '\0';
-					g_string_append_printf(out, "$%s$", &temp[2]);
+					g_string_append_printf(out, "\\(%s\\)", &temp[2]);
 				}
 			}
 			free(temp);
