@@ -59,10 +59,28 @@
 
 
 #include <getopt.h>
-#include <libgen.h>
 #include "parser.h"
 #include "transclude.h"
 #include "version.h"
+
+#ifndef _WIN32
+
+#include <libgen.h>
+
+#else
+
+#define strdup _strdup
+#define setmode _setmode
+#define fileno _fileno
+
+static char* dirname(char* path)
+{
+	static char dir[512];
+  _splitpath(path, NULL, dir, NULL, NULL);
+  return dir;
+}
+
+#endif
 
 /// main()
 int main(int argc, char **argv)

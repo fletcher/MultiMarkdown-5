@@ -148,15 +148,12 @@ endif ()
 
 # Need to build parser.c via greg
 
-add_custom_target(
-	greg
-	COMMAND make
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/submodules/greg
+add_subdirectory (${PROJECT_SOURCE_DIR}/submodules/greg
 )
 
 add_custom_command (
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/parser.c
-	COMMAND ${PROJECT_SOURCE_DIR}/submodules/greg/greg -o ${CMAKE_CURRENT_BINARY_DIR}/parser.c ${PROJECT_SOURCE_DIR}/src/parser.leg
+	COMMAND $<TARGET_FILE:greg> -o ${CMAKE_CURRENT_BINARY_DIR}/parser.c ${PROJECT_SOURCE_DIR}/src/parser.leg
 	DEPENDS greg
 )
 
@@ -419,6 +416,14 @@ set_target_properties(multimarkdown PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH 
 # Link the library to the app
 target_link_libraries(multimarkdown libMultiMarkdown)
 
+if (WIN32)
+	find_library (GETOPT wingetopt
+	)
+	target_link_libraries (multimarkdown wingetopt
+	)
+	include_directories (${PROJECT_SOURCE_DIR}/submodules/greg/MSVC
+	)
+endif()
 
 # ==========================
 # Build Installer with CPack

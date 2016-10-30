@@ -32,13 +32,9 @@
 #ifndef __MARKDOWN_GLIB_FACADE__
 #define __MARKDOWN_GLIB_FACADE__
 
-/* peg_markdown uses the link symbol for its own purposes */
-#define link MARKDOWN_LINK_IGNORED
-#include <unistd.h>
-#undef link
-
 #include <stdbool.h>
 #include <ctype.h>
+#include <string.h>
 
 typedef int gboolean;
 typedef char gchar;
@@ -51,15 +47,21 @@ typedef char gchar;
 #define TRUE true
 #endif
 
-/* WE implement minimal mirror implementations of GLib's GString and GSList 
+#ifdef _WIN32
+#define DllExport   __declspec( dllexport )
+#else
+#define DllExport
+#endif
+
+/* WE implement minimal mirror implementations of GLib's GString and GSList
  * sufficient to cover the functionality required by MultiMarkdown.
  *
  * NOTE: THese are 100% clean, from-scratch implementations using only the 
  * GLib function prototype as guide for behavior.
  */
 
-typedef struct 
-{	
+typedef struct DllExport
+{
 	/* Current UTF8 byte stream this string represents */
 	char* str;
 
@@ -69,21 +71,21 @@ typedef struct
 	unsigned long currentStringLength;
 } GString;
 
-GString* g_string_new(const char *startingString);
-char* g_string_free(GString* ripString, bool freeCharacterData);
+DllExport GString* g_string_new(const char *startingString);
+DllExport char* g_string_free(GString* ripString, bool freeCharacterData);
 
-void g_string_append_c(GString* baseString, char appendedCharacter);
-void g_string_append(GString* baseString, char *appendedString);
+DllExport void g_string_append_c(GString* baseString, char appendedCharacter);
+DllExport void g_string_append(GString* baseString, char *appendedString);
 
-void g_string_prepend(GString* baseString, char* prependedString);
+DllExport void g_string_prepend(GString* baseString, char* prependedString);
 
-void g_string_append_printf(GString* baseString, char* format, ...);
+DllExport void g_string_append_printf(GString* baseString, char* format, ...);
 
-void g_string_insert(GString* baseString, size_t pos, char * insertedString);
-void g_string_insert_c(GString* baseString, size_t pos, char insertedCharacter);
-void g_string_insert_printf(GString* baseString, size_t pos, char* format, ...);
+DllExport void g_string_insert(GString* baseString, size_t pos, char * insertedString);
+DllExport void g_string_insert_c(GString* baseString, size_t pos, char insertedCharacter);
+DllExport void g_string_insert_printf(GString* baseString, size_t pos, char* format, ...);
 
-void g_string_erase(GString* baseString, size_t pos, size_t len);
+DllExport void g_string_erase(GString* baseString, size_t pos, size_t len);
 
 /* Just implement a very simple singly linked list. */
 
