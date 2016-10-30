@@ -1122,23 +1122,20 @@ void print_odf_header(GString *out){
     "<style:style style:name=\"P1\" style:family=\"paragraph\" style:parent-style-name=\"Standard\"\n" \
     "             style:list-style-name=\"L1\"/>\n" \
 	"<text:list-style style:name=\"L1\">\n" \
-	"	<text:list-level-style-bullet text:level=\"1\" text:style-name=\"Numbering_20_Symbols\" style:num-suffix=\".\" text:bullet-char=\"\">\n" \
+	"	<text:list-level-style-bullet text:level=\"1\" text:style-name=\"Numbering_20_Symbols\" style:num-suffix=\".\" text:bullet-char=\"•\">\n" \
 	"		<style:list-level-properties text:list-level-position-and-space-mode=\"label-alignment\">\n" \
 	"			<style:list-level-label-alignment text:label-followed-by=\"listtab\" text:list-tab-stop-position=\"0.5in\" fo:text-indent=\"-0.25in\" fo:margin-left=\"0.5in\"/>\n" \
 	"		</style:list-level-properties>\n" \
-	"		<style:text-properties fo:font-family=\"starbats\" style:font-charset=\"x-symbol\"/>\n" \
 	"	</text:list-level-style-bullet>\n" \
-	"	<text:list-level-style-bullet text:level=\"2\" text:style-name=\"Numbering_20_Symbols\" style:num-suffix=\".\" text:bullet-char=\"\">\n" \
+	"	<text:list-level-style-bullet text:level=\"2\" text:style-name=\"Numbering_20_Symbols\" style:num-suffix=\".\" text:bullet-char=\"◦\">\n" \
 	"		<style:list-level-properties text:list-level-position-and-space-mode=\"label-alignment\">\n" \
 	"			<style:list-level-label-alignment text:label-followed-by=\"listtab\" text:list-tab-stop-position=\"0.75in\" fo:text-indent=\"-0.25in\" fo:margin-left=\"0.75in\"/>\n" \
 	"		</style:list-level-properties>\n" \
-	"		<style:text-properties fo:font-family=\"starbats\" style:font-charset=\"x-symbol\"/>\n" \
 	"	</text:list-level-style-bullet>\n" \
-	"	<text:list-level-style-bullet text:level=\"3\" text:style-name=\"Numbering_20_Symbols\" style:num-suffix=\".\" text:bullet-char=\"\">\n" \
+	"	<text:list-level-style-bullet text:level=\"3\" text:style-name=\"Numbering_20_Symbols\" style:num-suffix=\".\" text:bullet-char=\"▪\">\n" \
 	"		<style:list-level-properties text:list-level-position-and-space-mode=\"label-alignment\">\n" \
 	"			<style:list-level-label-alignment text:label-followed-by=\"listtab\" text:list-tab-stop-position=\"1in\" fo:text-indent=\"-0.25in\" fo:margin-left=\"1in\"/>\n" \
 	"		</style:list-level-properties>\n" \
-	"		<style:text-properties fo:font-family=\"starbats\" style:font-charset=\"x-symbol\"/>\n" \
 	"	</text:list-level-style-bullet>\n" \
 	"	<text:list-level-style-number text:level=\"4\" style:num-suffix=\".\" style:num-format=\"1\">\n" \
 	"		<style:list-level-properties text:list-level-position-and-space-mode=\"label-alignment\">\n" \
