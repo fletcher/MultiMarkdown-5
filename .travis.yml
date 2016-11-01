@@ -1,0 +1,8 @@
+language: c
+install:
+    - ./link_git_modules
+    - ./update_git_modules
+    - make
+    - cd build; make
+script:
+    - cd build; make test
