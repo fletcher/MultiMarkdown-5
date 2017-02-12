@@ -5,13 +5,13 @@
 	(c) 2013-2016 Fletcher T. Penney (http://fletcherpenney.net/).
 
 	Derived from peg-multimarkdown, which was forked from peg-markdown,
-	which is (c) 2008 John MacFarlane (jgm at berkeley dot edu), and 
+	which is (c) 2008 John MacFarlane (jgm at berkeley dot edu), and
 	licensed under GNU GPL or MIT.
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License or the MIT
 	license.  See LICENSE for details.
-	
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -48,13 +48,13 @@ node * mk_str(char *string) {
 node * mk_str_from_list(node *list, bool extra_newline) {
 	node *result = mk_node(STR);
 	node *rev = reverse_list(list);
-	
+
 	GString *c = concat_string_list(rev);
 	if (extra_newline)
 		g_string_append(c, "\n");
 
 	result->str = c->str;
-	
+
 	g_string_free(c, false);
 	return result;
 }
@@ -63,7 +63,7 @@ node * mk_link(node *text, char *label, char *source, char *title, node *attr) {
 	node *result = mk_node(LINK);
 	result->link_data = mk_link_data(label, source, title, attr);
 	result->children = text;
-	
+
 	return result;
 }
 
@@ -108,14 +108,14 @@ node * mk_list(int key, node *list) {
 void free_node(node *n) {
 	if (n == NULL)
 		return;
-	
+
 	if (n->str != NULL)
 		free(n->str);
 	n->str = NULL;
 
 	free_link_data(n->link_data);
 	n->link_data = NULL;
-	
+
 	if (n->children != NULL) {
 		free_node_tree(n->children);
 		n->children = NULL;
@@ -127,7 +127,7 @@ void free_node(node *n) {
 /* free element and it's descendents/siblings */
 void free_node_tree(node *n) {
 	node *next = NULL;
-	
+
 	while (n != NULL) {
 		next = n->next;
 		free_node(n);
@@ -141,7 +141,7 @@ void print_node_tree(node * n) {
 		fprintf(stderr,"node key: %d\n",n->key);
 		if (n->str != NULL)
 			fprintf(stderr,"node str: '%s'\n\n",n->str);
-		
+
 		if (n->children != NULL) {
 			print_node_tree(n->children);
 		}
@@ -166,7 +166,7 @@ node * reverse_list(node *list) {
 	if ((list != NULL) && (list->str != NULL))
 	fprintf(stderr, "reverse_list: '%s'\n",list->str);
 #endif
-	
+
 	while (list != NULL) {
 		next = list->next;
 		list->next = NULL;
@@ -184,11 +184,11 @@ void append_list(node *new, node *list) {
         list = new;
         return;
     }
-    
+
     if (new != NULL) {
 		node *step = list;
-        
-		
+
+
 		while (step->next != NULL) {
 			step = step->next;
 		}
@@ -199,7 +199,7 @@ void append_list(node *new, node *list) {
 
 #pragma mark - Parser Data
 
-/* Create parser data - this is where you stash stuff to communicate 
+/* Create parser data - this is where you stash stuff to communicate
 	into and out of the parser */
 parser_data * mk_parser_data(const char *charbuf, unsigned long extensions) {
 	clock_t start = clock();
@@ -210,10 +210,10 @@ parser_data * mk_parser_data(const char *charbuf, unsigned long extensions) {
 	result->original   = charbuf;
 	result->autolabels = NULL;
 	result->result     = NULL;
-	
+
 	result->parse_aborted = 0;
 	result->stop_time = start + 3 * CLOCKS_PER_SEC;	/* 3 second timeout */
-	
+
 	return result;
 }
 
@@ -222,7 +222,7 @@ void free_parser_data_preserving_result(parser_data *data) {
 /* don't do this - it's owned by someone else -- free(data->original); */
 	data->original = NULL;
 	data->charbuf = NULL;
-	
+
 	free(data);
 }
 
@@ -232,7 +232,7 @@ void free_parser_data(parser_data *data) {
 /* don't do this - it's owned by someone else -- free(data->original); */
 	data->original = NULL;
 	data->charbuf = NULL;
-	
+
 	free(data);
 }
 
@@ -275,7 +275,7 @@ scratch_pad * mk_scratch_pad(unsigned long extensions) {
 		result->random_seed_base = 0;
 	}
 	ran_start(310952L);
-	
+
 	result->lyx_para_type = PARA;             /* CRC - Simple paragraph */
 	result->lyx_level = 0;                    /* CRC - out outside level */
 	result->no_lyx_footnote = 0;              /* CRC  */
@@ -297,22 +297,22 @@ void free_scratch_pad(scratch_pad *scratch) {
 #ifdef DEBUG_ON
 	fprintf(stderr, "free scratch pad\n");
 #endif
-	
+
 	free_node_tree(scratch->notes);
 	free_node_tree(scratch->used_notes);
 	free_node_tree(scratch->links);
 	free_node_tree(scratch->glossary);
 	free_node_tree(scratch->citations);
 	free_node_tree(scratch->abbreviations);
-	
+
 	g_string_free(scratch->lyx_debug_pad, true);    /* CRC - initally, no indent */
 
 	if (scratch->html_footer != NULL)
 		free(scratch->html_footer);
-	
+
 	if (scratch->latex_footer != NULL)
 		free(scratch->latex_footer);
-	
+
 	if (scratch->table_alignment != NULL)
 		free(scratch->table_alignment);
 
@@ -333,16 +333,16 @@ link_data * mk_link_data(char *label, char *source, char *title, node *attr) {
 	if (title != NULL)
 		result->title = strdup(title);
 	else result->title = NULL;
-	
+
 	result->attr = attr;
-	
+
 	return result;
 }
 
 void free_link_data(link_data *l) {
 	if (l == NULL)
 		return;
-	
+
 	free(l->label);
 	l->label = NULL;
 	free(l->source);
@@ -351,7 +351,7 @@ void free_link_data(link_data *l) {
 	l->title = NULL;
 	free_node_tree(l->attr);
 	l->attr = NULL;
-	
+
 	free(l);
 }
 
@@ -387,14 +387,14 @@ char *label_from_string(char *str) {
 				next_char++;
 			}
 		}
-		
+
 		/* can relax on following characters */
 		else if ((*str >= '0' && *str <= '9') || (*str >= 'A' && *str <= 'Z')
 			|| (*str >= 'a' && *str <= 'z') || (*str == '.') || (*str== '_')
-			|| (*str== '-') || (*str== ':'))
+			|| (*str== '-') || (*str== ':') || (*str == '/'))
 		{
 			g_string_append_c(out, tolower(*str));
-		}           
+		}
 		str++;
 	}
 	label = out->str;
@@ -418,14 +418,14 @@ char *ascii_label_from_string(char *str) {
 				next_char++;
 			}
 		}
-		
+
 		/* can relax on following characters */
 		else if ((*str >= '0' && *str <= '9') || (*str >= 'A' && *str <= 'Z')
 			|| (*str >= 'a' && *str <= 'z') || (*str == '.') || (*str== '_')
-			|| (*str== '-') || (*str== ':'))
+			|| (*str== '-') || (*str== ':') || (*str == '/'))
 		{
 			g_string_append_c(out, tolower(*str));
-		}           
+		}
 		str++;
 	}
 	label = out->str;
@@ -438,7 +438,7 @@ char * clean_string(char *str) {
 	GString *out = g_string_new("");
 	char *clean;
 	bool block_whitespace = TRUE;
-	
+
 	while (*str != '\0') {
 		if ((*str == '\t') || (*str == ' ') || (*str == '\n') || (*str == '\r')) {
 			if (!block_whitespace) {
@@ -451,7 +451,7 @@ char * clean_string(char *str) {
 		}
 		str++;
 	}
-	
+
 	clean = out->str;
 	g_string_free(out, false);
 	return clean;
@@ -476,7 +476,7 @@ char * lower_string(char *str) {
 				next_char++;
 			}
 		}
-		
+
 		/* can relax on following characters */
 		else if (*str >= 'A' && *str <= 'Z')
 		{
@@ -486,7 +486,7 @@ char * lower_string(char *str) {
 		}
 		str++;
 	}
-	
+
 	result = out->str;
 	g_string_free(out, false);
 	return result;
@@ -514,7 +514,7 @@ char * label_from_node_tree(node *n) {
 	char *label;
 	if (n == NULL)
 		return NULL;
-	
+
 #ifdef DEBUG_ON
 		fprintf(stderr, "\n\nstart label from node_tree\n");
 #endif
@@ -538,7 +538,7 @@ char * ascii_label_from_node_tree(node *n) {
 	char *label;
 	if (n == NULL)
 		return NULL;
-	
+
 #ifdef DEBUG_ON
 		fprintf(stderr, "\n\nstart label from node_tree\n");
 #endif
@@ -563,7 +563,7 @@ char *label_from_node(node *n) {
 	char *label2;
 	if (n == NULL)
 		return NULL;
-	
+
 	GString *raw = g_string_new("");
 	print_raw_node(raw, n);
 	label =  label_from_string(raw->str);
@@ -580,7 +580,7 @@ char *ascii_label_from_node(node *n) {
 	char *label2;
 	if (n == NULL)
 		return NULL;
-	
+
 	GString *raw = g_string_new("");
 	print_raw_node(raw, n);
 	label =  ascii_label_from_string(raw->str);
@@ -669,7 +669,7 @@ char * preformat_text(const char *text) {
 }
 
 /* Don't let us get caught in "infinite" loop;
-	1 means we're ok 
+	1 means we're ok
 	0 means we're stuck -- abort */
 bool check_timeout(parser_data *data) {
 	/* Once we abort, keep aborting */
@@ -725,7 +725,7 @@ char * metadata_keys(node *list) {
 	step = list;
 	GString *out = g_string_new("");
 	char *temp;
-		
+
 	while (step != NULL) {
 		if (step->key == METADATA) {
 			/* search METAKEY children */
@@ -736,7 +736,7 @@ char * metadata_keys(node *list) {
 				free(temp);
 				step = step->next;
 			}
-			
+
 			temp = out->str;
 			g_string_free(out, false);
 
@@ -756,9 +756,9 @@ node * metadata_for_key(char *key, node *list) {
 	step = list;
 	char *label;
 	char *temp;
-	
+
 	label = label_from_string(key);
-	
+
 	while (step != NULL) {
 		if (step->key == METADATA) {
 			/* search METAKEY children */
@@ -785,33 +785,33 @@ node * metadata_for_key(char *key, node *list) {
 /* metavalue_for_key -- return the string value for metadata */
 char * metavalue_for_key(char *key, node *list) {
 	char *result;
-	
+
 	list = metadata_for_key(key, list);
-	
+
 	if (list == NULL)
 		return NULL;
-	
+
 	result = strdup(list->children->str);
 	trim_trailing_whitespace(result);
-	
+
 	return result;
 }
 
 /* Trim spaces at end of string */
 void trim_trailing_whitespace(char *str) {
 	unsigned long l;
-	
+
 	if (str == NULL)
 		return;
-	
+
 	l = strlen(str);
-	
+
 	if (l < 1)
 		return;
-	
+
 	while ( (l > 0) && (( str[l - 1] == ' ' ) ||
-		( str[l - 1] == '\n' ) || 
-		( str[l - 1] == '\r' ) || 
+		( str[l - 1] == '\n' ) ||
+		( str[l - 1] == '\r' ) ||
 		( str[l - 1] == '\t' )) ) {
 		str[l - 1] = '\0';
 		l = strlen(str);
@@ -821,16 +821,16 @@ void trim_trailing_whitespace(char *str) {
 /* Trim spaces at end of string */
 void trim_trailing_newlines(char *str) {
 	unsigned long l;
-	
+
 	if (str == NULL)
 		return;
-	
+
 	l = strlen(str);
-	
+
 	if (l < 1)
 		return;
-	
-	while ( (l > 0) && (( str[l - 1] == '\n' ) || 
+
+	while ( (l > 0) && (( str[l - 1] == '\n' ) ||
 	( str[l - 1] == '\r' )) ) {
 		str[l - 1] = '\0';
 		l = strlen(str);
@@ -888,10 +888,10 @@ node * copy_node_tree(node *n) {
 		return NULL;
 	else {
 		node *m = copy_node(n);
-		
+
 		if (n->next != NULL)
 			m->next = copy_node_tree(n->next);
-	
+
 		return m;
 	}
 }
